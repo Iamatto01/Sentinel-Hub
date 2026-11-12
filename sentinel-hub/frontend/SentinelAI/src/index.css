@@ -1,0 +1,1282 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design Tokens ─────────────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --bg-base:        #0c0f17;
+  --bg-surface:     #131722;
+  --bg-card:        #181f30;
+  --bg-elevated:    #222a3d;
+  --border:         rgba(255,255,255,0.11);
+  --border-md:      rgba(255,255,255,0.18);
+  --text-primary:   #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted:     #94a3b8;
+  --text-faint:     #64748b;
+  --accent:         #ffffff;
+  --accent-hover:   #e2e8f0;
+}
+
+/* Full-colour mode */
+
+::selection {
+  background: #ffffff;
+  color: #000000;
+  color: #ffffff;
+}
+
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a2a var(--bg-base);
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  @apply text-zinc-100 font-sans antialiased;
+  background: var(--bg-base);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@layer components {
+  /* ── Minimalist Dark Surfaces ──────────────────────────────────── */
+  .glass {
+    @apply rounded-xl border;
+    border-color: var(--border);
+    background: var(--bg-card);
+  }
+  .glass-soft {
+    @apply rounded-xl border;
+    border-color: var(--border);
+    background: var(--bg-surface);
+  }
+  .glass-deep {
+    @apply rounded-xl border;
+    border-color: var(--border);
+    background: #0d0d0d;
+  }
+
+  /* Card — flat dark surface with subtle border */
+  .card {
+    @apply rounded-xl border;
+    border-color: var(--border);
+    background: var(--bg-card);
+    transition: border-color 0.2s ease;
+  }
+  .card:hover {
+    border-color: var(--border-md);
+  }
+
+  /* ── Buttons (keep all gradient/colour styles) ─────────────────── */
+  .btn { @apply inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]; }
+  .btn-primary {
+    @apply btn text-zinc-950 font-extrabold;
+    background: var(--accent);
+  }
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+  .btn-ghost {
+    @apply btn text-zinc-300 border hover:text-white;
+    border-color: var(--border-md);
+    background: transparent;
+  }
+  .btn-ghost:hover {
+    background: var(--bg-elevated);
+    border-color: rgba(255,255,255,0.18);
+  }
+  .btn-danger {
+    @apply btn text-red-400 border border-red-500/30 hover:border-red-500/50 hover:text-red-300;
+    background: rgba(239, 68, 68, 0.08);
+  }
+  .btn-danger:hover { background: rgba(239, 68, 68, 0.15); }
+
+  /* ── Forms & Inputs ────────────────────────────────────────────── */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  input::-webkit-credentials-auto-fill-button,
+  input::-webkit-contacts-auto-fill-button {
+    visibility: hidden !important;
+    display: none !important;
+    pointer-events: none !important;
+  }
+  .input {
+    @apply w-full rounded-lg px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all duration-200;
+    border-color: var(--border-md);
+    background: var(--bg-elevated);
+  }
+  .input:hover { border-color: rgba(255,255,255,0.15); }
+  .label { @apply block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-1.5; }
+  select.input option { background: #1c1c1c; color: #f4f4f5; }
+
+  /* ── Chips / badges ───────────────────────────────────────────────── */
+  .chip {
+    @apply inline-flex items-center rounded-md px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider border;
+    border-color: var(--border);
+    background: var(--bg-elevated);
+  }
+
+  /* ── Terminal ─────────────────────────────────────────────────────── */
+  .terminal {
+    @apply font-mono text-[12.5px] leading-relaxed rounded-lg p-4 overflow-auto border;
+    border-color: rgba(255,255,255,0.08);
+    background: #080808;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    @apply font-mono text-[12.5px] leading-relaxed rounded-lg p-4 overflow-auto border text-slate-100;
+    border-color: rgba(255,255,255,0.13);
+    background: #0b101c;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+  }
+
+  /* ── Table ──────────────────────────────────────────────────────── */
+  .glass-table thead th {
+    @apply text-[11px] uppercase tracking-widest text-zinc-500 font-semibold border-b;
+    border-color: var(--border);
+    background: var(--bg-surface);
+  }
+  .glass-table tbody tr { @apply border-b transition-colors; border-color: var(--border); }
+  .glass-table tbody tr:hover { background: var(--bg-elevated); }
+
+  /* ── Icon Boxes (keep gradient colours) ─────────────────────────── */
+  .icon-box {
+    @apply flex items-center justify-center rounded-lg p-2.5 shrink-0 transition-transform duration-200;
+  }
+  .icon-box-cyan {
+    background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+    color: #ffffff;
+  }
+  .icon-box-purple {
+    background: linear-gradient(135deg, #27272a 0%, #18181b 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+  }
+  .icon-box-emerald {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+  }
+  .icon-box-amber {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+  }
+  .icon-box-rose {
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    color: #ffffff;
+  }
+}
+
+/* ── Utility classes ───────────────────────────────────────────── */
+.grid-bg {
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+.glass-glow { box-shadow: 0 0 0 1px rgba(255,255,255,0.08); }
+
+.glass-overlay {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+/* Card entrance animation */
+@keyframes glass-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.glass-in { animation: glass-in 0.25s ease both; }
+
+/* ── Motion animations ──────────────────────────────────────────── */
+@keyframes fade-slide-up {
+  0%   { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-slide-right {
+  0%   { opacity: 0; transform: translateX(-8px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1; }
+}
+@keyframes float-subtle {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
+}
+
+.motion-fade-up   { animation: fade-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.motion-fade-right { animation: fade-slide-right 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.motion-delay-1 { animation-delay: 60ms; }
+.motion-delay-2 { animation-delay: 120ms; }
+.motion-delay-3 { animation-delay: 180ms; }
+.motion-delay-4 { animation-delay: 240ms; }
+.motion-delay-5 { animation-delay: 300ms; }
+.motion-float   { animation: float-subtle 4s ease-in-out infinite; }
+.motion-pulse   { animation: pulse-glow 2.5s ease-in-out infinite; }
+
+/* ── Day / Night body support (kept for toggle compatibility) ───── */
+body.night { color-scheme: dark; }
+/* ── Day / Night body support (Unified Contrast & Theme System) ── */
+body.night {
+  color-scheme: dark;
+  --bg-base:        #0c0f17;
+  --bg-surface:     #131722;
+  --bg-card:        #181f30;
+  --bg-elevated:    #222a3d;
+  --border:         rgba(255,255,255,0.11);
+  --border-md:      rgba(255,255,255,0.18);
+  --text-primary:   #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted:     #94a3b8;
+  --text-faint:     #64748b;
+  --accent:         #ffffff;
+  --accent-hover:   #e2e8f0;
+  background: var(--bg-base);
+  color: var(--text-primary);
+}
+
+/* Dark mode contrast boosters: ensure faint text is never black-on-black */
+body.night .text-slate-500,
+body.night .text-zinc-500 {
+  color: #94a3b8;
+}
+body.night .text-slate-600,
+body.night .text-zinc-600 {
+  color: #64748b;
+}
+
+body.day-mode {
+  color-scheme: light;
+  --bg-base:        #f8fafc;
+  --bg-surface:     #ffffff;
+  --bg-card:        #ffffff;
+  --bg-elevated:    #f1f5f9;
+  --border:         #e2e8f0;
+  --border-md:      #cbd5e1;
+  --text-primary:   #0f172a;
+  --text-secondary: #334155;
+  --text-muted:     #475569;
+  --text-faint:     #64748b;
+  --accent:         #7c3aed;
+  --accent-hover:   #6d28d9;
+  color: #0f172a !important;
+  background: #f8fafc !important;
+}
+
+/* Light Mode surfaces */
+body.day-mode .glass,
+body.day-mode .glass-soft,
+body.day-mode .glass-deep,
+body.day-mode .card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+  color: #0f172a !important;
+}
+
+/* Adapt hardcoded dark container classes gracefully in Day Mode */
+body.day-mode [class*="bg-slate-950"]:not(.terminal):not([class*="btn-"]):not([class*="icon-box-"]):not([class*="chip"]):not([class*="badge"]):not(.fixed):not([class*="fixed"]),
+body.day-mode [class*="bg-slate-900"]:not(.terminal):not([class*="btn-"]):not([class*="icon-box-"]):not([class*="chip"]):not([class*="badge"]):not(.fixed):not([class*="fixed"]),
+body.day-mode [class*="bg-ink-950"]:not(.terminal):not([class*="btn-"]):not([class*="icon-box-"]):not([class*="chip"]):not([class*="badge"]):not(.fixed):not([class*="fixed"]),
+body.day-mode [class*="bg-ink-900"]:not(.terminal):not([class*="btn-"]):not([class*="icon-box-"]):not([class*="chip"]):not([class*="badge"]):not(.fixed):not([class*="fixed"]),
+body.day-mode [class*="bg-ink-850"]:not(.terminal):not([class*="btn-"]):not([class*="icon-box-"]):not([class*="chip"]):not([class*="badge"]):not(.fixed):not([class*="fixed"]),
+body.day-mode [class*="bg-ink-800"]:not(.terminal):not([class*="btn-"]):not([class*="icon-box-"]):not([class*="chip"]):not([class*="badge"]):not(.fixed):not([class*="fixed"]),
+body.day-mode [class*="bg-ink-700"]:not(.terminal):not([class*="btn-"]):not([class*="icon-box-"]):not([class*="chip"]):not([class*="badge"]):not(.fixed):not([class*="fixed"]),
+body.day-mode [class*="bg-[#111111]"]:not(.terminal):not([class*="btn-"]):not([class*="icon-box-"]):not([class*="chip"]):not([class*="badge"]):not(.fixed):not([class*="fixed"]),
+body.day-mode [class*="bg-[#161616]"]:not(.terminal):not([class*="btn-"]):not([class*="icon-box-"]):not([class*="chip"]):not([class*="badge"]):not(.fixed):not([class*="fixed"]),
+body.day-mode [class*="bg-[#1c1c1c]"]:not(.terminal):not([class*="btn-"]):not([class*="icon-box-"]):not([class*="chip"]):not([class*="badge"]):not(.fixed):not([class*="fixed"]) {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* ── Fix: Tailwind Gradient Dark Backgrounds in Day Mode ───────────────── */
+/* from-slate, via-slate, to-slate gradient classes are NOT caught by       */
+/* [class*="bg-slate-9"] because they are separate Tailwind CSS variables.   */
+body.day-mode [class*="from-slate-9"]:not(.terminal):not(.terminal *):not([class*="btn-"]):not([class*="badge"]):not([class*="icon-box-"]),
+body.day-mode [class*="from-slate-8"]:not(.terminal):not(.terminal *):not([class*="btn-"]):not([class*="badge"]):not([class*="icon-box-"]),
+body.day-mode [class*="via-slate-9"]:not(.terminal):not(.terminal *):not([class*="btn-"]):not([class*="badge"]),
+body.day-mode [class*="via-slate-8"]:not(.terminal):not(.terminal *):not([class*="btn-"]):not([class*="badge"]),
+body.day-mode [class*="to-slate-9"]:not(.terminal):not(.terminal *):not([class*="btn-"]):not([class*="badge"]),
+body.day-mode [class*="to-slate-8"]:not(.terminal):not(.terminal *):not([class*="btn-"]):not([class*="badge"]) {
+  background-image: none !important;
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Remove backdrop-blur in day mode — cards are opaque white, blur is irrelevant */
+body.day-mode [class*="backdrop-blur"]:not(.terminal):not(.terminal *):not(.fixed):not([class*="fixed"]) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Shell header pills (bg-slate-900/80) & dark header background in day mode */
+body.day-mode header > div[class*="bg-slate-"],
+body.day-mode header > div[class*="bg-slate-9"] {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Fix: shell theme-toggle button and breadcrumb pills in day mode */
+body.day-mode header button[class*="bg-slate-"] {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+body.day-mode header button[class*="bg-slate-"]:hover {
+  background-color: #e2e8f0 !important;
+}
+body.day-mode header button[class*="bg-slate-"] svg,
+body.day-mode header button[class*="bg-slate-"] span {
+  color: #0f172a !important;
+}
+/* Keep amber sun icon and purple moon icon their actual colors */
+body.day-mode header button svg.text-amber-400 { color: #d97706 !important; }
+body.day-mode header button svg.text-purple-400 { color: #7c3aed !important; }
+
+/* In Day Mode, adapt dark transparent borders and backgrounds to visible light accents */
+body.day-mode [class*="border-white"]:not(.btn-primary):not([class*="badge"]),
+body.day-mode [class*="border-white\\["]:not(.btn-primary):not([class*="badge"]) {
+  border-color: #e2e8f0 !important;
+}
+body.day-mode [class*="border-slate-700"]:not(.terminal *),
+body.day-mode [class*="border-slate-800"]:not(.terminal *) {
+  border-color: #e2e8f0 !important;
+}
+
+body.day-mode [class*="bg-white/"]:not(.btn-primary):not([class*="badge"]),
+body.day-mode [class*="bg-white\\["]:not(.btn-primary):not([class*="badge"]) {
+  background-color: #f1f5f9 !important;
+}
+body.day-mode [class*="bg-black/"]:not(.terminal *):not(.fixed):not([class*="fixed"]),
+body.day-mode [class*="bg-black\\["]:not(.terminal *):not(.fixed):not([class*="fixed"]) {
+  background-color: #f1f5f9 !important;
+}
+
+/* Modal and drawer overlay backdrops in Day Mode */
+body.day-mode .fixed.inset-0[class*="bg-black"],
+body.day-mode .fixed[class*="inset-0"][class*="bg-black"] {
+  background-color: rgba(15, 23, 42, 0.55) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+/* Light Mode: Primary Headings & Bold Text */
+body.day-mode h1,
+body.day-mode h2,
+body.day-mode h3,
+body.day-mode h4,
+body.day-mode h5,
+body.day-mode h6,
+body.day-mode .text-white:not([class*="bg-"]):not(.bg-black),
+body.day-mode .text-slate-100:not([class*="bg-"]):not(.bg-black),
+body.day-mode .text-zinc-100:not([class*="bg-"]):not(.bg-black),
+body.day-mode [class*="text-white"]:not([class*="btn-primary"]):not([class*="badge"]):not([class*="bg-"]):not(.terminal *),
+body.day-mode [class*="text-slate-100"]:not([class*="btn-primary"]):not([class*="badge"]):not([class*="bg-"]):not(.terminal *),
+body.day-mode [class*="text-zinc-100"]:not([class*="btn-primary"]):not([class*="badge"]):not([class*="bg-"]):not(.terminal *) {
+  color: #0f172a !important;
+}
+
+/* Light Mode: Ensure black buttons, pills & links keep crisp white text */
+body.day-mode a.bg-black,
+body.day-mode button.bg-black,
+body.day-mode .bg-black.text-white,
+body.day-mode a.bg-black > span:not(.model-badge):not(.bg-white):not([class*="text-black"]):not([class*="bg-black/"]):not([class*="bg-zinc"]),
+body.day-mode button.bg-black > span:not(.model-badge):not(.bg-white):not([class*="text-black"]):not([class*="bg-black/"]):not([class*="bg-zinc"]),
+body.day-mode .bg-black.text-white > span:not(.model-badge):not(.bg-white):not([class*="text-black"]):not([class*="bg-black/"]):not([class*="bg-zinc"]),
+body.day-mode a.bg-black svg,
+body.day-mode button.bg-black svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Light Mode: White badges/chips inside black buttons MUST show solid black text */
+body.day-mode button.bg-black .model-badge,
+body.day-mode button.bg-black span.model-badge,
+body.day-mode button.bg-black span.bg-white,
+body.day-mode button.bg-black span.text-black,
+body.day-mode button.bg-black [class*="text-black"],
+body.day-mode a.bg-black .model-badge,
+body.day-mode a.bg-black span.model-badge,
+body.day-mode a.bg-black span.bg-white,
+body.day-mode a.bg-black span.text-black {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+/* Light Mode: Secondary & Body Text */
+body.day-mode .text-slate-200,
+body.day-mode .text-zinc-200,
+body.day-mode .text-slate-300,
+body.day-mode .text-zinc-300,
+body.day-mode [class*="text-slate-200"]:not(.terminal *),
+body.day-mode [class*="text-zinc-200"]:not(.terminal *),
+body.day-mode [class*="text-slate-300"]:not(.terminal *),
+body.day-mode [class*="text-zinc-300"]:not(.terminal *) {
+  color: #1e293b !important;
+}
+
+/* Light Mode: Descriptions & Paragraphs */
+body.day-mode p:not([class*="text-"]):not(.terminal *),
+body.day-mode .text-slate-400,
+body.day-mode .text-zinc-400,
+body.day-mode [class*="text-slate-400"]:not(.terminal *),
+body.day-mode [class*="text-zinc-400"]:not(.terminal *) {
+  color: #334155 !important;
+}
+
+/* Light Mode: Muted Helper Text, Subtitles, Form Labels */
+body.day-mode label,
+body.day-mode .label,
+body.day-mode .text-slate-500,
+body.day-mode .text-zinc-500,
+body.day-mode .text-slate-600,
+body.day-mode .text-zinc-600,
+body.day-mode [class*="text-slate-500"]:not(.terminal *),
+body.day-mode [class*="text-zinc-500"]:not(.terminal *),
+body.day-mode [class*="text-slate-600"]:not(.terminal *),
+body.day-mode [class*="text-zinc-600"]:not(.terminal *) {
+  color: #475569 !important;
+}
+
+/* Light Mode: High-Contrast Accent & Cyan (Deep Royal Blue) */
+body.day-mode .text-accent,
+body.day-mode .text-cyan-300,
+body.day-mode .text-cyan-400,
+body.day-mode [class*="text-cyan-"]:not(.terminal *),
+body.day-mode [class*="text-accent"]:not(.terminal *) {
+  color: #0284c7 !important;
+}
+
+/* Light Mode: Purple / Violet Accent — high-contrast dark purple */
+body.day-mode .text-purple-400,
+body.day-mode .text-purple-300,
+body.day-mode .text-violet-400,
+body.day-mode .text-violet-300,
+body.day-mode [class*="text-purple-"]:not(.terminal *),
+body.day-mode [class*="text-violet-"]:not(.terminal *) {
+  color: #6d28d9 !important;
+}
+
+/* Light Mode: Indigo Accent — was MISSING entirely, causing invisible text */
+body.day-mode .text-indigo-400,
+body.day-mode .text-indigo-300,
+body.day-mode [class*="text-indigo-"]:not(.terminal *) {
+  color: #3730a3 !important;
+}
+
+/* Light Mode: Other missing accent colors */
+body.day-mode [class*="text-teal-"]:not(.terminal *) { color: #0f766e !important; }
+body.day-mode [class*="text-sky-"]:not(.terminal *) { color: #0369a1 !important; }
+body.day-mode [class*="text-fuchsia-"]:not(.terminal *) { color: #7e22ce !important; }
+body.day-mode [class*="text-pink-"]:not(.terminal *) { color: #be185d !important; }
+
+/* Light Mode: Dark bg-purple-9*, bg-indigo-9*, bg-violet-9* in day mode  */
+/* These opaque dark overlays make text invisible in light mode             */
+body.day-mode [class*="bg-purple-9"]:not(.terminal):not([class*="btn-"]):not([class*="badge"]):not([class*="border-"]):not(svg):not(span.w-),
+body.day-mode [class*="bg-violet-9"]:not(.terminal):not([class*="btn-"]):not([class*="badge"]):not(svg):not(span.w-),
+body.day-mode [class*="bg-indigo-9"]:not(.terminal):not([class*="btn-"]):not([class*="badge"]):not(svg):not(span.w-) {
+  background-color: #f5f3ff !important;
+  background-image: none !important;
+  border-color: #ddd6fe !important;
+}
+
+body.day-mode [class*="bg-cyan-9"]:not(.terminal):not([class*="btn-"]):not([class*="badge"]):not(svg):not(span.w-),
+body.day-mode [class*="bg-teal-9"]:not(.terminal):not([class*="btn-"]):not([class*="badge"]):not(svg):not(span.w-) {
+  background-color: #f0fdfa !important;
+  background-image: none !important;
+  border-color: #a5f3fc !important;
+}
+/* Same for semi-opaque dark color containers: bg-[#0c...], bg-[#11...] etc */
+body.day-mode [class*="bg-[#0"]:not(.terminal):not([class*="btn-"]):not([class*="badge"]),
+body.day-mode [class*="bg-[#1"]:not(.terminal):not([class*="btn-"]):not([class*="badge"]) {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Override icon boxes that should stay colorful in day mode */
+body.day-mode [class*="icon-box-purple"] svg,
+body.day-mode [class*="icon-box-purple"] { color: #6d28d9 !important; }
+body.day-mode [class*="icon-box-emerald"] svg,
+body.day-mode [class*="icon-box-emerald"] { color: #059669 !important; }
+body.day-mode [class*="icon-box-rose"] svg,
+body.day-mode [class*="icon-box-rose"] { color: #dc2626 !important; }
+body.day-mode [class*="icon-box-amber"] svg,
+body.day-mode [class*="icon-box-amber"] { color: #b45309 !important; }
+
+/* Light Mode: Status Colors */
+body.day-mode .text-emerald-400,
+body.day-mode .text-emerald-300,
+body.day-mode [class*="text-emerald-"]:not(.terminal *) {
+  color: #059669 !important;
+}
+
+body.day-mode .text-amber-300,
+body.day-mode .text-amber-400,
+body.day-mode [class*="text-amber-"]:not(.terminal *) {
+  color: #b45309 !important;
+}
+
+body.day-mode .text-rose-400,
+body.day-mode .text-red-400,
+body.day-mode [class*="text-rose-"]:not(.terminal *),
+body.day-mode [class*="text-red-"]:not(.terminal *) {
+  color: #dc2626 !important;
+}
+
+/* Light Mode Sidebar (Sharp & High Contrast) */
+body.day-mode aside {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04) !important;
+}
+body.day-mode aside nav a {
+  color: #475569 !important;
+}
+body.day-mode aside nav a svg {
+  color: #475569 !important;
+}
+body.day-mode aside nav a:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+body.day-mode aside nav a:hover svg {
+  color: #0f172a !important;
+}
+body.day-mode aside nav a.active {
+  background: #eff6ff !important;
+  color: #0284c7 !important;
+  border-color: #bfdbfe !important;
+}
+body.day-mode aside nav a.active svg {
+  color: #0284c7 !important;
+}
+body.day-mode aside p {
+  color: #0f172a !important;
+}
+
+/* Light Mode Header & Breadcrumbs */
+body.day-mode header {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+body.day-mode header .drop-shadow-\[0_0_8px_rgba\(0\,242\,254\,0\.4\)\] {
+  filter: none !important;
+}
+
+/* Light Mode Inputs, Selects, and Textareas */
+body.day-mode .input,
+body.day-mode input[type="text"],
+body.day-mode input[type="url"],
+body.day-mode input[type="email"],
+body.day-mode input[type="password"],
+body.day-mode input[type="number"],
+body.day-mode textarea,
+body.day-mode select {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+body.day-mode .input::placeholder,
+body.day-mode input::placeholder,
+body.day-mode textarea::placeholder {
+  color: #64748b !important;
+}
+body.day-mode .input:focus,
+body.day-mode input:focus,
+body.day-mode textarea:focus {
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+}
+body.day-mode select.input option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+/* Light Mode Chips & Badges */
+body.day-mode .chip {
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+/* Light Mode Tables */
+body.day-mode .glass-table thead th,
+body.day-mode table th {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+body.day-mode .glass-table tbody tr,
+body.day-mode table td {
+  border-color: #f1f5f9 !important;
+  color: #1e293b !important;
+}
+body.day-mode .glass-table tbody tr:hover,
+body.day-mode table tr:hover td {
+  background: #f8fafc !important;
+}
+
+/* Light Mode Code & Pre */
+body.day-mode pre:not(.terminal) {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+}
+body.day-mode code:not(.terminal *) {
+  color: #0284c7 !important;
+  background-color: #f1f5f9 !important;
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.25rem;
+}
+
+/* Day Mode: Protect primary buttons and ghost buttons */
+body.day-mode .btn-primary {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25) !important;
+}
+body.day-mode .btn-primary:hover {
+  background: #0369a1 !important;
+}
+body.day-mode .btn-primary *,
+body.day-mode .btn-primary svg {
+  color: #ffffff !important;
+}
+
+body.day-mode .btn-ghost {
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  background-color: #ffffff !important;
+}
+body.day-mode .btn-ghost:hover {
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+/* Day Mode: High-contrast Dark Console Terminal */
+body.day-mode .terminal {
+  background: #090d16 !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+body.day-mode .terminal span {
+  background: transparent !important;
+}
+body.day-mode .terminal [class~="text-slate-100"],
+body.day-mode .terminal [class~="text-slate-200"] {
+  color: #f8fafc !important;
+}
+body.day-mode .terminal [class~="text-emerald-400"] {
+  color: #34d399 !important;
+}
+body.day-mode .terminal [class~="text-amber-300"],
+body.day-mode .terminal [class~="text-amber-400"],
+body.day-mode .terminal [class~="text-sev-medium"] {
+  color: #fbbf24 !important;
+}
+body.day-mode .terminal [class~="text-rose-400"],
+body.day-mode .terminal [class~="text-sev-critical"] {
+  color: #f87171 !important;
+}
+body.day-mode .terminal [class~="text-cyan-400"],
+body.day-mode .terminal [class~="text-cyan-300"] {
+  color: #38bdf8 !important;
+}
+body.day-mode .terminal [class~="text-slate-400"],
+body.day-mode .terminal [class~="text-slate-500"],
+body.day-mode .terminal [class~="text-slate-600"] {
+  color: #94a3b8 !important;
+}
+
+/* Day Mode Grid & Scrollbar */
+body.day-mode .grid-bg {
+  background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 0) !important;
+}
+body.day-mode * { scrollbar-color: rgba(15, 23, 42, 0.18) transparent; }
+body.day-mode *::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.18); }
+body.day-mode *::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.30); }
+
+/* ── System Tree Root Node High-Contrast Styling ── */
+.system-tree-root {
+  background-color: #0f172a !important;
+  background-image: linear-gradient(135deg, #0f172a 0%, #082f49 100%) !important;
+  border-color: rgba(34, 211, 238, 0.6) !important;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7), 0 0 24px rgba(6, 182, 212, 0.25) !important;
+}
+.system-tree-root .system-tree-title {
+  color: #ffffff !important;
+}
+.system-tree-root .system-tree-desc {
+  color: #94a3b8 !important;
+}
+
+body.day-mode .system-tree-root {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border-color: #06b6d4 !important;
+  box-shadow: 0 14px 36px rgba(6, 182, 212, 0.2), 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+}
+body.day-mode .system-tree-root .system-tree-title {
+  color: #0f172a !important;
+}
+body.day-mode .system-tree-root .system-tree-desc {
+  color: #334155 !important;
+}
+
+
+
+
+/* ==========================================================================
+   DEV COMMUNITY BUTTON ANIMATION SUITE (75 CSS Buttons)
+   ========================================================================== */
+
+/* ── #1 Hover Glow Effect ── */
+.btn-hover-glow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35), 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-hover-glow:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.8), 0 8px 24px rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+}
+
+/* ── #6 Thin Buttons (Minimalist Glass Outline) ── */
+.btn-thin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 9999px;
+  padding: 0.48rem 1.2rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-thin:hover {
+  color: #ffffff;
+  background: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.55);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+/* ── #8 Rounded Pulse Button ── */
+.btn-rounded-pulse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.65rem 1.45rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 50%, #6d28d9 100%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.5), 0 4px 14px rgba(0, 0, 0, 0.35);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: btnPulseGlowRing 2.4s infinite;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+}
+.btn-rounded-pulse:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 28px rgba(168, 85, 247, 0.85), 0 6px 20px rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+}
+.btn-rounded-pulse--sm {
+  padding: 0.42rem 1.05rem;
+  font-size: 0.76rem;
+}
+@keyframes btnPulseGlowRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.65), 0 0 18px rgba(168, 85, 247, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(168, 85, 247, 0), 0 0 26px rgba(168, 85, 247, 0.65);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0), 0 0 18px rgba(168, 85, 247, 0.4);
+  }
+}
+
+/* ── #9 CSS Fizzy Button ── */
+.btn-fizzy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.25rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  color: #060b26;
+  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(56, 189, 248, 0.35);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.btn-fizzy:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 22px rgba(129, 140, 248, 0.55);
+}
+.btn-fizzy:active {
+  transform: scale(0.96);
+}
+
+/* ── #11 Flush Button (Color Wipe) ── */
+.btn-flush {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 0.84rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: rgba(14, 165, 233, 0.2);
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  overflow: hidden;
+  z-index: 1;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-flush::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #00f2fe 0%, #0284c7 100%);
+  z-index: -1;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-flush:hover {
+  color: #060b26;
+  border-color: rgba(0, 242, 254, 0.8);
+  box-shadow: 0 8px 25px rgba(0, 242, 254, 0.5);
+  transform: translateY(-2px);
+}
+.btn-flush:hover::before {
+  transform: scaleX(1);
+}
+
+/* ── #12 Button Concept (Segmented Action Button) ── */
+.btn-concept-12 {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  font-family: inherit;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 60%, #0369a1 100%);
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.4), 0 2px 6px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+.btn-concept-12:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(14, 165, 233, 0.6), 0 4px 14px rgba(0, 0, 0, 0.45);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.btn-concept-12__text {
+  padding: 0.82rem 1.45rem;
+  font-weight: 800;
+  font-size: 0.84rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+.btn-concept-12__icon {
+  background: rgba(0, 0, 0, 0.25);
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 0.82rem 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+.btn-concept-12:hover .btn-concept-12__icon {
+  background: rgba(0, 0, 0, 0.4);
+  color: #67e8f9;
+}
+.btn-concept-12:hover .btn-concept-12__icon svg {
+  transform: scale(1.15) rotate(6deg);
+  transition: transform 0.3s ease;
+}
+.btn-concept-12--indigo {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 60%, #4338ca 100%);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+}
+.btn-concept-12--indigo:hover {
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.6);
+}
+
+/* ── #13 Sliced Button (Glitch Split) ── */
+.btn-sliced {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.35rem;
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ff0055;
+  background: rgba(255, 0, 85, 0.1);
+  border: 1px solid rgba(255, 0, 85, 0.45);
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-sliced:hover {
+  color: #ffffff;
+  background: #ff0055;
+  box-shadow: 0 0 20px rgba(255, 0, 85, 0.6), 4px 4px 0px rgba(0, 242, 254, 0.8);
+  transform: translate(-2px, -2px);
+}
+
+/* ── #18 Swipe Right Button ── */
+.btn-swipe-right {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.15rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  z-index: 1;
+  transition: color 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+.btn-swipe-right::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(0, 242, 254, 0.25) 0%, rgba(0, 117, 255, 0.25) 100%);
+  z-index: -1;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-swipe-right:hover, .btn-swipe-right--active {
+  color: #00f2fe;
+  border-color: rgba(0, 242, 254, 0.5);
+}
+.btn-swipe-right:hover::before, .btn-swipe-right--active::before {
+  transform: translateX(0);
+}
+.btn-swipe-right--active {
+  background: rgba(0, 242, 254, 0.15);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+}
+
+/* ── #19 Fancy VIP Button ── */
+.btn-fancy-vip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 0.84rem;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-fancy-vip:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 242, 254, 0.7);
+  box-shadow: 0 0 24px rgba(0, 242, 254, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
+  color: #00f2fe;
+}
+
+/* ── #22 Animated Border & Glow ── */
+.btn-animated-border {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  background: rgba(6, 11, 38, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 242, 254, 0.35);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+.btn-animated-border:hover {
+  border-color: rgba(0, 242, 254, 0.8);
+  box-shadow: 0 0 25px rgba(0, 242, 254, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #00f2fe;
+  transform: translateY(-2px);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   SKELETON SHIMMER LOADER
+   ═══════════════════════════════════════════════════════════════════ */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.skeleton-shimmer {
+  display: block;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 0%,
+    rgba(255,255,255,0.10) 30%,
+    rgba(0,242,254,0.07)  50%,
+    rgba(255,255,255,0.10) 70%,
+    rgba(255,255,255,0.04) 100%
+  );
+  background-size: 1200px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: 0.5rem;
+  min-height: 1rem;
+}
+
+body.day-mode .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(0,0,0,0.04) 0%,
+    rgba(0,0,0,0.10) 30%,
+    rgba(0,117,255,0.06) 50%,
+    rgba(0,0,0,0.10) 70%,
+    rgba(0,0,0,0.04) 100%
+  );
+  background-size: 1200px 100%;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   GLASSMORPHIC TOOLTIP
+   ═══════════════════════════════════════════════════════════════════ */
+@keyframes tooltip-in {
+  from { opacity: 0; transform: translate(-50%, calc(-100% + 6px)); }
+  to   { opacity: 1; transform: translate(-50%, -100%); }
+}
+
+.tooltip-popup {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  color: #e2e8f0;
+  background: rgba(6, 11, 38, 0.94);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 12px rgba(0,242,254,0.12);
+  animation: tooltip-in 0.18s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   ICON-ONLY BUTTON UTILITY
+   ═══════════════════════════════════════════════════════════════════ */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+.icon-btn:hover {
+  background: rgba(0,242,254,0.12);
+  border-color: rgba(0,242,254,0.3);
+  color: #e2e8f0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,242,254,0.15);
+}
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+.icon-btn-danger:hover {
+  background: rgba(244,63,94,0.15);
+  border-color: rgba(244,63,94,0.35);
+  color: #f87171;
+  box-shadow: 0 4px 12px rgba(244,63,94,0.2);
+}
+.icon-btn-success:hover {
+  background: rgba(16,185,129,0.15);
+  border-color: rgba(16,185,129,0.35);
+  color: #34d399;
+  box-shadow: 0 4px 12px rgba(16,185,129,0.2);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   MICRO-INTERACTION UTILITIES
+   ═══════════════════════════════════════════════════════════════════ */
+.hover-lift {
+  transition: transform 0.22s cubic-bezier(0.16,1,0.3,1), box-shadow 0.22s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.28), 0 0 20px rgba(0,242,254,0.08);
+}
+
+.active-press:active { transform: scale(0.97); }
+
+@keyframes progress-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+.progress-running { animation: progress-pulse 1.4s ease-in-out infinite; }
+
+@keyframes ring-urgent {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,242,254,0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(0,242,254,0); }
+}
+.ring-urgent { animation: ring-urgent 1.6s ease-out infinite; }
+
+@keyframes row-flash {
+  0% { background: rgba(0,242,254,0.10); }
+  100% { background: transparent; }
+}
+.row-flash { animation: row-flash 0.5s ease-out both; }
+
+.count-up { font-variant-numeric: tabular-nums; }
+
+@keyframes content-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.content-fade { animation: content-fade 0.3s cubic-bezier(0.16,1,0.3,1) both; }
+
+/* ── Browser Autofill Harmonization ─────────────────────────────── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: inherit !important;
+  transition: background-color 500000s ease-in-out 0s, color 500000s ease-in-out 0s;
+}
+
+input.bg-black:-webkit-autofill,
+input.bg-black:-webkit-autofill:hover,
+input.bg-black:-webkit-autofill:focus,
+input.bg-black:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0px 1000px #000000 inset !important;
+  box-shadow: 0 0 0px 1000px #000000 inset !important;
+  caret-color: #ffffff;
+}
+
+input.bg-zinc-50:-webkit-autofill,
+input.bg-zinc-50:-webkit-autofill:hover,
+input.bg-zinc-50:-webkit-autofill:focus,
+input.bg-zinc-50:-webkit-autofill:active {
+  -webkit-text-fill-color: #09090b !important;
+  -webkit-box-shadow: 0 0 0px 1000px #fafafa inset !important;
+  box-shadow: 0 0 0px 1000px #fafafa inset !important;
+  caret-color: #09090b;
+}

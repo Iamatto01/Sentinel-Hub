@@ -1,0 +1,1284 @@
+import React, { useEffect, useState } from 'react'
+import { X, Loader2, ShieldAlert, BookOpen, StickyNote, Send, ExternalLink, Trash2, Bot, Sparkles, AlertTriangle, Target, Wrench, Crosshair, Bug, Play, Pause, Square, ChevronRight, CheckCircle, XCircle, Clock, Copy, Check, Terminal, ShieldCheck } from 'lucide-react'
+import { prettifyTitle } from '../lib/formatters.js'
+import { api } from '../lib/api.js'
+import { useAi } from '../lib/AiContext.jsx'
+import SeverityBadge from './SeverityBadge.jsx'
+import Tooltip from './Tooltip.jsx'
+import Cvss4Calculator from './Cvss4Calculator.jsx'
+
+function safeParse(j, fallback) {
+  if (!j) return fallback
+  if (typeof j === 'object') return j
+  try { return JSON.parse(j) } catch { return fallback }
+}
+
+// ── Plain-English summary generator ─────────────────────────────────────────
+// Turns technical finding fields into a simple "what / why dangerous / what to do"
+// explanation that non-security people can understand. No AI call needed.
+//
+// Matching is deliberately two-channel:
+//   `cwes`  — exact CWE id equality. An id is ground truth emitted by the
+//             scanner, so it must never be matched by substring. `CWE-798`
+//             contains `CWE-79`, `CWE-787` contains `CWE-78`, `CWE-228`
+//             contains `CWE-22`: unbounded regexes here silently explained a
+//             hardcoded-credential finding as Cross-Site Scripting.
+//   `match` — keyword regex, tested only against human-readable claim text
+//             (title / impact / description), never against the CWE field.
+const VULN_EXPLAIN = [
+  {
+    id: 'pentest-meta',
+    cwes: [],
+    match: /penetration[- ]test(ing)?|pentest|security\s*assessment|bug\s*bounty|scope\s*(document|file)|hackerone|responsible\s*disclosure|test\s*plan/i,
+    what: 'Fail atau halaman ini ialah bahan kerja ujian keselamatan (skop, laporan, atau nota pentest) — bukan kelemahan sistem.',
+    why: 'Ia tidak boleh dieksploitasi sendiri. Tetapi kalau ia terdedah kepada awam, ia beri attacker peta sasaran: senarai endpoint, akaun ujian, dan had serangan.',
+    fix: 'Alihkan dokumen ujian ke storan dalaman. Jangan letak laporan pentest atau fail skop di root web.',
+  },
+  {
+    id: 'auth-bypass',
+    cwes: ['CWE-306', 'CWE-287', 'CWE-288', 'CWE-620'],
+    match: /unauthenticated|no\s*authentication|without\s*(?:auth|login)|auth(?:entication)?\s*bypass|broken\s*auth|exposed\s*(?:api|endpoint)/i,
+    what: 'Endpoint ini boleh dicapai tanpa log masuk — semakan autentikasi tiada atau boleh dipintas.',
+    why: 'Attacker terus guna fungsi dalaman (baca data, ubah rekod, buat akaun) tanpa perlu tahu sebarang kata laluan.',
+    fix: 'Pasang semakan sesi pada setiap route (middleware auth), bukan pada UI sahaja. Default menolak, kecuali route awam yang disenaraikan.',
+  },
+  {
+    id: 'panel-login',
+    cwes: ['CWE-284', 'CWE-799'],
+    match: /(?:login|log-in|signin|sign-in|admin|administrative|portal|dashboard|panel|cpanel|console|backend)\b/i,
+    what: 'Halaman log masuk atau panel pentadbir dijumpai dan boleh diakses dari internet.',
+    why: 'Ini pintu utama ke sistem. Kalau kata laluan lemah atau tiada had cubaan, attacker boleh brute-force dan masuk sebagai admin.',
+    fix: 'Hadkan akses panel (VPN atau IP allowlist), kuatkuasakan 2FA, tambah lockout selepas beberapa cubaan gagal, dan tukar URL lalai.',
+  },
+  {
+    id: 'sqli',
+    cwes: ['CWE-89', 'CWE-564'],
+    match: /sql\s*injection|sql\s*inject|\bsqli\b|\bunion\s+select\b/i,
+    what: 'Input pengguna masuk terus ke dalam arahan SQL (SQL Injection).',
+    why: 'Attacker boleh baca, ubah, atau padam keseluruhan database — termasuk senarai pengguna dan kata laluan.',
+    fix: 'Guna prepared statements / parameterized queries. Jangan gabungkan input pengguna terus ke SQL.',
+  },
+  {
+    id: 'xss',
+    cwes: ['CWE-79', 'CWE-80', 'CWE-83', 'CWE-87'],
+    match: /(?:^|[^a-z])xss|cross[- ]site\s*scripting/i,
+    what: 'Aplikasi paparkan input pengguna tanpa tapisan (Cross-Site Scripting).',
+    why: 'Attacker boleh tanam script jahat yang mencuri sesi/kuki pengguna lain — boleh ambil alih akaun tanpa tahu kata laluan.',
+    fix: 'Encode semua output HTML. Guna Content Security Policy (CSP).',
+  },
+  {
+    id: 'cmd-injection',
+    cwes: ['CWE-78', 'CWE-77', 'CWE-74', 'CWE-94'],
+    match: /command\s*injection|shell\s*injection|code\s*injection|command\s*execution|code\s*execution|remote\s*code\s*execution|os\s*command|\brce\b/i,
+    what: 'Aplikasi benarkan input pengguna dijalankan sebagai arahan sistem.',
+    why: 'Attacker boleh kawal penuh server — paling bahaya dari semua jenis kerentanan.',
+    fix: 'Jangan hantar input pengguna ke shell. Guna whitelist input yang ketat dan API tanpa shell.',
+  },
+  {
+    id: 'traversal',
+    cwes: ['CWE-22', 'CWE-23', 'CWE-35', 'CWE-36', 'CWE-73'],
+    match: /directory\s*traversal|path\s*traversal|local\s*file\s*inclusion|\blfi\b|\.\.\//i,
+    what: 'Aplikasi benarkan akses fail di luar folder yang dibenarkan (Path Traversal).',
+    why: 'Attacker boleh baca fail sensitif server seperti /etc/passwd atau fail konfigurasi.',
+    fix: 'Sahkan dan hadkan input path. Guna whitelist nama fail dan resolve laluan sebenar sebelum dibaca.',
+  },
+  {
+    id: 'ssrf',
+    cwes: ['CWE-918'],
+    match: /\bssrf\b|server[- ]side\s*request\s*forgery/i,
+    what: 'Server boleh dipaksa membuat request ke destinasi dalaman (SSRF).',
+    why: 'Attacker boleh akses perkhidmatan dalaman (database, metadata cloud) yang sepatutnya tersembunyi dari internet.',
+    fix: 'Sahkan dan whitelist semua URL yang server akan panggil. Sekat julat IP dalaman dan endpoint metadata cloud.',
+  },
+  {
+    id: 'deserialization',
+    cwes: ['CWE-502'],
+    match: /deserializ|unserialize|pickle\.loads|yaml\.load\b|objectinputstream/i,
+    what: 'Aplikasi deserialize data tak dipercayai (Insecure Deserialization).',
+    why: 'Attacker boleh laksanakan kod hasad semasa proses deserialize — ambil alih server.',
+    fix: 'Jangan deserialize data dari pengguna. Guna format selamat seperti JSON dengan skema ketat.',
+  },
+  {
+    id: 'hardcoded-secret',
+    cwes: ['CWE-798', 'CWE-259', 'CWE-321', 'CWE-522', 'CWE-260'],
+    match: /hard[\s-]?coded|secret\s*key|api[\s_-]?key|\bpassword\s*(?:in|hard)|credential/i,
+    what: 'Kata laluan atau kunci API ditulis terus dalam kod (hardcoded secret).',
+    why: 'Sesiapa yang nampak kod boleh guna kunci ini untuk akses servis/database anda.',
+    fix: 'Pindahkan secrets ke environment variables atau vault. Batalkan kunci yang bocor dan jana semula.',
+  },
+  {
+    id: 'weak-crypto',
+    cwes: ['CWE-327', 'CWE-328', 'CWE-338', 'CWE-916', 'CWE-326'],
+    match: /weak\s*(?:crypto|hash|cipher|algorithm)|\bmd5\b|\bsha1\b|\bdes\b|\brc4\b/i,
+    what: 'Aplikasi guna algoritma kripto yang lemah/lapuk.',
+    why: 'Kata laluan atau data yang di-hash boleh dipecahkan dengan mudah menggunakan rainbow tables.',
+    fix: 'Guna algoritma moden: bcrypt/Argon2 untuk kata laluan, SHA-256+ untuk hashing.',
+  },
+  {
+    id: 'jwt',
+    cwes: ['CWE-347', 'CWE-345', 'CWE-290', 'CWE-488'],
+    match: /\bjwt\b|json\s*web\s*token|bearer\s*token\s*(?:not|un)?validat/i,
+    what: 'Token sesi (JWT) tidak disahkan dengan betul.',
+    why: 'Attacker boleh palsukan token untuk jadi mana-mana pengguna termasuk admin.',
+    fix: 'Sahkan signature JWT di server. Tolak algoritma "none" dan jangan terima alg dari klien.',
+  },
+  {
+    id: 'cors',
+    cwes: ['CWE-942', 'CWE-346'],
+    match: /\bcors\b|cross[- ]origin\s*resource/i,
+    what: 'Polisi CORS terlalu longgar.',
+    why: 'Kalau Access-Control-Allow-Credentials turut dihantar, laman web jahat boleh baca data pengguna dari aplikasi ini melalui browser mangsa.',
+    fix: 'Hadkan CORS kepada domain yang dipercayai sahaja. Jangan gabungkan wildcard origin dengan credentials.',
+  },
+  {
+    id: 'git-exposure',
+    cwes: ['CWE-527', 'CWE-538'],
+    match: /(?:\.git|\.svn|version\s*control)[\s/]*(?:config|entries|exposure|repository|directory|found)|git\s*(?:config|repo)/i,
+    what: 'Folder kawalan versi (git/svn) terdedah kepada umum.',
+    why: 'Attacker boleh download keseluruhan source code termasuk password, API keys, dan sejarah perubahan — ibarat bagi kunci rumah beserta pelan lantai.',
+    fix: 'Sekat akses ke /.git dan /.svn di web server. Keluarkan folder ini dari root web.',
+  },
+  {
+    id: 'header-noise',
+    cwes: ['CWE-693'],
+    match: /missing\s*(?:security\s*)?header|security\s*header|content-security-policy|strict-transport-security|referrer-policy|permissions-policy|x-content-type-options/i,
+    what: 'Satu atau lebih header keselamatan HTTP tiada pada respons server.',
+    why: 'Header ini bukan pintu masuk. Ia lapisan pertahanan kedua yang menghalang serangan sedia ada (XSS, clickjacking, sniffing) daripada berjaya. Tanpanya, kelemahan lain jadi lebih mudah dieksploitasi.',
+    fix: 'Tetapkan di reverse proxy: Strict-Transport-Security, X-Content-Type-Options: nosniff, Referrer-Policy, dan Content-Security-Policy. Satu perubahan pada konfigurasi, bukan satu per halaman.',
+  },
+  {
+    id: 'backup-exposure',
+    cwes: ['CWE-530', 'CWE-552'],
+    // Deliberately does NOT match the bare word "database": every SQLi
+    // description mentions a database, and matching it here made the backup
+    // rule swallow injection findings before their own rule was consulted.
+    match: /backup\s*file|database\s*(?:dump|backup)|\.sql\b|\.bak\b|\.zip\b|\.tar\.gz\b|db\s*dump|sql\s*dump/i,
+    what: 'Fail backup atau dump database boleh diakses dari internet.',
+    why: 'Semua data (pengguna, kata laluan, rekod perniagaan) boleh dimuat turun terus. Ini punca utama kebocoran data besar.',
+    fix: 'Alihkan fail backup keluar dari root web. Sekat akses, atau padamkan.',
+  },
+  {
+    id: 'heartbleed',
+    cwes: [],
+    match: /heartbleed|CVE-2014-0160/i,
+    what: 'Server SSL/TLS ada kelemahan Heartbleed.',
+    why: 'Attacker boleh curi ingatan server — termasuk kunci peribadi SSL, kata laluan pengguna, dan token sesi — tanpa tinggal jejak.',
+    fix: 'Kemas kini OpenSSL ke versi patch. Batalkan & jana semula sijil SSL.',
+  },
+  {
+    id: 'eternalblue',
+    cwes: [],
+    match: /eternalblue|ms17-010|CVE-2017-0144/i,
+    what: 'Perkhidmatan Windows SMB terdedah kepada exploit EternalBlue.',
+    why: 'Ini exploit yang sama digunakan oleh ransomware WannaCry — attacker boleh ambil alih server sepenuhnya dari jauh.',
+    fix: 'Pasang patch Microsoft MS17-010 segera. Sekat port 445 di firewall.',
+  },
+  {
+    id: 'anon-ftp',
+    cwes: ['CWE-287'],
+    match: /\bftp\b|file\s*transfer\s*protocol/i,
+    what: 'Pelayan FTP benarkan log masuk tanpa kata laluan (anonymous).',
+    why: 'Sesiapa sahaja boleh muat turun atau muat naik fail ke server anda.',
+    fix: 'Matikan log masuk anonymous dalam konfigurasi FTP.',
+  },
+  {
+    id: 'shellshock',
+    cwes: [],
+    match: /shellshock|CVE-2014-6271/i,
+    what: 'Server web terdedah kepada Shellshock (Bash bug).',
+    why: 'Attacker boleh jalankan sebarang arahan di server melalui header HTTP — ambil alih penuh mesin.',
+    fix: 'Kemas kini Bash. Sekat atau tapis CGI scripts.',
+  },
+  {
+    id: 'dir-listing',
+    cwes: ['CWE-548'],
+    match: /directory\s*listing|open\s*directory|autoindex|index\s*of\s*\//i,
+    what: 'Server paparkan senarai fail dalam folder (directory listing).',
+    why: 'Attacker nampak semua fail — senang cari backup, config, atau data sensitif.',
+    fix: 'Matikan autoindex / Options -Indexes di web server.',
+  },
+  {
+    id: 'info-leak',
+    cwes: ['CWE-200', 'CWE-209', 'CWE-497', 'CWE-215'],
+    match: /phpinfo|server-status|debug\s*(?:mode|page|endpoint)|actuator|stack\s*trace|verbose\s*error|information\s*(?:leak|disclosure|exposure)|internal\s*(?:path|config)\s*(?:leak|expos)|server\s*(?:header|banner)\s*(?:information|disclosure)|\bcsp\b/i,
+    what: 'Server dedahkan maklumat dalaman (konfigurasi, versi, env, stack trace).',
+    why: 'Attacker dapat peta lengkap sistem — versi software, path, env variables — untuk rancang serangan yang lebih tepat.',
+    fix: 'Matikan halaman debug/info di production. Pulangkan mesej ralat generik kepada pengguna.',
+  },
+  {
+    id: 'clickjacking',
+    cwes: ['CWE-1021'],
+    match: /clickjacking|frame[- ]?busting/i,
+    what: 'Halaman boleh dimuatkan dalam iframe laman lain (Clickjacking).',
+    why: 'Attacker boleh tipu pengguna klik butang tanpa sedar — contoh: tukar kata laluan atau buat pembayaran.',
+    fix: 'Tambah header X-Frame-Options: DENY atau CSP frame-ancestors.',
+  },
+  {
+    id: 'waf',
+    cwes: [],
+    match: /\bwaf\b.*(?:not|missing|absent|undetected)|no\s*(?:waf|web\s*application\s*firewall)|web\s*application\s*firewall.*(?:not|missing)/i,
+    what: 'Tiada Web Application Firewall (WAF) dikesan di hadapan aplikasi.',
+    why: 'Serangan biasa (SQLi, XSS) sampai terus ke aplikasi tanpa tapisan pertama.',
+    fix: 'Pertimbangkan WAF seperti Cloudflare, ModSecurity, atau AWS WAF.',
+  },
+]
+
+/**
+ * Pick the explanation that best fits a finding.
+ *
+ * A CWE id is machine-readable ground truth, so an exact id match is decisive.
+ * Everything else competes on where the keyword appeared: a title hit is much
+ * stronger evidence than a word buried in a long description.
+ */
+function buildSummary(f, evidence) {
+    const cwes = String(f.cwe_id || '').toUpperCase().match(/CWE-\d+/g) || []
+    if (cwes.length) {
+      // Exact membership only. Prefix regexes on this field made CWE-798
+      // ("hardcoded credentials") match the CWE-79 rule and the panel was
+      // explaining XSS for a hardcoded password.
+      for (const rule of VULN_EXPLAIN) {
+        if (rule.cwes.some(c => cwes.includes(c))) return rule
+      }
+    }
+
+    const title = String(f.title || '')
+    const body = [f.description, f.layman_impact].filter(Boolean).join(' ')
+    const module = String(f.module || '')
+    let best = null
+    let bestScore = 0
+    for (const rule of VULN_EXPLAIN) {
+      let score = 0
+      if (rule.match.test(title)) score = 60
+      else if (rule.match.test(body)) score = 30
+      else if (rule.match.test(module)) score = 20
+      if (score > bestScore) { best = rule; bestScore = score }
+    }
+    if (best) return best
+
+  // Generic fallback using severity
+  const sev = (f.severity || 'info').toLowerCase()
+  const sevWord = { critical: 'SANGAT KRITIKAL', high: 'berbahaya', medium: 'sederhana', low: 'rendah', info: 'maklumat sahaja' }[sev] || 'perlu perhatian'
+  return {
+    what: `${f.title || 'Isu keselamatan'} ditemui pada ${f.target || 'sasaran'}.`,
+    why: `Isu ini diklasifikasikan sebagai ${sevWord}. ${f.description || 'Semak bukti (evidence) untuk butiran teknikal.'}`,
+    fix: f.remediation || 'Rujuk bahagian Remediation di bawah untuk langkah pembaikan.',
+  }
+}
+
+export default function FindingDetailDrawer({ finding, onClose, onStatusChange, onDelete, onSeverityChange }) {
+  const { getFindingChat, sendFindingAiQuery, activeTasks, activeTabOverride, setActiveTabOverride } = useAi()
+  const [tab, setTab] = useState('overview')
+  const [notes, setNotes] = useState([])
+  const [noteText, setNoteText] = useState('')
+  const [cve, setCve] = useState(null)
+  const [cveBusy, setCveBusy] = useState(false)
+  const [status, setStatus] = useState(finding?.status || 'open')
+
+  // Local input state
+  const [chatInput, setChatInput] = useState('')
+
+  // ── Exploit State ──
+  const [exploitCheck, setExploitCheck] = useState(null)     // result of /api/exploits/check
+  const [exploitChecking, setExploitChecking] = useState(false)
+  const [exploitCampaign, setExploitCampaign] = useState(null) // active campaign for this finding
+  const [exploitLaunching, setExploitLaunching] = useState(false)
+  const [exploitError, setExploitError] = useState('')
+  const [customPoc, setCustomPoc] = useState(null)
+  const [generatingPoc, setGeneratingPoc] = useState(false)
+  const [pocCopied, setPocCopied] = useState(false)
+
+  useEffect(() => {
+    if (!finding) return
+    setStatus(finding.status || 'open')
+    if (activeTabOverride) {
+      setTab(activeTabOverride)
+      setActiveTabOverride(null)
+    } else {
+      setTab('overview')
+    }
+    setCve(null)
+    setExploitCheck(null)
+    setExploitCampaign(null)
+    setExploitError('')
+    setCustomPoc(safeParse(finding.poc, null))
+    api.findingNotes(finding.id).then(setNotes).catch(() => setNotes([]))
+
+    // Auto-check exploitability
+    checkExploitability()
+  }, [finding, activeTabOverride])
+
+  if (!finding) return null
+
+  const chatMessages = getFindingChat(finding)
+  const chatBusy = activeTasks[finding?.id]?.busy
+
+  const evidence = safeParse(finding.evidence, {})
+  const poc = safeParse(finding.poc, {})
+  const verdict = safeParse(finding.agent_verdict, null)
+  const verdictPct = verdict?.confidence != null
+    ? Math.round((verdict.confidence > 1 ? verdict.confidence : verdict.confidence * 100))
+    : null
+  const cveId = finding.cve_id || (finding.title.match(/CVE-\d{4}-\d{4,}/i)?.[0])
+
+  async function loadCve() {
+    if (!cveId) return
+    setCveBusy(true)
+    try { setCve(await api.cve(cveId)) } catch (e) { setCve({ error: e.message }) }
+    setCveBusy(false)
+  }
+
+  async function saveStatus(s) {
+    setStatus(s)
+    try { await api.setFindingStatus(finding.id, s); onStatusChange?.(finding.id, s) } catch { /* noop */ }
+  }
+
+  async function addNote(e) {
+    e.preventDefault()
+    if (!noteText.trim()) return
+    const n = await api.addFindingNote(finding.id, noteText.trim())
+    setNotes((p) => [...p, n])
+    setNoteText('')
+  }
+
+  function handleSendAi(customMsg) {
+    const query = customMsg || chatInput
+    if (!query.trim() || chatBusy) return
+    sendFindingAiQuery(finding, query.trim())
+    if (!customMsg) setChatInput('')
+  }
+
+  // ── Exploit Functions ──
+  async function checkExploitability() {
+    if (!finding?.id) return
+    setExploitChecking(true)
+    setExploitError('')
+    try {
+      const result = await api.checkExploit(finding.id)
+      setExploitCheck(result)
+      // If a campaign already exists, fetch it
+      if (result.alreadyExists) {
+        setExploitCampaign(result)
+        // Switch to exploit tab
+      }
+    } catch (e) {
+      setExploitError(e.message)
+    } finally {
+      setExploitChecking(false)
+    }
+  }
+
+  async function handleGeneratePoc() {
+    if (!finding?.id) return
+    setGeneratingPoc(true)
+    setExploitError('')
+    try {
+      const res = await api.generatePoc(finding.id)
+      if (res?.poc) {
+        setCustomPoc(res.poc)
+      }
+    } catch (e) {
+      setExploitError(e.message)
+    } finally {
+      setGeneratingPoc(false)
+    }
+  }
+
+  function copyAttackCommand(cmd) {
+    if (!cmd) return
+    navigator.clipboard.writeText(cmd)
+    setPocCopied(true)
+    setTimeout(() => setPocCopied(false), 2000)
+  }
+
+  async function launchExploit() {
+    if (!finding?.id) return
+    setExploitLaunching(true)
+    setExploitError('')
+    try {
+      const result = await api.launchExploitCampaign(finding.id)
+      if (!result.campaignId && !result.campaign) {
+        setExploitError('No exploit strategy matched this finding.')
+        return
+      }
+      // Launch returns a flat {campaignId} — fetch the full campaign (steps, approvals)
+      // so the UI can render Start/Approve controls immediately.
+      const full = result.campaign
+        ? result // already-exists response is already full
+        : await api.exploitCampaign(result.campaignId)
+      setExploitCampaign(full)
+      setExploitCheck(prev => prev ? { ...prev, ...result } : result)
+      setTab('exploit')
+    } catch (e) {
+      setExploitError(e.message)
+    } finally {
+      setExploitLaunching(false)
+    }
+  }
+
+  async function approveExploitStep(stepId) {
+    if (!exploitCampaign?.campaign?.id) return
+    setExploitError('')
+    try {
+      await api.approveExploitStep(exploitCampaign.campaign.id, stepId)
+      // Refresh campaign data
+      const updated = await api.exploitCampaign(exploitCampaign.campaign.id)
+      setExploitCampaign(updated)
+    } catch (e) {
+      setExploitError(e.message)
+    }
+  }
+
+  async function denyExploitStep(stepId) {
+    if (!exploitCampaign?.campaign?.id) return
+    setExploitError('')
+    try {
+      await api.denyExploitStep(exploitCampaign.campaign.id, stepId)
+      const updated = await api.exploitCampaign(exploitCampaign.campaign.id)
+      setExploitCampaign(updated)
+    } catch (e) {
+      setExploitError(e.message)
+    }
+  }
+
+  // ── Campaign Control Functions ──
+  async function startCampaign(campaignId) {
+    setExploitError('')
+    try {
+      await api.resumeExploitCampaign(campaignId)
+      const updated = await api.exploitCampaign(campaignId)
+      setExploitCampaign(updated)
+    } catch (e) {
+      setExploitError(e.message)
+    }
+  }
+
+  async function pauseCampaign(campaignId) {
+    setExploitError('')
+    try {
+      await api.pauseExploitCampaign(campaignId)
+      const updated = await api.exploitCampaign(campaignId)
+      setExploitCampaign(updated)
+    } catch (e) {
+      setExploitError(e.message)
+    }
+  }
+
+  async function resumeCampaign(campaignId) {
+    setExploitError('')
+    try {
+      await api.resumeExploitCampaign(campaignId)
+      const updated = await api.exploitCampaign(campaignId)
+      setExploitCampaign(updated)
+    } catch (e) {
+      setExploitError(e.message)
+    }
+  }
+
+  async function abortCampaign(campaignId) {
+    setExploitError('')
+    try {
+      await api.abortExploitCampaign(campaignId)
+      const updated = await api.exploitCampaign(campaignId)
+      setExploitCampaign(updated)
+    } catch (e) {
+      setExploitError(e.message)
+    }
+  }
+
+  // Auto-refresh campaign when it's running or awaiting approval
+  useEffect(() => {
+    if (!exploitCampaign?.campaign?.id) return
+    const status = exploitCampaign.campaign.status
+    if (['running', 'awaiting_approval', 'paused'].includes(status)) {
+      const interval = setInterval(async () => {
+        try {
+          const updated = await api.exploitCampaign(exploitCampaign.campaign.id)
+          setExploitCampaign(updated)
+        } catch { /* ignore */ }
+      }, 3000)
+      return () => clearInterval(interval)
+    }
+  }, [exploitCampaign?.campaign?.id, exploitCampaign?.campaign?.status])
+
+  const TABS = [
+    { id: 'overview', label: 'Overview', icon: ShieldAlert },
+    { id: 'cvss', label: 'CVSS 4.0', icon: ShieldCheck },
+    { id: 'exploit', label: 'Exploit', icon: Crosshair },
+    { id: 'ai', label: 'AI Chat', icon: Bot },
+    { id: 'poc', label: 'PoC / Evidence', icon: BookOpen },
+    { id: 'cve', label: 'CVE', icon: ExternalLink },
+    { id: 'notes', label: `Notes (${notes.length})`, icon: StickyNote },
+  ]
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-end p-0 sm:p-4 glass-overlay" onClick={onClose}>
+      <div className="w-full max-w-xl max-h-[92vh] flex flex-col glass sm:rounded-3xl border border-white/15 shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="sticky top-0 z-10 glass-deep border-b border-white/10 p-5 shrink-0">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold text-slate-100 leading-snug">{prettifyTitle(finding.title)}</h2>
+              <p className="text-xs text-slate-500 mt-1">{finding.target || finding.module}</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <SeverityBadge severity={finding.severity} onChange={onSeverityChange} />
+              <Tooltip content="Close Panel">
+                <button onClick={onClose} className="icon-btn" aria-label="Close">
+                  <X size={16} />
+                </button>
+              </Tooltip>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <label className="text-[11px] uppercase tracking-wider text-slate-500">Status</label>
+            <select value={status} onChange={(e) => saveStatus(e.target.value)} className="input py-1 px-2 text-xs w-auto">
+              {['open', 'confirmed', 'in-progress', 'fixed', 'accepted', 'false-positive'].map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div className="mt-4 flex gap-1 border-b border-ink-700 -mb-5">
+            {TABS.map(({ id, label, icon: Icon }) => (
+              <button key={id} onClick={() => setTab(id)}
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 transition-colors ${tab === id ? 'border-accent text-accent' : 'border-transparent text-slate-500 hover:text-slate-300'}`}>
+                <Icon size={13} /> {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-5 space-y-4 overflow-y-auto flex-1">
+          {tab === 'overview' && (
+            <>
+                {/* Verification status — the first thing an operator needs to know:
+                    was this claim actually confirmed, or is it still unproven? */}
+                {(() => {
+                  const tp = verdict?.is_true_positive
+                  const tier = verdict?.evidence_tier || evidence?.aiEvidenceTier || null
+                  const conf = verdictPct
+                  let tone, label, detail
+                  if (tp === true) {
+                    tone = 'emerald'
+                    label = 'CONFIRMED'
+                    detail = tier === 'exploited'
+                      ? 'An artifact in the evidence shows the exploit actually worked.'
+                      : tier === 'validated'
+                        ? 'Evidence proves the vulnerable configuration and the path to it.'
+                        : tier === 'observed'
+                          ? 'A literal artifact (tool output / HTTP response) matches the claim, but exploitation was not demonstrated.'
+                          : 'The claim is backed by a captured artifact.'
+                  } else if (tp === false) {
+                    tone = 'rose'
+                    label = 'REJECTED'
+                    detail = 'The evidence contradicts this claim, or no artifact supports it.'
+                  } else {
+                    tone = 'amber'
+                    label = 'UNVERIFIED'
+                    detail = 'No artifact settles this claim yet. Treat it as a lead, not a finding — run the PoC below to confirm or dismiss it.'
+                  }
+                  const toneMap = {
+                    emerald: 'border-emerald-500/30 bg-emerald-500/[0.07] text-emerald-300',
+                    rose: 'border-rose-500/30 bg-rose-500/[0.07] text-rose-300',
+                    amber: 'border-amber-500/30 bg-amber-500/[0.07] text-amber-300',
+                  }
+                  return (
+                    <div className={`rounded-xl border p-3 ${toneMap[tone]}`}>
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[11px] uppercase tracking-wider font-bold flex items-center gap-1.5">
+                          <ShieldAlert size={12} /> {label}
+                        </p>
+                        <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider opacity-80">
+                          {verdict?.agent && <span>{verdict.agent}</span>}
+                          {conf != null && <span>· {conf}%</span>}
+                          {tier && <span className="px-1.5 py-0.5 rounded bg-black/20">{tier}</span>}
+                        </div>
+                      </div>
+                      <p className="text-xs mt-1.5 leading-relaxed text-slate-300">{detail}</p>
+                      {verdict?.reasoning && (
+                        <p className="text-[11px] mt-1.5 leading-relaxed text-slate-400 italic">{verdict.reasoning}</p>
+                      )}
+                      {tp !== true && (
+                        <button
+                          type="button"
+                          onClick={() => setTab('exploit')}
+                          className="mt-2 text-[11px] font-semibold underline underline-offset-2 hover:opacity-80"
+                        >
+                          Verify it now — open the Exploit tab →
+                        </button>
+                      )}
+                    </div>
+                  )
+                })()}
+                <div className="flex flex-wrap gap-2 text-[11px]">
+                {finding.owasp_category && <span className="chip bg-accent/10 text-accent border border-accent/30">{finding.owasp_category}</span>}
+                {finding.cwe_id && <span className="chip bg-ink-700 text-slate-300 border border-ink-600">{finding.cwe_id}</span>}
+                {cveId && <span className="chip bg-sev-high/10 text-sev-high border border-sev-high/30">{cveId}</span>}
+                {finding.cvss != null && (
+                  <button onClick={() => setTab('cvss')} className="chip bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:border-cyan-500/60 cursor-pointer transition flex items-center gap-1">
+                    <ShieldCheck size={11} /> CVSS 4.0: {finding.cvss}
+                  </button>
+                )}
+              </div>
+              {/* Plain-English summary — auto-generated from finding data */}
+              {(() => {
+                const s = buildSummary(finding, evidence)
+                return (
+                  <div className="rounded-xl border border-accent/25 bg-accent/[0.06] p-4 space-y-3">
+                    <p className="text-[11px] uppercase tracking-wider text-accent font-semibold flex items-center gap-1.5">
+                      <Sparkles size={12} /> Ringkasan Mudah Faham
+                    </p>
+                    <div className="flex gap-2.5">
+                      <Target size={15} className="text-sky-400 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[11px] font-semibold text-sky-300 uppercase tracking-wide">Apa masalahnya?</p>
+                        <p className="text-sm text-slate-200 leading-relaxed">{s.what}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2.5">
+                      <AlertTriangle size={15} className="text-amber-400 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[11px] font-semibold text-amber-300 uppercase tracking-wide">Kenapa bahaya?</p>
+                        <p className="text-sm text-slate-200 leading-relaxed">{s.why}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2.5">
+                      <Wrench size={15} className="text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[11px] font-semibold text-emerald-300 uppercase tracking-wide">Apa nak buat?</p>
+                        <p className="text-sm text-slate-200 leading-relaxed">{s.fix}</p>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })()}
+              {finding.description && (
+                <div><p className="label">Technical Description</p><p className="text-sm text-slate-300 whitespace-pre-wrap">{finding.description}</p></div>
+              )}
+              {verdict && (
+                <div className="rounded-lg bg-accent/5 border border-accent/20 p-3">
+                  <p className="text-[11px] uppercase tracking-wider text-accent/80 mb-1">
+                    Agent Verdict · {verdict.agent || 'unknown'}{verdictPct != null ? ` · ${verdictPct}%` : ''}
+                    {verdict.evidence_tier ? ` · ${verdict.evidence_tier}` : ''}
+                  </p>
+                  <p className="text-xs text-slate-300 whitespace-pre-wrap">{verdict.reasoning || 'No reasoning recorded.'}</p>
+                  {Array.isArray(evidence?.actions) && evidence.actions.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-accent/10">
+                      <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">Provenance</p>
+                      <ul className="space-y-0.5">
+                        {evidence.actions.slice(-5).map((a, i) => (
+                          <li key={`${a.at || ''}-${i}`} className="text-[11px] text-slate-400">
+                            <span className="text-slate-500">{a.at ? new Date(a.at).toLocaleTimeString() : '—'}</span>
+                            {' · '}{a.kind || 'action'}{' · '}
+                            <span className={a.status === 'completed' ? 'text-emerald-400/80' : 'text-amber-400/80'}>{a.status || 'unknown'}</span>
+                            {' · '}{a.by || 'unknown'}{a.tier ? ` (${a.tier})` : ''}
+                            {a.summary && <span className="block text-slate-500 italic">{String(a.summary).slice(0, 220)}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+              {finding.remediation && (
+                <div className="rounded-lg bg-emerald-500/5 border border-emerald-500/20 p-3">
+                  <p className="text-[11px] uppercase tracking-wider text-emerald-400/80 mb-1">Remediation</p>
+                  <p className="text-sm text-emerald-100/90 whitespace-pre-wrap">{finding.remediation}</p>
+                </div>
+              )}
+            </>
+          )}
+
+          {tab === 'exploit' && (
+            <div className="space-y-4">
+              {/* Exploit Check Status */}
+              {exploitChecking && (
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <Loader2 size={14} className="animate-spin" /> Checking exploitability...
+                </div>
+              )}
+
+              {!exploitChecking && exploitCheck && !exploitCampaign && (
+                <div className="space-y-4">
+                  <div className={`rounded-xl border p-4 ${exploitCheck.exploitable ? 'border-red-500/30 bg-red-500/5' : 'border-slate-700/50 bg-slate-800/30'}`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Crosshair size={16} className={exploitCheck.exploitable ? 'text-red-400' : 'text-slate-500'} />
+                      <span className={`text-sm font-semibold ${exploitCheck.exploitable ? 'text-red-300' : 'text-slate-400'}`}>
+                        {exploitCheck.exploitable ? `${exploitCheck.matchCount} exploit strategy available` : 'No exploit strategy available'}
+                      </span>
+                      <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${exploitCheck.risk === 'critical' ? 'bg-red-500/20 text-red-400' : exploitCheck.risk === 'high' ? 'bg-orange-500/20 text-orange-400' : exploitCheck.risk === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'}`}>
+                        {exploitCheck.risk?.toUpperCase()}
+                      </span>
+                    </div>
+
+                    {exploitCheck.strategies?.map((s, i) => (
+                      <div key={i} className="mt-2 flex items-center gap-2 text-xs text-slate-400">
+                        <ChevronRight size={12} />
+                        <span className="font-mono">{s.id}</span>
+                        <span className="text-slate-600">|</span>
+                        <span>{s.techniqueCount} techniques</span>
+                        <span className="text-slate-600">|</span>
+                        <span>Post: {s.postExploit?.join(', ')}</span>
+                      </div>
+                    ))}
+
+                    {exploitCheck.exploitable && (
+                      <button
+                        onClick={launchExploit}
+                        disabled={exploitLaunching}
+                        className="btn-primary w-full mt-4 text-sm flex items-center justify-center gap-2"
+                      >
+                        {exploitLaunching ? (
+                          <><Loader2 size={14} className="animate-spin" /> Launching...</>
+                        ) : (
+                          <><Play size={14} /> Launch Exploit Campaign</>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Active Campaign View */}
+              {exploitCampaign && (
+                <div className="space-y-4">
+                  {/* Campaign Header with Controls */}
+                  <div className={`rounded-xl border p-4 ${exploitCampaign.campaign?.status === 'completed' ? 'border-green-500/30 bg-green-500/5' : exploitCampaign.campaign?.status === 'failed' ? 'border-red-500/30 bg-red-500/5' : exploitCampaign.campaign?.status === 'awaiting_approval' ? 'border-amber-500/30 bg-amber-500/5' : 'border-accent/30 bg-accent/5'}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Crosshair size={16} className="text-accent" />
+                        <span className="text-sm font-semibold text-slate-200">Campaign</span>
+                        <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                          exploitCampaign.campaign?.status === 'completed' ? 'bg-green-500/20 text-green-400' :
+                          exploitCampaign.campaign?.status === 'failed' ? 'bg-red-500/20 text-red-400' :
+                          exploitCampaign.campaign?.status === 'awaiting_approval' ? 'bg-amber-500/20 text-amber-400' :
+                          exploitCampaign.campaign?.status === 'running' ? 'bg-blue-500/20 text-blue-400' :
+                          'bg-slate-500/20 text-slate-400'
+                        }`}>
+                          {exploitCampaign.campaign?.status || 'unknown'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {exploitCampaign.campaign?.id && (
+                          <span className="text-[10px] font-mono text-slate-600 truncate ml-2 max-w-[120px]">{exploitCampaign.campaign.id}</span>
+                        )}
+                        {/* Campaign Controls */}
+                        {exploitCampaign.campaign?.status === 'queued' && (
+                          <button
+                            onClick={() => startCampaign(exploitCampaign.campaign.id)}
+                            className="btn-primary text-xs flex items-center gap-1"
+                          >
+                            <Play size={12} /> Start
+                          </button>
+                        )}
+                        {/* Legacy stuck campaigns: awaiting_approval with no gated step pending — allow restart */}
+                        {exploitCampaign.campaign?.status === 'awaiting_approval' &&
+                          !(exploitCampaign.steps || []).some(s => s.status === 'awaiting_approval') && (
+                          <button
+                            onClick={() => startCampaign(exploitCampaign.campaign.id)}
+                            className="btn-primary text-xs flex items-center gap-1"
+                          >
+                            <Play size={12} /> Start
+                          </button>
+                        )}
+                        {exploitCampaign.campaign?.status === 'running' && (
+                          <button
+                            onClick={() => pauseCampaign(exploitCampaign.campaign.id)}
+                            className="btn-secondary text-xs flex items-center gap-1"
+                          >
+                            <Pause size={12} /> Pause
+                          </button>
+                        )}
+                        {exploitCampaign.campaign?.status === 'paused' && (
+                          <button
+                            onClick={() => resumeCampaign(exploitCampaign.campaign.id)}
+                            className="btn-primary text-xs flex items-center gap-1"
+                          >
+                            <Play size={12} /> Resume
+                          </button>
+                        )}
+                        {['running', 'paused', 'awaiting_approval'].includes(exploitCampaign.campaign?.status) && (
+                          <button
+                            onClick={() => abortCampaign(exploitCampaign.campaign.id)}
+                            className="btn-secondary text-xs !border-red-500/30 !text-red-400 hover:!bg-red-500/10 flex items-center gap-1"
+                          >
+                            <Square size={12} /> Abort
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step Timeline */}
+                  {exploitCampaign.steps?.length > 0 && (
+                    <div className="space-y-3">
+                      <p className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Attack Steps</p>
+                      {exploitCampaign.steps.map((step) => (
+                        <div key={step.id} className={`rounded-xl border p-3.5 transition-colors ${
+                          step.status === 'success' ? 'border-emerald-500/30 bg-emerald-500/5' :
+                          step.status === 'failed' ? 'border-rose-500/30 bg-rose-500/5' :
+                          step.status === 'awaiting_approval' ? 'border-amber-500/40 bg-amber-500/10' :
+                          step.status === 'running' ? 'border-blue-500/30 bg-blue-500/5' :
+                          'border-white/10 bg-white/[0.02]'
+                        }`}>
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              {step.status === 'success' ? <CheckCircle size={15} className="text-emerald-400 shrink-0" /> :
+                               step.status === 'failed' ? <XCircle size={15} className="text-rose-400 shrink-0" /> :
+                               step.status === 'awaiting_approval' ? <AlertTriangle size={15} className="text-amber-400 shrink-0 animate-bounce" /> :
+                               step.status === 'running' ? <Loader2 size={15} className="text-cyan-400 animate-spin shrink-0" /> :
+                               <Clock size={15} className="text-slate-500 shrink-0" />}
+                              <span className="text-xs font-bold text-slate-100">
+                                Step #{step.step_order}: {step.step_type}
+                              </span>
+                              {step.tool_name && (
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-400 font-mono">
+                                  {step.tool_name}
+                                </span>
+                              )}
+                            </div>
+                            {step.status === 'awaiting_approval' && (
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                                Approval Needed
+                              </span>
+                            )}
+                          </div>
+
+                          {step.command && (
+                            <div className="mt-2.5">
+                              <pre className="text-[11px] text-cyan-300 font-mono bg-black/60 border border-white/10 rounded-xl p-3 overflow-x-auto max-h-32 whitespace-pre-wrap break-all break-words select-text">
+                                {(() => { try { return JSON.stringify(JSON.parse(step.command), null, 2) } catch { return step.command } })()}
+                              </pre>
+                            </div>
+                          )}
+
+                          {step.output && (
+                            <div className="mt-2.5">
+                              <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Execution Output:</span>
+                              <pre className="text-[11px] text-slate-300 font-mono bg-slate-950 border border-white/10 rounded-xl p-3 overflow-x-auto max-h-48 whitespace-pre-wrap break-all break-words select-text">
+                                {(() => { try { return JSON.stringify(JSON.parse(step.output), null, 2) } catch { return step.output } })()}
+                              </pre>
+                            </div>
+                          )}
+
+                          {/* Approval buttons */}
+                          {step.status === 'awaiting_approval' && (
+                            <div className="flex flex-wrap gap-2 mt-3.5">
+                              <button
+                                onClick={() => approveExploitStep(step.id)}
+                                className="btn-primary text-xs py-1.5 px-3.5 !bg-emerald-600 hover:!bg-emerald-500 flex items-center gap-1.5 font-bold shadow-glow"
+                              >
+                                <CheckCircle size={13} /> Approve
+                              </button>
+                              <button
+                                onClick={() => denyExploitStep(step.id)}
+                                className="btn-secondary text-xs py-1.5 px-3.5 !border-rose-500/40 !text-rose-300 hover:!bg-rose-500/20 flex items-center gap-1.5 font-bold"
+                              >
+                                <XCircle size={13} /> Deny
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Loot */}
+                  {exploitCampaign.loot?.length > 0 && (
+                    <div className="space-y-3">
+                      <p className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Loot Collected</p>
+                      {exploitCampaign.loot.map((l) => (
+                        <div key={l.id} className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3.5">
+                          <div className="flex items-center gap-2">
+                            <Bug size={15} className="text-amber-400 shrink-0" />
+                            <span className="text-xs font-bold text-slate-200">{l.label || l.loot_type}</span>
+                          </div>
+                          <pre className="mt-2.5 text-[11px] text-amber-200 font-mono bg-black/60 border border-white/10 rounded-xl p-3 overflow-x-auto max-h-36 whitespace-pre-wrap break-all break-words select-text">
+                            {(() => { try { return JSON.stringify(JSON.parse(l.data), null, 2) } catch { return l.data } })()}
+                          </pre>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* No campaign yet */}
+                  {exploitCampaign.alreadyExists && !exploitCampaign.steps?.length && !exploitCheck?.exploitable && (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-slate-500">No exploit steps available for this finding.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Interactive Exploit PoC & Verification Section */}
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Terminal size={15} className="text-cyan-400 shrink-0" />
+                    <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+                      Exploit & Reproduction PoC
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleGeneratePoc}
+                    disabled={generatingPoc}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-semibold hover:bg-cyan-500/25 transition-all disabled:opacity-50 shrink-0 shadow-sm"
+                  >
+                    {generatingPoc ? (
+                      <><Loader2 size={12} className="animate-spin" /> Generating AI PoC...</>
+                    ) : (
+                      <><Sparkles size={12} /> {customPoc ? 'Regenerate AI Exploit' : 'Generate AI Exploit / PoC'}</>
+                    )}
+                  </button>
+                </div>
+
+                {/* Display generated or existing PoC */}
+                {customPoc ? (
+                  <div className="space-y-3 pt-1">
+                    {customPoc.attackCommand && (
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Attack / Verification Command</span>
+                          <button
+                            onClick={() => copyAttackCommand(customPoc.attackCommand)}
+                            className="text-[10px] flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold"
+                          >
+                            {pocCopied ? <><Check size={11} /> Copied</> : <><Copy size={11} /> Copy Command</>}
+                          </button>
+                        </div>
+                        <pre className="text-xs font-mono text-cyan-300 bg-black/60 border border-white/10 rounded-xl p-3 overflow-x-auto whitespace-pre-wrap break-all select-text">
+                          {customPoc.attackCommand}
+                        </pre>
+                      </div>
+                    )}
+
+                    {customPoc.pocPayload && (
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Payload</span>
+                        <pre className="text-xs font-mono text-amber-300 bg-black/60 border border-white/10 rounded-xl p-3 overflow-x-auto whitespace-pre-wrap break-all select-text">
+                          {customPoc.pocPayload}
+                        </pre>
+                      </div>
+                    )}
+
+                    {customPoc.exploitSteps && customPoc.exploitSteps.length > 0 && (
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Exploitation Procedure</span>
+                        <div className="space-y-1.5 pl-2 border-l-2 border-cyan-500/40">
+                          {customPoc.exploitSteps.map((s, idx) => (
+                            <p key={idx} className="text-xs text-slate-300 leading-relaxed">
+                              <span className="text-cyan-400 font-bold mr-1.5">{idx + 1}.</span> {s}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {customPoc.impact && (
+                      <div className="rounded-lg bg-rose-500/10 border border-rose-500/20 p-2.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-rose-400 block mb-0.5">Exploitation Impact</span>
+                        <p className="text-xs text-rose-200">{customPoc.impact}</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2.5 pt-1">
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Manual verification probe for this target endpoint. Click <strong>Generate AI Exploit / PoC</strong> above to synthesize an automated exploit payload.
+                    </p>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Quick Probe</span>
+                      <button
+                        onClick={() => copyAttackCommand(`curl -isk -A "Mozilla/5.0 SentinelAI/2.0" "${finding.target || (evidence && evidence.url) || 'https://target'}"`)}
+                        className="text-[10px] flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold"
+                      >
+                        {pocCopied ? <><Check size={11} /> Copied</> : <><Copy size={11} /> Copy</>}
+                      </button>
+                    </div>
+                    <pre className="text-xs font-mono text-cyan-300 bg-black/60 border border-white/10 rounded-xl p-3 overflow-x-auto whitespace-pre-wrap break-all select-text">
+                      {`curl -isk -A "Mozilla/5.0 SentinelAI/2.0" "${finding.target || (evidence && evidence.url) || 'https://target'}"`}
+                    </pre>
+                  </div>
+                )}
+              </div>
+
+              {exploitError && (
+                <div className="rounded-lg bg-red-500/10 border border-red-500/30 p-3">
+                  <p className="text-xs text-red-400">{exploitError}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {tab === 'ai' && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                <button 
+                  type="button" 
+                  onClick={() => handleSendAi('Apa yang bahaya pasal finding ni?')}
+                  className="btn-ghost text-xs border border-accent/30 text-accent hover:bg-accent/10 flex items-center gap-1"
+                >
+                  <Sparkles size={12} /> Apa yang bahaya ni?
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => handleSendAi('Macam mana nak fix / remediate kerentanan ni?')}
+                  className="btn-ghost text-xs border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 flex items-center gap-1"
+                >
+                  <Sparkles size={12} /> How to fix this?
+                </button>
+              </div>
+
+              <div className="rounded-xl bg-ink-900/80 border border-ink-700/80 p-4 space-y-3 max-h-80 overflow-y-auto">
+                {chatMessages.map((m, i) => (
+                  <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[85%] rounded-lg p-3 text-xs leading-relaxed ${m.role === 'user' ? 'bg-accent text-white' : 'bg-ink-800 text-slate-200 border border-ink-700'}`}>
+                      <p className="whitespace-pre-wrap">{m.text}</p>
+                    </div>
+                  </div>
+                ))}
+                {chatBusy && (
+                  <div className="flex justify-start">
+                    <div className="bg-ink-800 rounded-lg p-3 text-xs text-slate-400 flex items-center gap-2">
+                      <Loader2 size={14} className="animate-spin text-accent" /> AI thinking in background...
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2 items-end">
+                <textarea 
+                  className="input flex-1 text-xs resize-none min-h-[42px] max-h-32 py-2" 
+                  rows={2}
+                  placeholder="Ask AI about this finding… (Enter = newline, Click Send to submit)" 
+                  value={chatInput} 
+                  onChange={(e) => setChatInput(e.target.value)} 
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+                      // Pressing Enter alone creates a newline (moves down) and does NOT submit!
+                      e.stopPropagation()
+                    } else if (e.key === 'Enter' && (e.shiftKey || e.ctrlKey)) {
+                      // Shift+Enter or Ctrl+Enter submits
+                      e.preventDefault()
+                      handleSendAi()
+                    }
+                  }}
+                />
+                <button 
+                  type="button" 
+                  onClick={() => handleSendAi()} 
+                  disabled={chatBusy} 
+                  className="btn-primary px-3.5 py-3.5 h-[42px] flex items-center justify-center shrink-0"
+                  title="Send Question"
+                >
+                  <Send size={14} />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {tab === 'poc' && (() => {
+            const hasEvidence = Object.keys(evidence).length > 0
+            const hasPoc = Object.keys(poc).length > 0
+            const hidden = ['actions', 'exploitPlaybooks', 'aiEvidenceTier']
+            const proofEvidence = Object.fromEntries(Object.entries(evidence).filter(([k]) => !hidden.includes(k)))
+            const proofPoc = Object.fromEntries(Object.entries(poc).filter(([k]) => !hidden.includes(k)))
+            const hasProof = Object.keys(proofEvidence).length > 0 || Object.keys(proofPoc).length > 0
+
+            // Build runnable verification steps from what the finding actually is.
+            // These are read-only replays an operator can paste in a terminal —
+            // the whole point of a PoC tab is "show me how to check this".
+            const target = finding.target || ''
+            const base = target ? (target.startsWith('http') ? target : `https://${target}`) : ''
+            const hints = Array.isArray(evidence.paths) ? evidence.paths.slice(0, 5)
+              : Array.isArray(evidence.discovered) ? evidence.discovered.slice(0, 5)
+              : Array.isArray(evidence.urls) ? evidence.urls.slice(0, 5) : []
+            const recipe = []
+            if (base) {
+              recipe.push({ label: 'Header + status fingerprint', cmd: `curl -skI ${base}` })
+              if (hints.length) {
+                recipe.push({ label: 'Replay the discovered path(s)', cmd: hints.map(p => `curl -skI ${base.replace(/\/$/, '')}/${String(p).replace(/^\//, '')}`).join('\n') })
+              }
+              const params = evidence.parameters || evidence.params
+              if (Array.isArray(params) && params.length) {
+                const url = `${base.replace(/\/$/, '')}/?${params.slice(0, 4).map(p => `${p}=1`).join('&')}`
+                recipe.push({ label: 'Exercise the discovered parameter(s)', cmd: `curl -sk "${url}"` })
+              }
+              if (/sql/i.test(`${finding.title} ${finding.module}`)) {
+                recipe.push({ label: 'SQLi re-probe (benign, time-based)', cmd: `curl -sk -o /dev/null -w 'baseline %{time_total}s\\n' "${base}"\ncurl -sk -o /dev/null -w "payload  %{time_total}s\\n" "${base}${base.includes('?') ? '&' : '?'}id=1'%20AND%20SLEEP(5)--%20-"` })
+              }
+              if (/xss|cross.?site/i.test(`${finding.title} ${finding.module}`)) {
+                recipe.push({ label: 'XSS tag-reflection check', cmd: `curl -sk "${base}${base.includes('?') ? '&' : '?'}q=%3Csvg%2Fonload%3Dalert(1)%3E" | grep -o '<svg/onload=alert(1)>'` })
+              }
+              if (/cors/i.test(`${finding.title} ${finding.module}`)) {
+                recipe.push({ label: 'CORS origin reflection', cmd: `curl -sk -H 'Origin: https://evil.example' -D - -o /dev/null "${base}" | grep -i 'access-control'` })
+              }
+              if (/header/i.test(`${finding.title} ${finding.module}`)) {
+                recipe.push({ label: 'Confirm the missing header', cmd: `curl -skI ${base} | grep -iE 'strict-transport-security|content-security-policy|x-frame-options' || echo 'header absent — finding reproduced'` })
+              }
+            }
+
+            return (
+              <>
+                {!hasProof && (
+                  <div className="rounded-xl border border-amber-500/30 bg-amber-500/[0.06] p-4 space-y-2">
+                    <p className="text-[11px] uppercase tracking-wider font-bold text-amber-300 flex items-center gap-1.5">
+                      <AlertTriangle size={12} /> No tool confirmation captured
+                    </p>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Nothing in this finding proves the claim yet — no scanner output, no HTTP response, no tool verdict.
+                      It survived as a <span className="font-mono">lead</span>, not a confirmed bug.
+                      {verdict?.reasoning ? ` Reason it stayed open: ${verdict.reasoning}` : ''}
+                    </p>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Either run the PoC below by hand, or use the <span className="font-semibold text-accent">Exploit</span> tab to
+                      replay it automatically. If the replay contradicts the claim, mark the finding as a false positive.
+                    </p>
+                  </div>
+                )}
+
+                {recipe.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="label">How to verify this yourself</p>
+                    {recipe.map((r, i) => (
+                      <div key={i} className="rounded-lg border border-white/10 bg-white/[0.02] overflow-hidden">
+                        <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10">
+                          <span className="text-[11px] text-slate-300 font-medium">{r.label}</span>
+                          <button onClick={() => copyAttackCommand(r.cmd)} className="text-[10px] text-accent hover:opacity-80 flex items-center gap-1">
+                            {pocCopied ? <><Check size={10} /> Copied</> : <><Copy size={10} /> Copy</>}
+                          </button>
+                        </div>
+                        <pre className="terminal text-[11px] whitespace-pre-wrap p-3">{r.cmd}</pre>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {Object.keys(proofEvidence).length > 0 && (
+                  <div><p className="label">Captured Evidence</p>
+                    <pre className="terminal text-xs whitespace-pre-wrap">{JSON.stringify(proofEvidence, null, 2)}</pre></div>
+                )}
+                {Object.keys(proofPoc).length > 0 && (
+                  <div><p className="label">PoC / Payloads</p>
+                    <pre className="terminal text-xs whitespace-pre-wrap">{JSON.stringify(proofPoc, null, 2)}</pre></div>
+                )}
+                {hasEvidence && Object.keys(proofEvidence).length === 0 && !hasPoc && recipe.length === 0 && (
+                  <p className="text-xs text-slate-500">
+                    This finding carries only verification metadata (no target to replay against).
+                  </p>
+                )}
+              </>
+            )
+          })()}
+
+          {tab === 'cve' && (
+            <>
+              {/* Known CVEs from scan enrichment (embedded in evidence) */}
+              {evidence.knownCves?.length > 0 && (
+                <div className="space-y-3 mb-4">
+                  <p className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                    Known CVEs for {evidence.product} {evidence.version} ({evidence.totalCves || evidence.knownCves.length} found on NVD)
+                  </p>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {evidence.knownCves.map((c) => (
+                      <div
+                        key={c.id}
+                        className="rounded-lg border border-white/10 bg-white/[0.02] p-3 hover:bg-white/[0.05] cursor-pointer transition-colors"
+                        onClick={() => {
+                          const id = c.id
+                          setCveBusy(true)
+                          api.cve(id).then(setCve).catch((e) => setCve({ error: e.message })).finally(() => setCveBusy(false))
+                        }}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-accent font-mono">{c.id}</span>
+                            {c.score != null && (
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                                c.score >= 9 ? 'bg-red-500/20 text-red-400' :
+                                c.score >= 7 ? 'bg-orange-500/20 text-orange-400' :
+                                c.score >= 4 ? 'bg-yellow-500/20 text-yellow-400' :
+                                'bg-green-500/20 text-green-400'
+                              }`}>
+                                CVSS {c.score}
+                              </span>
+                            )}
+                          </div>
+                          <ExternalLink size={12} className="text-slate-600 shrink-0" />
+                        </div>
+                        {c.description && (
+                          <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed line-clamp-2">{c.description}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Primary CVE lookup */}
+              {!cveId && !evidence.knownCves?.length && <p className="text-sm text-slate-500">No CVE associated with this finding.</p>}
+              {cveId && (
+                <>
+                  <button onClick={loadCve} disabled={cveBusy} className="btn-ghost">
+                    {cveBusy ? <Loader2 size={15} className="animate-spin" /> : <ExternalLink size={15} />} Lookup {cveId} (NVD)
+                  </button>
+                </>
+              )}
+
+              {/* CVE detail view (loaded on click or primary lookup) */}
+              {cve && (
+                cve.error ? <p className="text-sm text-sev-critical">{cve.error}</p> : (
+                  <div className="space-y-3 mt-3 rounded-xl border border-accent/20 bg-accent/[0.03] p-4">
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-base font-bold text-slate-100">{cve.id}</h3>
+                      {cve.cvss?.score != null && <SeverityBadge severity={(cve.severity || '').toLowerCase()} />}
+                      {cve.cvss?.score != null && <span className="text-sm text-slate-300">{cve.cvss.score}/10</span>}
+                      {cve.cached && <span className="text-[10px] text-slate-600">(cached)</span>}
+                      <button onClick={() => setCve(null)} className="ml-auto text-slate-500 hover:text-slate-300 text-xs">✕ Close</button>
+                    </div>
+                    <p className="text-sm text-slate-300 whitespace-pre-wrap">{cve.description}</p>
+                    {cve.cvss?.vector && <p className="text-xs font-mono text-slate-500">{cve.cvss.vector}</p>}
+                    {cve.weaknesses?.length > 0 && <div className="flex flex-wrap gap-1.5">{cve.weaknesses.map((w) => <span key={w} className="chip bg-ink-700 text-slate-300 border border-ink-600 text-[11px]">{w}</span>)}</div>}
+                    {cve.references?.length > 0 && (
+                      <div><p className="label">References</p>
+                        <ul className="space-y-1">{cve.references.map((r) => <li key={r}><a href={r} target="_blank" rel="noreferrer" className="text-xs text-accent hover:underline break-all">{r}</a></li>)}</ul></div>
+                    )}
+                  </div>
+                )
+              )}
+            </>
+          )}
+
+          
+          {tab === 'cvss' && (
+            <div className="space-y-4">
+              <Cvss4Calculator
+                initialVector={finding.cvss_vector || finding.evidence?.cvssVector}
+                findingId={finding.id}
+                onUpdate={(updated) => {
+                  if (updated && onSeverityChange) {
+                    onSeverityChange(updated.severity)
+                  }
+                }}
+              />
+            </div>
+          )}
+
+          {tab === 'notes' && (
+            <>
+              <div className="space-y-3">
+                {notes.length === 0 && <p className="text-sm text-slate-500">No notes yet.</p>}
+                {notes.map((n) => (
+                  <div key={n.id} className="rounded-lg bg-ink-800/60 border border-ink-700/60 p-3">
+                    <p className="text-[11px] text-slate-500 mb-1">{n.author} · {new Date(n.ts).toLocaleString()}</p>
+                    <p className="text-sm text-slate-200 whitespace-pre-wrap">{n.note}</p>
+                  </div>
+                ))}
+              </div>
+              <form onSubmit={addNote} className="flex gap-2">
+                <input className="input flex-1" placeholder="Add a note…" value={noteText} onChange={(e) => setNoteText(e.target.value)} />
+                <button type="submit" className="btn-primary px-3"><Send size={15} /></button>
+              </form>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

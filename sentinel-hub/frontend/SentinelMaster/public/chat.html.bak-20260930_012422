@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentinel AI Studio — Intelligent Chat Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="../Sentinel-Brand/favicon.svg" type="image/svg+xml">
+  <!-- Markdown parser -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Highlight.js for code syntax -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #07090e;
+      --sidebar-bg: #0b0f19;
+      --panel: rgba(14, 20, 35, 0.85);
+      --card: rgba(17, 24, 43, 0.95);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(0, 240, 255, 0.25);
+      --cyan: #00f0ff;
+      --indigo: #6366f1;
+      --purple: #a855f7;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --text: #f1f5f9;
+      --text-dim: #94a3b8;
+      --text-muted: #64748b;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.04) 0%, transparent 40%);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .sidebar-header {
+      padding: 18px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(99, 102, 241, 0.2));
+      border: 1px solid var(--border-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      background: linear-gradient(90deg, #fff, var(--text-dim));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .new-chat-btn {
+      margin: 14px 16px 8px 16px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      color: var(--cyan);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .new-chat-btn:hover {
+      background: rgba(0, 240, 255, 0.2);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+    }
+    .history-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .history-item {
+      padding: 9px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--text-dim);
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: all 0.15s;
+    }
+    .history-item:hover, .history-item.active {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+    .sidebar-footer {
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--emerald);
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px var(--emerald);
+      margin-right: 6px;
+    }
+
+    /* Main Container */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Top Bar */
+    .topbar {
+      height: 60px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: rgba(11, 15, 25, 0.6);
+      backdrop-filter: blur(12px);
+    }
+    .model-selector-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .model-select {
+      background: var(--card);
+      border: 1px solid var(--border-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .model-select:hover, .model-select:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+    .model-badge {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      font-family: var(--font-mono);
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-icon {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-icon:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    /* Chat Messages Area */
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .message-row {
+      display: flex;
+      gap: 14px;
+      max-width: 880px;
+      width: 100%;
+      margin: 0 auto;
+      animation: fadeIn 0.25s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .avatar.user {
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: #fff;
+    }
+    .avatar.ai {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.35);
+    }
+    .message-content {
+      flex: 1;
+      background: transparent;
+      border-radius: 12px;
+      line-height: 1.65;
+      font-size: 14.5px;
+      color: var(--text);
+      overflow-wrap: break-word;
+    }
+    .message-row.user .message-content {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px 16px;
+      border-radius: 12px;
+    }
+
+    /* Reasoning / Thinking Accordion */
+    .reasoning-box {
+      margin-bottom: 12px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .reasoning-toggle {
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #a5b4fc;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, 0.1);
+      user-select: none;
+    }
+    .reasoning-toggle:hover {
+      background: rgba(99, 102, 241, 0.15);
+    }
+    .reasoning-content {
+      padding: 12px;
+      font-size: 12.5px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      line-height: 1.5;
+      white-space: pre-wrap;
+      border-top: 1px solid rgba(99, 102, 241, 0.15);
+      background: rgba(10, 15, 30, 0.4);
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    /* Markdown Styling */
+    .message-content p { margin-bottom: 10px; }
+    .message-content p:last-child { margin-bottom: 0; }
+    .message-content pre {
+      margin: 12px 0;
+      border-radius: 8px;
+      background: #141b2d !important;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow-x: auto;
+      position: relative;
+    }
+    .message-content code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--cyan);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .copy-btn:hover { background: rgba(0, 240, 255, 0.15); }
+    .message-content ul, .message-content ol {
+      margin-left: 20px;
+      margin-bottom: 10px;
+    }
+    .message-content li { margin-bottom: 4px; }
+
+    /* Input Box Area */
+    .input-wrapper {
+      padding: 16px 24px 20px 24px;
+      max-width: 880px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .input-box {
+      background: var(--card);
+      border: 1px solid var(--border-accent);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s ease;
+    }
+    .input-box:focus-within {
+      border-color: var(--cyan);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+    }
+    textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 14.5px;
+      line-height: 1.5;
+      resize: none;
+      max-height: 160px;
+      min-height: 48px;
+    }
+    textarea::placeholder { color: var(--text-muted); }
+    .input-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 8px;
+    }
+    .input-hints {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .send-btn {
+      background: linear-gradient(135deg, #00f0ff, #3b82f6);
+      color: #000;
+      border: none;
+      padding: 7px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .send-btn:hover {
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+      transform: translateY(-1px);
+    }
+    .send-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Modal Settings */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-box {
+      background: var(--card);
+      border: 1px solid var(--border-accent);
+      border-radius: 12px;
+      width: 480px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .modal-title { font-size: 16px; font-weight: 700; color: #fff; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text-dim); }
+    .form-input {
+      background: rgba(10, 15, 25, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+      font-family: var(--font-mono);
+    }
+    .form-input:focus { border-color: var(--cyan); }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-logo">S</div>
+      <div>
+        <div class="brand-title">Sentinel AI Studio</div>
+        <div class="brand-sub">Enterprise Gateway</div>
+      </div>
+    </div>
+
+    <button class="new-chat-btn" id="newChatBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Sembang Baharu
+    </button>
+
+    <div class="history-list" id="historyList">
+      <!-- Chat history items will render here -->
+    </div>
+
+    <div class="sidebar-footer">
+      <div><span class="status-dot"></span>Gateway: <strong style="color:#fff;">Online (20128)</strong></div>
+      <div>Tunnel: <span style="color:var(--cyan); font-family:var(--font-mono);">router.sentinelai.studio</span></div>
+    </div>
+  </aside>
+
+  <!-- Main Chat Area -->
+  <main class="main-area">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="model-selector-group">
+        <select class="model-select" id="modelSelect">
+          <option value="sentinel-flagship" selected>🚀 sentinel-flagship (DeepSeek V4 Pro + Cloudflare)</option>
+          <option value="kimi-k3">⚡ kimi-k3 (Moonshot Kimi K2.7 Code)</option>
+          <option value="glm-5.3-flash">⚡ glm-5.3-flash (GLM 5.2 Flash)</option>
+        </select>
+        <span class="model-badge" id="latencyBadge">Live Routing</span>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="btn-icon" id="settingsBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Tetapan Gateway
+        </button>
+      </div>
+    </header>
+
+    <!-- Chat Messages -->
+    <div class="chat-container" id="chatContainer">
+      <!-- Default Welcome Message -->
+      <div class="message-row">
+        <div class="avatar ai">S</div>
+        <div class="message-content">
+          <p><strong>Selamat datang ke Sentinel AI Studio!</strong></p>
+          <p>Ini adalah konsol AI langsung di luar playground yang bersambung terus kepada <strong>Sentinel Route Gateway</strong> dengan sokongan auto-failover, pembuktian penalaran (DeepSeek Thinking), dan penulisan kod Markdown.</p>
+          <p>Sila taip soalan atau tugasan pengaturcaraan anda di bawah untuk mula.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="input-wrapper">
+      <div class="input-box">
+        <textarea id="promptInput" placeholder="Tanya soalan, jana kod, atau minta bantuan analisis... (Shift+Enter untuk baris baru)" rows="2"></textarea>
+        <div class="input-toolbar">
+          <div class="input-hints">Tekan <strong>Enter</strong> untuk hantar • Bersambung ke <strong>router.sentinelai.studio</strong></div>
+          <button class="send-btn" id="sendBtn">
+            Hantar
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-box">
+      <div class="modal-title">Tetapan Gateway & API</div>
+      
+      <div class="form-group">
+        <label class="form-label">Gateway Base URL</label>
+        <input type="text" class="form-input" id="cfgBaseUrl" value="https://router.sentinelai.studio/v1">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">API Key (sk-...)</label>
+        <input type="password" class="form-input" id="cfgApiKey" value="sk-9a2fddfa555eabbd-dnlkri-1f9e9b85">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">System Instruction</label>
+        <textarea class="form-input" id="cfgSystemPrompt" rows="3">Anda adalah Sentinel AI, pembantu kejuruteraan perisian dan risikan siber yang amat cekap, tepat, dan membantu.</textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-icon" id="closeSettingsBtn">Batal</button>
+        <button class="send-btn" id="saveSettingsBtn">Simpan Tetapan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configuration & State
+    const CONFIG = {
+      baseUrl: localStorage.getItem('sentinel_base_url') || 'https://router.sentinelai.studio/v1',
+      apiKey: localStorage.getItem('sentinel_api_key') || 'sk-9a2fddfa555eabbd-dnlkri-1f9e9b85',
+      systemPrompt: localStorage.getItem('sentinel_sys_prompt') || 'Anda adalah Sentinel AI, pembantu kejuruteraan perisian dan risikan siber yang amat cekap, tepat, dan membantu.'
+    };
+
+    let conversations = JSON.parse(localStorage.getItem('sentinel_chats') || '[]');
+    let currentChatId = null;
+    let currentMessages = [];
+
+    // DOM Elements
+    const chatContainer = document.getElementById('chatContainer');
+    const promptInput = document.getElementById('promptInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const modelSelect = document.getElementById('modelSelect');
+    const latencyBadge = document.getElementById('latencyBadge');
+    const newChatBtn = document.getElementById('newChatBtn');
+    const historyList = document.getElementById('historyList');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    const cfgBaseUrl = document.getElementById('cfgBaseUrl');
+    const cfgApiKey = document.getElementById('cfgApiKey');
+    const cfgSystemPrompt = document.getElementById('cfgSystemPrompt');
+
+    cfgBaseUrl.value = CONFIG.baseUrl;
+    cfgApiKey.value = CONFIG.apiKey;
+    cfgSystemPrompt.value = CONFIG.systemPrompt;
+
+    // Auto resize input
+    promptInput.addEventListener('input', () => {
+      promptInput.style.height = 'auto';
+      promptInput.style.height = Math.min(promptInput.scrollHeight, 160) + 'px';
+    });
+
+    // Enter to send
+    promptInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    sendBtn.addEventListener('click', sendMessage);
+    newChatBtn.addEventListener('click', startNewChat);
+
+    // Settings Modal
+    settingsBtn.addEventListener('click', () => { settingsModal.style.display = 'flex'; });
+    closeSettingsBtn.addEventListener('click', () => { settingsModal.style.display = 'none'; });
+    saveSettingsBtn.addEventListener('click', () => {
+      CONFIG.baseUrl = cfgBaseUrl.value.trim().replace(/\/+$/, '');
+      CONFIG.apiKey = cfgApiKey.value.trim();
+      CONFIG.systemPrompt = cfgSystemPrompt.value.trim();
+      localStorage.setItem('sentinel_base_url', CONFIG.baseUrl);
+      localStorage.setItem('sentinel_api_key', CONFIG.apiKey);
+      localStorage.setItem('sentinel_sys_prompt', CONFIG.systemPrompt);
+      settingsModal.style.display = 'none';
+      alert('Tetapan berjaya disimpan!');
+    });
+
+    // Append Message to UI
+    function appendMessage(role, content, reasoning = '', servedModel = '') {
+      const row = document.createElement('div');
+      row.className = `message-row ${role}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = `avatar ${role}`;
+      avatar.textContent = role === 'user' ? 'U' : 'S';
+
+      const contentBox = document.createElement('div');
+      contentBox.className = 'message-content';
+
+      // If reasoning exists, append expandable thinking box
+      if (reasoning && reasoning.trim()) {
+        const reasoningBox = document.createElement('div');
+        reasoningBox.className = 'reasoning-box';
+        
+        const toggle = document.createElement('div');
+        toggle.className = 'reasoning-toggle';
+        toggle.innerHTML = `🧠 <span>Thought Process (Pemikiran AI)</span> • <small style="color:var(--text-muted); font-size:10px;">Klik untuk buka/tutup</small>`;
+        
+        const body = document.createElement('div');
+        body.className = 'reasoning-content';
+        body.textContent = reasoning.trim();
+        body.style.display = 'none'; // closed by default
+
+        toggle.addEventListener('click', () => {
+          body.style.display = body.style.display === 'none' ? 'block' : 'none';
+        });
+
+        reasoningBox.appendChild(toggle);
+        reasoningBox.appendChild(body);
+        contentBox.appendChild(reasoningBox);
+      }
+
+      // If text content is empty but reasoning exists, use reasoning
+      if (!content || !content.trim()) {
+        if (reasoning && reasoning.trim()) {
+          content = "*AI telah selesai berfikir dan membekalkan analisis di atas.*";
+        } else {
+          content = "*(Tiada respons teks diterima daripada model)*";
+        }
+      }
+
+      const textContainer = document.createElement('div');
+      if (role === 'user') {
+        textContainer.textContent = content;
+      } else {
+        textContainer.innerHTML = marked.parse(content);
+        // Code highlight and copy buttons
+        textContainer.querySelectorAll('pre code').forEach((block) => {
+          hljs.highlightElement(block);
+          const pre = block.parentElement;
+          const header = document.createElement('div');
+          header.className = 'code-header';
+          header.innerHTML = `<span>CODE</span><button class="copy-btn">Salin Kod</button>`;
+          header.querySelector('.copy-btn').addEventListener('click', (e) => {
+            navigator.clipboard.writeText(block.innerText);
+            e.target.textContent = 'Disalin!';
+            setTimeout(() => e.target.textContent = 'Salin Kod', 2000);
+          });
+          pre.insertBefore(header, block);
+        });
+      }
+
+      contentBox.appendChild(textContainer);
+      row.appendChild(avatar);
+      row.appendChild(contentBox);
+      chatContainer.appendChild(row);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Send Message
+    async function sendMessage() {
+      const text = promptInput.value.trim();
+      if (!text) return;
+
+      const model = modelSelect.value;
+      promptInput.value = '';
+      promptInput.style.height = 'auto';
+      promptInput.disabled = true;
+      sendBtn.disabled = true;
+
+      // Add to conversation
+      if (!currentChatId) {
+        currentChatId = 'chat_' + Date.now();
+        conversations.unshift({ id: currentChatId, title: text.slice(0, 30) + '...', messages: [] });
+      }
+
+      appendMessage('user', text);
+      currentMessages.push({ role: 'user', content: text });
+
+      // Placeholder for loading
+      const loadingRow = document.createElement('div');
+      loadingRow.className = 'message-row ai';
+      loadingRow.id = 'loadingRow';
+      loadingRow.innerHTML = `
+        <div class="avatar ai">S</div>
+        <div class="message-content" style="color:var(--text-muted); font-style:italic;">
+          Sedang berfikir & menghubungkan ke model ${model}...
+        </div>
+      `;
+      chatContainer.appendChild(loadingRow);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      const startTime = Date.now();
+
+      try {
+        const payload = {
+          model: model,
+          messages: [
+            { role: 'system', content: CONFIG.systemPrompt },
+            ...currentMessages
+          ],
+          temperature: 0.7
+        };
+
+        const res = await fetch(`${CONFIG.baseUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${CONFIG.apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const elapsed = Date.now() - startTime;
+        latencyBadge.textContent = `${elapsed}ms • 200 OK`;
+        latencyBadge.style.color = 'var(--emerald)';
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`HTTP ${res.status}: ${errText}`);
+        }
+
+        const data = await res.json();
+        loadingRow.remove();
+
+        const choice = data.choices && data.choices[0];
+        const content = choice?.message?.content || '';
+        const reasoning = choice?.message?.reasoning_content || '';
+        const servedModel = data.model || model;
+
+        appendMessage('ai', content, reasoning, servedModel);
+        currentMessages.push({ role: 'assistant', content, reasoning });
+
+        // Update history
+        const activeChat = conversations.find(c => c.id === currentChatId);
+        if (activeChat) {
+          activeChat.messages = currentMessages;
+          localStorage.setItem('sentinel_chats', JSON.stringify(conversations));
+          renderHistory();
+        }
+
+      } catch (err) {
+        loadingRow.remove();
+        latencyBadge.textContent = `Ralat!`;
+        latencyBadge.style.color = 'var(--rose)';
+        appendMessage('ai', `⚠️ **Ralat semasa menghubungi API:**\n\`\`\`\n${err.message}\n\`\`\`\n*Pastikan Base URL dan API Key dalam Tetapan adalah sah.*`);
+      } finally {
+        promptInput.disabled = false;
+        sendBtn.disabled = false;
+        promptInput.focus();
+      }
+    }
+
+    function startNewChat() {
+      currentChatId = null;
+      currentMessages = [];
+      chatContainer.innerHTML = `
+        <div class="message-row">
+          <div class="avatar ai">S</div>
+          <div class="message-content">
+            <p><strong>Sesi Sembang Baharu Dimulakan.</strong></p>
+            <p>Model dipilih: <strong style="color:var(--cyan);">${modelSelect.options[modelSelect.selectedIndex].text}</strong>.</p>
+          </div>
+        </div>
+      `;
+      renderHistory();
+    }
+
+    function renderHistory() {
+      historyList.innerHTML = '';
+      conversations.forEach(c => {
+        const item = document.createElement('div');
+        item.className = `history-item ${c.id === currentChatId ? 'active' : ''}`;
+        item.textContent = c.title;
+        item.addEventListener('click', () => {
+          currentChatId = c.id;
+          currentMessages = c.messages || [];
+          chatContainer.innerHTML = '';
+          currentMessages.forEach(m => appendMessage(m.role, m.content, m.reasoning));
+          renderHistory();
+        });
+        historyList.appendChild(item);
+      });
+    }
+
+    renderHistory();
+  </script>
+</body>
+</html>

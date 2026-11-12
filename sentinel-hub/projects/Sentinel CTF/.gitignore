@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+*.env.local
+
+# Database
+sentinel_ctf.db
+sentinel_ctf.db-wal
+sentinel_ctf.db-shm
+
+# Workspace (challenge files — keep locally, don't commit)
+workspace/
+writeups/
+
+# SSH keys (NEVER commit)
+*.pem
+*.key
+id_rsa
+id_ed25519
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Ruff / mypy
+.ruff_cache/
+.mypy_cache/
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+desktop.ini

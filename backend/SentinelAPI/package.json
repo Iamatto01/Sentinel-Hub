@@ -1,0 +1,28 @@
+{
+  "name": "sentinel-api-telegram-bot",
+  "version": "1.0.0",
+  "description": "Telegram Auto-Payment Bot untuk Reseller API BandelBanget",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [
+    "telegram-bot",
+    "bandelbanget",
+    "api-reseller",
+    "duitnow-qr",
+    "auto-payment"
+  ],
+  "author": "Antigravity",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "better-sqlite3": "^11.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-cron": "^4.6.0",
+    "telegraf": "^4.16.3"
+  }
+}

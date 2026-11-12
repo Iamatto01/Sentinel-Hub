@@ -1,0 +1,44 @@
+services:
+  kali-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sentinel-kali-server:latest
+    container_name: sentinel-kali-node
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE
+      - NET_RAW
+    security_opt:
+      - seccomp:unconfined
+    ports:
+      - "3000:3000"   # SentinelMaster Hub
+      - "3005:3005"   # SentinelMLBB
+      - "3010:3010"   # SentinelAPI
+      - "5000:5000"   # SentinelAI Backend
+      - "5173:5173"   # SentinelAI Frontend
+      - "8009:8009"   # SentinelThreat
+      - "8016:8016"   # SentinelWeb
+      - "8028:8028"   # SentinelAlong
+      - "8029:8029"   # SentinelArcuz100
+      - "20128:20128" # OmniRoute 9router
+      - "55553:55553" # msfrpcd
+    volumes:
+      # Mount the clean organized workspace from F: drive into /home/kali/server
+      - "F:/Sentinel Hub:/home/kali/server"
+      # Persistent PM2 & environment storage on Kingston SSD
+      - "C:/SentinelKali/pm2_data:/home/kali/.pm2"
+      - "C:/SentinelKali/metasploit_data:/home/kali/.msf4"
+    environment:
+      - NODE_ENV=production
+      - HUB_PORT=3000
+      - HUB_HOST=0.0.0.0
+      - KALI_HOST=127.0.0.1
+    command: >
+      /bin/bash -c "
+        echo '=== Sentinel Kali Node Starting ===' &&
+        tail -f /dev/null
+      "

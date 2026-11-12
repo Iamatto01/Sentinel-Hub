@@ -1,0 +1,393 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SENTINEL MASTER DESIGN SYSTEM FOR SENTINEL ROUTE (router.sentinelai.studio)
+   High-Fidelity Parity with Sentinel Hub (hub.sentinelai.studio)
+   Apple-grade glassmorphism, obsidian black base, ambient matrix lighting
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root, html, body, .dark, [data-theme="dark"], [data-theme="system"] {
+  /* Sentinel Hub Palette Variables */
+  --bg: #000000 !important;
+  --bg-soft: #08080a !important;
+  --panel: rgba(255, 255, 255, 0.035) !important;
+  --panel-solid: #0e0e11 !important;
+  --panel-2: rgba(255, 255, 255, 0.055) !important;
+  --panel-2-solid: #141418 !important;
+  --panel-3: rgba(255, 255, 255, 0.085) !important;
+  --line: rgba(255, 255, 255, 0.12) !important;
+  --line-soft: rgba(255, 255, 255, 0.06) !important;
+  --glass-border: rgba(255, 255, 255, 0.14) !important;
+  --glass-border-hover: rgba(255, 255, 255, 0.65) !important;
+  --glass-glow: 0 0 30px rgba(255, 255, 255, 0.16) !important;
+  --glass-blur: blur(20px) !important;
+  --glass-blur-heavy: blur(32px) !important;
+  --text: #ffffff !important;
+  --text-dim: #a1a1a6 !important;
+  --text-faint: #6e6e73 !important;
+  --accent: #ffffff !important;
+  --accent-soft: rgba(255, 255, 255, 0.1) !important;
+  --green: #34d399 !important;
+  --green-soft: rgba(52, 211, 153, 0.12) !important;
+  --amber: #fbbf24 !important;
+  --amber-soft: rgba(251, 191, 36, 0.12) !important;
+  --red: #f87171 !important;
+  --red-soft: rgba(248, 113, 113, 0.12) !important;
+  --cyan: #38bdf8 !important;
+  --radius: 16px !important;
+  --radius-sm: 10px !important;
+  --radius-control: 10px !important;
+  --radius-pill: 9999px !important;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+  --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Plus Jakarta Sans', system-ui, sans-serif !important;
+  --serif: 'Instrument Serif', Georgia, serif !important;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+  --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 0 20px -2px rgba(255, 255, 255, 0.08), 0 16px 40px -10px rgba(0, 0, 0, 0.85) !important;
+
+  /* OmniRoute Token Remappings */
+  --color-bg: #000000 !important;
+  --color-bg-alt: #08080a !important;
+  --color-bg-primary: #000000 !important;
+  --color-bg-subtle: #08080a !important;
+  --color-surface: #0e0e11 !important;
+  --color-card: #0e0e11 !important;
+  --color-sidebar: rgba(8, 8, 11, 0.88) !important;
+  --surface-2: #141418 !important;
+  --color-border: rgba(255, 255, 255, 0.08) !important;
+  --color-text-main: #ffffff !important;
+  --color-text-primary: #ffffff !important;
+  --color-text-muted: #a1a1a6 !important;
+  --color-primary: #ffffff !important;
+  --color-primary-hover: #e2e8f0 !important;
+  --color-accent: #ffffff !important;
+  --color-accent-hover: #e2e8f0 !important;
+  --color-accent-light: #cbd5e1 !important;
+  --grad-brand: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%) !important;
+  --focus-ring: 0 0 0 2px #000000, 0 0 0 4px rgba(255, 255, 255, 0.4) !important;
+
+  /* Semantic Status */
+  --color-success: #34d399 !important;
+  --color-warning: #fbbf24 !important;
+  --color-error: #f87171 !important;
+
+  /* Data-Table Surfaces */
+  --table-header-bg: rgba(14, 14, 18, 0.94) !important;
+  --table-row-zebra: rgba(255, 255, 255, 0.015) !important;
+  --table-row-hover: rgba(255, 255, 255, 0.04) !important;
+  --table-cell-border: rgba(255, 255, 255, 0.05) !important;
+  --table-row-selected: rgba(255, 255, 255, 0.08) !important;
+
+  /* Ambient Wallpaper Grid */
+  --grid-line: rgba(255, 255, 255, 0.045) !important;
+  --grid-size: 32px !important;
+  --section-alt: rgba(255, 255, 255, 0.018) !important;
+}
+
+/* ── Apple White Mode (Light Theme Support) ── */
+[data-theme="light"], html:not(.dark) {
+  --bg: #f5f5f7 !important;
+  --bg-soft: #e8e8ed !important;
+  --panel: rgba(255, 255, 255, 0.8) !important;
+  --panel-solid: #ffffff !important;
+  --panel-2: rgba(0, 0, 0, 0.04) !important;
+  --panel-2-solid: #f0f0f2 !important;
+  --panel-3: rgba(0, 0, 0, 0.07) !important;
+  --line: rgba(0, 0, 0, 0.1) !important;
+  --line-soft: rgba(0, 0, 0, 0.05) !important;
+  --glass-border: rgba(0, 0, 0, 0.12) !important;
+  --glass-border-hover: rgba(0, 0, 0, 0.35) !important;
+  --glass-glow: 0 0 25px rgba(0, 0, 0, 0.08) !important;
+  --text: #1d1d1f !important;
+  --text-dim: #515154 !important;
+  --text-faint: #86868b !important;
+  --accent: #000000 !important;
+  --accent-soft: rgba(0, 0, 0, 0.06) !important;
+
+  --color-bg: #f5f5f7 !important;
+  --color-bg-alt: #e8e8ed !important;
+  --color-bg-primary: #f5f5f7 !important;
+  --color-bg-subtle: #e8e8ed !important;
+  --color-surface: #ffffff !important;
+  --color-card: #ffffff !important;
+  --color-sidebar: #ededf2 !important;
+  --surface-2: #f0f0f4 !important;
+  --color-border: rgba(0, 0, 0, 0.08) !important;
+  --color-text-main: #1d1d1f !important;
+  --color-text-primary: #1d1d1f !important;
+  --color-text-muted: #515154 !important;
+  --color-primary: #000000 !important;
+  --color-primary-hover: #333336 !important;
+  --color-accent: #000000 !important;
+  --grad-brand: linear-gradient(135deg, #000000 0%, #333336 100%) !important;
+  --focus-ring: 0 0 0 2px #f5f5f7, 0 0 0 4px rgba(0, 0, 0, 0.25) !important;
+  --table-header-bg: rgba(245, 245, 247, 0.95) !important;
+  --table-row-zebra: rgba(0, 0, 0, 0.02) !important;
+  --table-row-hover: rgba(0, 0, 0, 0.04) !important;
+  --table-cell-border: rgba(0, 0, 0, 0.04) !important;
+  --grid-line: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ── Typography & Global Elements ── */
+body, html, #__next {
+  background-color: var(--color-bg) !important;
+  color: var(--color-text-main) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Plus Jakarta Sans", system-ui, sans-serif !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+code, pre, .mono, [class*="font-mono"] {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+}
+
+/* ── Ambient Background Lighting & Matrix Grid (Identical to Hub) ── */
+body::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+  background-color: var(--color-bg) !important;
+  background-image:
+    radial-gradient(var(--grid-line) 1.2px, transparent 1.2px),
+    radial-gradient(circle 800px at 50% -120px, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.01) 45%, transparent 70%),
+    radial-gradient(circle 600px at 85% -50px, rgba(52, 211, 153, 0.025), transparent 70%) !important;
+  background-size: var(--grid-size) var(--grid-size), 100% 100%, 100% 100% !important;
+}
+
+/* ── Sidebar: Apple Frosted Obsidian Glass & Apple Pill Navigation ── */
+aside, .dashboard-sidebar-desktop aside, [class*="dashboard-sidebar"] aside {
+  background-color: var(--color-sidebar) !important;
+  backdrop-filter: blur(30px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(190%) !important;
+  border-right: 1px solid var(--color-border) !important;
+  box-shadow: 1px 0 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Nav items - Apple Pill Design */
+aside a[class*="rounded-lg"], aside button[class*="rounded-lg"] {
+  border-radius: 9999px !important;
+  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border: 1px solid transparent !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+}
+
+/* Active Nav item in Sidebar */
+aside a.bg-primary\/10, aside button.bg-primary\/10,
+aside [class*="bg-primary/10"] {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+  font-weight: 600 !important;
+}
+
+/* Hover Nav item in Sidebar */
+aside a:hover:not([class*="bg-primary/10"]):not(.bg-primary\/10),
+aside button:hover:not([class*="bg-primary/10"]):not(.bg-primary\/10) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+  transform: translateX(2px) !important;
+}
+
+/* ── Topbar / Header: Frosted Glass ── */
+header {
+  background: rgba(6, 7, 10, 0.75) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Apple Bento Cards & Glass Panels ── */
+.bg-surface, .bg-card, div[class*="rounded-card"] {
+  background: rgba(255, 255, 255, 0.025) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 16px !important;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.14), 0 12px 36px -10px rgba(0, 0, 0, 0.7) !important;
+  transition: border-color 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1), transform 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.bg-surface:hover, .bg-card:hover, div[class*="rounded-card"]:hover {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 0 25px rgba(255, 255, 255, 0.06), 0 18px 48px -12px rgba(0, 0, 0, 0.85) !important;
+}
+
+.bg-surface-2 {
+  background: rgba(255, 255, 255, 0.045) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Buttons: Solid Crisp White (Primary) & Frosted Glass (Secondary) ── */
+button.bg-\[image\:var\(--grad-brand\)\],
+.bg-primary, button.bg-primary,
+button[class*="bg-primary"],
+button[class*="grad-brand"] {
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  border: 1px solid #ffffff !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+button.bg-\[image\:var\(--grad-brand\)\]:hover,
+.bg-primary:hover, button.bg-primary:hover,
+button[class*="bg-primary"]:hover,
+button[class*="grad-brand"]:hover {
+  background: #f1f5f9 !important;
+  color: #000000 !important;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.28) !important;
+  transform: translateY(-1px) !important;
+}
+
+button[class*="border-black/10"], button[class*="border-white/10"],
+button[class*="border-border"], button.border-border {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 9999px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+button[class*="border-black/10"]:hover, button[class*="border-white/10"]:hover,
+button[class*="border-border"]:hover, button.border-border:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 18px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ── Inputs & Selects ── */
+input, select, textarea {
+  background-color: rgba(12, 12, 16, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12) !important;
+  outline: none !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #6e6e73 !important;
+}
+
+/* ── DataTables & Grids ── */
+table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+thead tr, th {
+  background: rgba(14, 14, 18, 0.9) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #a1a1a6 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+}
+
+tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: background-color 0.12s ease !important;
+}
+
+tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* ── Status Badges & Glow Dots ── */
+.bg-emerald-500\/10, .bg-green-500\/10,
+[class*="bg-emerald-500/10"], [class*="bg-green-500/10"] {
+  background-color: rgba(52, 211, 153, 0.12) !important;
+  border: 1px solid rgba(52, 211, 153, 0.3) !important;
+}
+
+.text-emerald-500, .text-green-500,
+[class*="text-emerald-500"], [class*="text-green-500"] {
+  color: #34d399 !important;
+}
+
+.bg-amber-500\/10, .bg-yellow-500\/10,
+[class*="bg-amber-500/10"], [class*="bg-yellow-500/10"] {
+  background-color: rgba(251, 191, 36, 0.12) !important;
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+}
+
+.text-amber-500, .text-yellow-500 {
+  color: #fbbf24 !important;
+}
+
+.bg-red-500\/10, [class*="bg-red-500/10"] {
+  background-color: rgba(248, 113, 113, 0.12) !important;
+  border: 1px solid rgba(248, 113, 113, 0.3) !important;
+}
+
+.text-red-500 {
+  color: #f87171 !important;
+}
+
+/* ── Modals & Overlays ── */
+div[class*="fixed inset-0"][class*="bg-black"] {
+  background: rgba(0, 0, 0, 0.78) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+div[role="dialog"], .ant-modal-content, [class*="max-w-"][class*="bg-surface"] {
+  background: #0e0e12 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 24px 70px -12px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ── Login Screen ── */
+main[class*="items-center"] > div,
+div[class*="w-full max-w-sm"],
+div[class*="w-full max-w-md"] {
+  background: rgba(14, 14, 18, 0.75) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 24px 70px -20px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 35px rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Eliminate macOS traffic lights */
+div[class*="bg-[#FF5F56]"],
+div[class*="bg-[#FFBD2E]"],
+div[class*="bg-[#27C93F]"],
+div:has(> div[class*="bg-[#FF5F56]"]),
+.traffic-lights {
+  display: none !important;
+}
+
+/* ── Custom Scrollbar ── */
+::-webkit-scrollbar {
+  width: 7px !important;
+  height: 7px !important;
+}
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-radius: 99px !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+}

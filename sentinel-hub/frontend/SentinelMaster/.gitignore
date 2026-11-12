@@ -1,0 +1,43 @@
+# dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# next.js
+.next/
+out/
+build/
+dist/
+next-env.d.ts
+*.tsbuildinfo
+.vercel
+
+# environment - never commit real secrets
+.env
+.env.*
+!.env.example
+
+# hub runtime state (auth lockouts, audit trail, scan cache)
+.sentinel-state/
+_archives/
+.browser_profiles/
+*.tar.gz
+
+
+# logs
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# os / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+.idea/

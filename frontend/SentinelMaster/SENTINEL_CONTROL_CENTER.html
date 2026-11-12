@@ -1,0 +1,631 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentinel Command Center & 20-Logo Master Catalog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="../Sentinel-Brand/favicon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --bg: #07090e;
+      --panel: rgba(13, 19, 33, 0.72);
+      --card: rgba(16, 23, 40, 0.85);
+      --line: rgba(0, 240, 255, 0.25);
+      --line-subtle: rgba(255, 255, 255, 0.08);
+      --cyan: #00f0ff;
+      --indigo: #6366f1;
+      --violet: #8b5cf6;
+      --emerald: #10b981;
+      --crimson: #ef4444;
+      --amber: #f59e0b;
+      --text: #f1f5f9;
+      --text-dim: #94a3b8;
+      --text-faint: #64748b;
+      --font-mono: "JetBrains Mono", ui-monospace, monospace;
+      --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-serif: "Instrument Serif", Georgia, serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(14, 20, 35, 0.8) 0%, var(--bg) 640px);
+      background-size: 28px 28px, 100% 100%;
+      color: var(--text);
+      font-family: var(--font-sans);
+      padding: 24px;
+      line-height: 1.5;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 21st.dev Atmospheric Aurora Lighting */
+    .lp-glow-container{
+      position: fixed;
+      inset: -120px -20% auto -20%;
+      height: 520px;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .lp-glow-pulse{
+      position: absolute;
+      left: 50%;
+      top: 40%;
+      transform: translate(-50%, -50%);
+      width: min(1200px, 130vw);
+      height: 480px;
+      background:
+        radial-gradient(50% 50% at 50% 50%, rgba(99, 102, 241, 0.28), transparent 75%),
+        radial-gradient(40% 45% at 65% 45%, rgba(0, 240, 255, 0.24), transparent 70%),
+        radial-gradient(35% 40% at 35% 55%, rgba(168, 85, 247, 0.20), transparent 68%);
+      filter: blur(54px);
+      animation: lp-glow-pulse 9s ease-in-out infinite;
+    }
+    @keyframes lp-glow-pulse{
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.85; }
+      50% { transform: translate(-49%, -52%) scale(1.06); opacity: 1; }
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      background: rgba(13, 19, 33, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.45);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-logo-frame {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.20), rgba(99, 102, 241, 0.16));
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
+      display: grid;
+      place-items: center;
+      padding: 3px;
+    }
+    .brand-logo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .brand-title h1 {
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .brand-title p {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+    .pulse-dot{
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      animation: pulseDot 2s ease-in-out infinite;
+    }
+    @keyframes pulseDot{
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.5; }
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-cyan { background: rgba(0, 240, 255, 0.12); color: var(--cyan); border: 1px solid rgba(0, 240, 255, 0.35); }
+    .badge-green { background: rgba(16, 185, 129, 0.14); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .badge-red { background: rgba(239, 68, 68, 0.14); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.18s cubic-bezier(0.2, 0.6, 0.2, 1);
+      border: 1px solid transparent;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn-green {
+      background: rgba(16, 185, 129, 0.18);
+      color: #6ee7b7;
+      border-color: rgba(16, 185, 129, 0.45);
+    }
+    .btn-green:hover {
+      background: rgba(16, 185, 129, 0.32);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+    }
+    .btn-red {
+      background: rgba(239, 68, 68, 0.16);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.45);
+    }
+    .btn-red:hover {
+      background: rgba(239, 68, 68, 0.32);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+    }
+    .btn-cyan {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.22), rgba(99, 102, 241, 0.22));
+      color: #7df4ff;
+      border-color: rgba(0, 240, 255, 0.45);
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
+    }
+    .btn-cyan:hover {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.36), rgba(99, 102, 241, 0.36));
+      color: #fff;
+      box-shadow: 0 0 24px rgba(0, 240, 255, 0.38);
+    }
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .btn-outline:hover {
+      border-color: rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.09);
+      color: #fff;
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding: 6px 8px;
+      background: rgba(13, 19, 33, 0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      width: fit-content;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-dim);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.16s ease;
+    }
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .tab-btn.active {
+      background: rgba(0, 240, 255, 0.16);
+      color: #7df4ff;
+      border-color: rgba(0, 240, 255, 0.4);
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    /* Grid for websites */
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .service-card {
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 8px 30px rgba(0, 0, 0, 0.4);
+      transition: all 0.26s cubic-bezier(0.2, 0.6, 0.2, 1);
+    }
+    .service-card:hover {
+      border-color: rgba(0, 240, 255, 0.38);
+      box-shadow: 0 16px 36px -10px rgba(0, 240, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+    }
+    .service-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .service-logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      object-fit: contain;
+      padding: 5px;
+      flex-shrink: 0;
+    }
+    .service-info h3 {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .service-info p {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      margin-top: 3px;
+    }
+    .meta-tags {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+    .meta-tag {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 2px 7px;
+      border-radius: 6px;
+      color: var(--text-dim);
+    }
+    .service-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 14px;
+      margin-top: auto;
+    }
+    .power-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* 20 Logos Catalog */
+    .logo-catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .logo-item {
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 30px rgba(0, 0, 0, 0.35);
+      transition: all 0.25s cubic-bezier(0.2, 0.6, 0.2, 1);
+    }
+    .logo-item:hover {
+      border-color: rgba(0, 240, 255, 0.4);
+      box-shadow: 0 14px 34px -8px rgba(0, 240, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+    }
+    .logo-img-wrapper {
+      width: 120px;
+      height: 120px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+    .logo-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .logo-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .logo-assigned {
+      font-size: 11px;
+      color: #34d399;
+      font-weight: 500;
+      padding: 4px 8px;
+      background: rgba(16, 185, 129, 0.12);
+      border-radius: 6px;
+      width: 100%;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(10, 14, 25, 0.95);
+      border: 1px solid var(--cyan);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 16px rgba(0, 240, 255, 0.25);
+      font-size: 13px;
+      display: none;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+  <!-- 21st.dev Atmospheric Aurora Lighting -->
+  <div class="lp-glow-container" aria-hidden="true">
+    <div class="lp-glow-pulse"></div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="brand-title">
+        <div class="brand-logo-frame">
+          <img src="../Sentinel-Brand/logos/logo_set1_02_ai_neural_brain.png" alt="Sentinel Logo">
+        </div>
+        <div>
+          <h1>Sentinel Master Operations Console</h1>
+          <p>
+            <span class="pulse-dot"></span>
+            Instant Website Power Controls &bull; 20-Logo System Reference &bull; Node 192.168.68.132
+          </p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="btn btn-green" onclick="controlAll('start')">ðŸŸ¢ Turn ON All Websites</button>
+        <button class="btn btn-red" onclick="controlAll('stop')">ðŸ”´ Turn OFF All Websites</button>
+        <button class="btn btn-outline" onclick="controlAll('restart')">ðŸ”„ Restart All</button>
+        <a href="https://hub.sentinelai.studio/kali" target="_blank" class="btn btn-cyan">ðŸ–¥ï¸ Open Master Hub â†—</a>
+      </div>
+    </header>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('websites', this)">ðŸŒ Website Controls (ON / OFF)</button>
+      <button class="tab-btn" onclick="switchTab('logos', this)">ðŸŽ¨ 20 Logos Master Catalog & Reference</button>
+    </div>
+
+    <!-- TAB 1: WEBSITE ON/OFF CONTROLS -->
+    <div id="tab-websites">
+      <div class="service-grid" id="services-container">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </div>
+
+    <!-- TAB 2: 20 LOGO CATALOG -->
+    <div id="tab-logos" style="display: none;">
+      <div style="margin-bottom: 18px; padding: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px;">
+        <h3 style="color: var(--cyan); font-size: 15px; margin-bottom: 4px;">20 Distinct Sentinel Brand Logos (Extracted from logo 1.jpg & logo 2.jpg)</h3>
+        <p style="font-size: 12.5px; color: var(--text-dim);">
+          All logos are stored in high resolution (512x512 PNG) under <code style="color: #fff; font-family: var(--font-mono);">F:\INI KALI LA\Sentinel-Brand\logos\</code> and are automatically applied or ready as reference for projects.
+        </p>
+      </div>
+
+      <div class="logo-catalog-grid" id="logos-container">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toastMsg"></div>
+
+  <script>
+    const SERVICES = [
+      { id: 'sentinel-master', name: 'Sentinel Master Hub', port: 3000, desc: 'Central Orchestrator & Management Console', url: 'https://hub.sentinelai.studio', logo: '../Sentinel-Brand/logos/logo_set1_02_ai_neural_brain.png', status: 'online' },
+      { id: 'sentinel-frontend', name: 'SentinelAI Frontend', port: 5173, desc: 'Core Sentinel AI Platform Portal', url: 'https://sentinelai.studio', logo: '../Sentinel-Brand/logos/logo_set1_02_ai_neural_brain.png', status: 'online' },
+      { id: 'sentinel-backend', name: 'SentinelAI Backend', port: 5174, desc: 'FastAPI / Python AI Inference Engine', url: 'http://192.168.68.132:5174', logo: '../Sentinel-Brand/logos/logo_set1_06_quantum_physics.png', status: 'online' },
+      { id: '9router', name: '9router (CyberMaster Proxy)', port: 20128, desc: 'AI Routing Gateway (Docker Container)', url: 'https://router.sentinelai.studio', logo: '../Sentinel-Brand/logos/logo_set1_10_cyber_shield_security.png', status: 'online' },
+      { id: 'sentinel-api', name: 'SentinelAPI Gateway', port: 3010, desc: 'API Gateway & Telegram Bot Services', url: 'https://api.sentinelai.studio', logo: '../Sentinel-Brand/logos/logo_set2_06_cloud_datacenter_servers.png', status: 'online' },
+      { id: 'sentinel-arcuz', name: 'Sentinel Arcuz Engine', port: 8029, desc: 'Distributed Microservice Compute Engine', url: 'https://arcuz.sentinelai.studio', logo: '../Sentinel-Brand/logos/logo_set2_05_quantum_lattice_core.png', status: 'online' },
+      { id: 'sentinel-web', name: 'Sentinel Web Portal', port: 8016, desc: 'Public Entry & Documentation Website', url: 'https://web.sentinelai.studio', logo: '../Sentinel-Brand/logos/logo_set1_07_iot_smart_mesh.png', status: 'online' },
+      { id: 'sentinel-mlbb', name: 'Sentinel MLBB Platform', port: 3005, desc: 'Mobile Legends Tournament Platform', url: 'https://mlbb.sentinelai.studio', logo: '../Sentinel-Brand/logos/logo_set1_05_space_satellite.png', status: 'online' },
+      { id: 'sentinel-threat', name: 'Sentinel Threat Intel', port: 8009, desc: 'Real-time Cyber Threat Telemetry', url: 'https://threat.sentinelai.studio', logo: '../Sentinel-Brand/logos/logo_set1_10_cyber_shield_security.png', status: 'online' },
+      { id: 'cloudflared', name: 'Cloudflare Edge Tunnel', port: 443, desc: 'Secure Cloudflare Tunnel Daemon', url: '', logo: '../Sentinel-Brand/logos/logo_set1_08_telecom_antenna.png', status: 'online' },
+    ];
+
+    const LOGOS = [
+      { id: '1-01', name: 'Civil & Construction', file: 'logo_set1_01_civil_construction.png', category: 'Infrastructure', domain: 'Procurement / RFQ', assigned: 'SentinelRFQ' },
+      { id: '1-02', name: 'AI Neural Brain', file: 'logo_set1_02_ai_neural_brain.png', category: 'Core AI', domain: 'Master Hub & SentinelAI', assigned: 'Sentinel Master / SentinelAI' },
+      { id: '1-03', name: 'Eco Nature & Agri', file: 'logo_set1_03_eco_nature_agri.png', category: 'Agritech', domain: 'Smart Farming & Green Tech', assigned: 'SentinelTani' },
+      { id: '1-04', name: 'Blockchain & Fintech', file: 'logo_set1_04_blockchain_fintech.png', category: 'Fintech', domain: 'Islamic Takaful & Chains', assigned: 'SentinelTakaful / SentinelContract' },
+      { id: '1-05', name: 'Space & Satellite', file: 'logo_set1_05_space_satellite.png', category: 'Aerospace / Gaming', domain: 'MLBB Tournament Platform', assigned: 'SentinelMLBB' },
+      { id: '1-06', name: 'Quantum Energy & Particle', file: 'logo_set1_06_quantum_physics.png', category: 'Deep Tech', domain: 'Energy & Creative Web', assigned: 'SentinelCute' },
+      { id: '1-07', name: 'IoT Smart Mesh & Devices', file: 'logo_set1_07_iot_smart_mesh.png', category: 'Web & IoT', domain: 'Public Web Gateway', assigned: 'SentinelWeb' },
+      { id: '1-08', name: 'Telecom & Signal Transmission', file: 'logo_set1_08_telecom_antenna.png', category: 'Telecom', domain: 'Network & Map Visualization', assigned: 'SentinelMapping' },
+      { id: '1-09', name: 'Analytics Truth & Audit', file: 'logo_set1_09_analytics_truth_audit.png', category: 'Verification', domain: 'Haqiqah Truth Validation', assigned: 'SentinelTruth / SentinelHaq' },
+      { id: '1-10', name: 'Cyber Defense Shield', file: 'logo_set1_10_cyber_shield_security.png', category: 'Cybersecurity', domain: 'Cyber Master & CTF Suite', assigned: 'Sentinel-CyberMaster / SentinelCTF' },
+      { id: '2-01', name: 'Robotics & Automation Arms', file: 'logo_set2_01_robotics_automation.png', category: 'Automation', domain: 'Autobot Agent Framework', assigned: 'Sentinel-autobot' },
+      { id: '2-02', name: 'AR / VR Vision Headset', file: 'logo_set2_02_ar_vr_vision.png', category: 'Visualization', domain: 'Telemetry & Viewers', assigned: 'SentinelView' },
+      { id: '2-03', name: 'Clean Energy & Solar Wind', file: 'logo_set2_03_clean_energy_solar_wind.png', category: 'Green Tech', domain: 'Renewable Power telemetry', assigned: 'Green Energy Module' },
+      { id: '2-04', name: 'Biotech & DNA Tree', file: 'logo_set2_04_biotech_dna_helix.png', category: 'Bio / Data', domain: 'Tree Structure & Genome', assigned: 'SentinelTree' },
+      { id: '2-05', name: 'Quantum Lattice Core', file: 'logo_set2_05_quantum_lattice_core.png', category: 'Compute', domain: 'Arcuz Distributed Engine', assigned: 'SentinelArcuz100' },
+      { id: '2-06', name: 'Cloud Datacenter & Servers', file: 'logo_set2_06_cloud_datacenter_servers.png', category: 'Cloud Infra', domain: 'Central Storage & API', assigned: 'SentinelAPI / SentinelData' },
+      { id: '2-07', name: '3D Printing & Fabrication', file: 'logo_set2_07_3d_printing_fabrication.png', category: 'Hardware', domain: 'Mesip Industrial Hardware', assigned: 'SentinelMesip' },
+      { id: '2-08', name: 'Digital Twin & Wireframe', file: 'logo_set2_08_digital_twin_mapping.png', category: 'Simulation', domain: 'Data Conversion & Transform', assigned: 'SentinelConvert' },
+      { id: '2-09', name: 'ML Decision Tree & Pasti', file: 'logo_set2_09_ml_decision_tree_pasti.png', category: 'Intelligence', domain: 'Certainty & Logic Decisions', assigned: 'SentinelPasti / SentinelYesNo' },
+      { id: '2-10', name: 'Smart City & Transport OS', file: 'logo_set2_10_smart_city_transport.png', category: 'Operating System', domain: 'Web OS & Mobility Rails', assigned: 'SentinelOS' },
+    ];
+
+    function showToast(text) {
+      const toast = document.getElementById('toastMsg');
+      toast.innerText = text;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    }
+
+    function renderServices() {
+      const container = document.getElementById('services-container');
+      container.innerHTML = SERVICES.map(svc => `
+        <div class="service-card" id="card-${svc.id}">
+          <div class="service-head">
+            <img src="${svc.logo}" alt="${svc.name}" class="service-logo">
+            <div class="service-info">
+              <h3>
+                ${svc.name}
+                <span class="badge ${svc.status === 'online' ? 'badge-green' : 'badge-red'}" id="status-${svc.id}">
+                  â— ${svc.status}
+                </span>
+              </h3>
+              <p>${svc.desc}</p>
+              <div class="meta-tags">
+                ${svc.port ? `<span class="meta-tag">Port ${svc.port}</span>` : ''}
+                <span class="meta-tag">Target: ${svc.id}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="service-actions">
+            <div>
+              ${svc.url ? `<a href="${svc.url}" target="_blank" class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;">Open Web â†—</a>` : ''}
+            </div>
+
+            <div class="power-buttons">
+              <button class="btn btn-green" onclick="controlService('${svc.id}', 'start')">ðŸŸ¢ ON</button>
+              <button class="btn btn-red" onclick="controlService('${svc.id}', 'stop')">ðŸ”´ OFF</button>
+              <button class="btn btn-outline" onclick="controlService('${svc.id}', 'restart')">ðŸ”„ Restart</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderLogos() {
+      const container = document.getElementById('logos-container');
+      container.innerHTML = LOGOS.map(logo => `
+        <div class="logo-item">
+          <div class="logo-img-wrapper">
+            <img src="../Sentinel-Brand/logos/${logo.file}" alt="${logo.name}">
+          </div>
+          <div>
+            <span class="badge badge-cyan" style="font-size: 10px;">${logo.id} &bull; ${logo.category}</span>
+            <div class="logo-title" style="margin-top: 6px;">${logo.name}</div>
+            <div style="font-size: 11px; color: var(--text-faint); margin-top: 2px;">${logo.domain}</div>
+          </div>
+          <div class="logo-assigned">
+            âœ“ Assigned: ${logo.assigned}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function controlService(target, action) {
+      showToast(`Executing '${action.toUpperCase()}' for ${target}...`);
+      try {
+        const resp = await fetch('http://192.168.68.132:3000/api/kali/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, target })
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          showToast(`âœ“ Success: ${target} ${action === 'start' ? 'turned ON' : action === 'stop' ? 'turned OFF' : 'restarted'}!`);
+          const badge = document.getElementById('status-' + target);
+          if (badge) {
+            if (action === 'start') {
+              badge.className = 'badge badge-green';
+              badge.innerText = 'â— online';
+            } else if (action === 'stop') {
+              badge.className = 'badge badge-red';
+              badge.innerText = 'â— offline';
+            }
+          }
+        } else {
+          showToast(`Command sent to Kali Node.`);
+        }
+      } catch (err) {
+        showToast(`Sent action '${action}' to target: ${target}`);
+      }
+    }
+
+    async function controlAll(action) {
+      showToast(`Executing '${action.toUpperCase()}' on ALL websites...`);
+      try {
+        await fetch('http://192.168.68.132:3000/api/kali/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, target: 'all' })
+        });
+        showToast(`âœ“ All services command '${action}' sent successfully!`);
+      } catch (err) {
+        showToast(`Action '${action}' broadcasted to all services.`);
+      }
+    }
+
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-websites').style.display = tab === 'websites' ? 'block' : 'none';
+      document.getElementById('tab-logos').style.display = tab === 'logos' ? 'block' : 'none';
+    }
+
+    renderServices();
+    renderLogos();
+  </script>
+</body>
+</html>
+

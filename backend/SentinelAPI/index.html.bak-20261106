@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html class="dark notranslate" lang="en" translate="no">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta name="google" content="notranslate"/>
+  <title>Sentinel API | OpenAI-Compatible AI Model Gateway</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg"/>
+  <meta name="description" content="Sentinel API - AI API access for DeepSeek V4, GLM-5, Kimi K3. 100M Tokens RM 6.00. Order via WhatsApp 011-65340306."/>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#070b18",
+            "surface-dim": "#060913",
+            "surface-container-lowest": "#0a0e1c",
+            "surface-container-low": "#111728",
+            "surface-container": "#182035",
+            "surface-container-high": "#222c45",
+            "surface-container-highest": "#2e3b5a",
+            "on-surface": "#e2e8f0",
+            "on-surface-variant": "#94a3b8",
+            "primary": "#f8fafc",
+            "primary-container": "#00f0ff",
+            "on-primary": "#041a24",
+            "secondary": "#25D366", // WhatsApp Green
+            "secondary-container": "#075E54",
+            "whatsapp": "#25D366",
+            "whatsapp-dark": "#128C7E",
+            "accent": "#6366f1",
+            "outline-variant": "#334155"
+          },
+          fontFamily: {
+            "display": ["Space Grotesk", "sans-serif"],
+            "body": ["Geist", "sans-serif"],
+            "mono": ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .cyber-grid {
+      background-size: 32px 32px;
+      background-image: 
+        linear-gradient(to right, rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
+    }
+    .radial-cyber {
+      background: radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.14) 0%, rgba(37, 211, 102, 0.06) 35%, rgba(7, 11, 24, 0) 70%);
+    }
+    .neon-border-glow {
+      box-shadow: 0 0 30px -4px rgba(0, 240, 255, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    }
+    .whatsapp-glow {
+      box-shadow: 0 0 25px -4px rgba(37, 211, 102, 0.6);
+    }
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.96); }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card:hover {
+      border-color: rgba(0, 240, 255, 0.3);
+    }
+    .glass-hero-card {
+      background: linear-gradient(180deg, rgba(8, 47, 73, 0.45) 0%, rgba(15, 23, 42, 0.65) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      box-shadow: 0 8px 32px 0 rgba(0, 240, 255, 0.12);
+    }
+    .glass-nav {
+      background: rgba(7, 11, 24, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #070b18; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased min-h-screen cyber-grid selection:bg-primary-container selection:text-on-primary notranslate" translate="no">
+
+  <!-- SINGLE SLEEK GLASS NAVIGATION HEADER -->
+  <header class="w-full glass-nav sticky top-0 z-50 shadow-lg shadow-black/20">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      <!-- Brand & Telemetry Status -->
+      <div class="flex items-center gap-4 sm:gap-6">
+        <a class="flex items-center gap-2 group" href="#hero">
+          <span class="font-display font-extrabold text-lg sm:text-xl text-white tracking-tight">SENTINEL</span>
+          <span class="font-display font-bold text-xs sm:text-sm px-2 py-0.5 rounded-md bg-cyan-400/15 border border-cyan-400/30 text-cyan-300 font-mono">API</span>
+        </a>
+
+        <!-- Stock & Customers Status -->
+        <div class="hidden lg:flex items-center gap-2">
+          <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 font-mono text-xs text-emerald-400 backdrop-blur-md">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="navQuotaStock">800M TOKENS IN STOCK</span>
+          </div>
+          <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 font-mono text-xs text-purple-300 backdrop-blur-md">
+            <span class="material-symbols-outlined text-[14px]">groups</span>
+            <span id="navCustomersCount">-- Customers</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center gap-7 font-mono text-xs sm:text-sm">
+        <a class="text-cyan-400 font-semibold border-b-2 border-cyan-400 pb-0.5 transition-colors" href="#pricing">Token Plans</a>
+        <a class="text-slate-300 hover:text-white transition-colors" href="#models">Model Catalog</a>
+        <a class="text-slate-300 hover:text-white transition-colors" href="#sandbox">Quickstart</a>
+        <a class="text-slate-300 hover:text-cyan-300 transition-colors flex items-center gap-1" href="#vscode">
+          <span class="material-symbols-outlined text-[15px] text-cyan-400">code</span>
+          <span>VS Code Setup</span>
+        </a>
+      </nav>
+
+      <!-- Trailing WhatsApp CTA -->
+      <div class="flex items-center gap-2">
+        <a class="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-whatsapp hover:bg-emerald-400 text-slate-950 font-display font-bold text-xs sm:text-sm tracking-tight shadow-md hover:shadow-emerald-500/20 active:scale-95 transition-all" href="https://wa.me/601165340306?text=Hi%20admin%2C%20I%20would%20like%20to%20buy%20the%20100M%20Tokens%20(RM%206.00)%20Package%20for%20Sentinel%20API" target="_blank">
+          <svg class="w-4 h-4 fill-slate-950 shrink-0" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+          </svg>
+          <span class="hidden sm:inline">Buy via WhatsApp</span>
+          <span class="sm:hidden">WhatsApp</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="w-full">
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-8 sm:pt-14 pb-14 sm:pb-20 px-4 sm:px-6 max-w-[1440px] mx-auto radial-cyber" id="hero">
+      <div class="max-w-4xl mx-auto text-center flex flex-col items-center">
+        <!-- Main Headline -->
+        <h1 class="font-display text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight font-extrabold mb-4 sm:mb-5 leading-tight">
+          AI API Access &mdash; <span class="text-cyan-400 drop-shadow-[0_0_25px_rgba(0,240,255,0.4)]">DeepSeek V4</span>, GLM-5, Kimi K3
+        </h1>
+
+        <!-- Subheadline -->
+        <p class="font-body text-sm sm:text-lg text-slate-300 max-w-2xl mb-6 sm:mb-8 leading-relaxed">
+          100% standard <code class="text-cyan-300 font-mono text-xs sm:text-sm bg-white/5 px-2 py-0.5 rounded border border-white/10 break-words">OpenAI Drop-In Replacement</code>. Simply swap the base URL to connect with cURL, Python, NextChat, or VS Code.
+        </p>
+
+        <!-- CTA Action Cluster -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto justify-center mb-10 sm:mb-12">
+          <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-display font-bold text-sm sm:text-base tracking-tight hover:shadow-[0_0_25px_rgba(0,240,255,0.4)] active:scale-95 transition-all duration-150" href="#pricing">
+            <span>View Pricing Plans</span>
+            <span class="material-symbols-outlined text-[18px] sm:text-[20px]">arrow_forward</span>
+          </a>
+          <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl bg-slate-900/60 border border-white/10 backdrop-blur-md text-white font-display text-sm sm:text-base hover:border-cyan-400 hover:text-cyan-300 transition-all duration-150" href="#vscode">
+            <span class="material-symbols-outlined text-[18px] sm:text-[20px]">code</span>
+            <span>VS Code Setup</span>
+          </a>
+        </div>
+
+        <!-- Trust Metrics Bento (Glassmorphic 6-Col Grid) -->
+        <div class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-4 p-3.5 sm:p-5 rounded-2xl glass-card shadow-xl">
+          <div class="p-3 sm:p-4 flex flex-col items-center justify-center rounded-xl bg-white/[0.02] border border-white/5 sm:border-0 sm:bg-transparent lg:border-r border-white/5">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="material-symbols-outlined text-cyan-400 text-[18px]">visibility</span>
+              <span class="font-display text-lg sm:text-2xl font-bold text-white tracking-tight" id="heroVisitorDisplay">--</span>
+            </div>
+            <span class="font-mono text-[10px] sm:text-[11px] text-slate-400 text-center uppercase tracking-wider">Web Visitors</span>
+          </div>
+          <div class="p-3 sm:p-4 flex flex-col items-center justify-center rounded-xl bg-white/[0.02] border border-white/5 sm:border-0 sm:bg-transparent lg:border-r border-white/5">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="material-symbols-outlined text-emerald-400 text-[18px]">verified_user</span>
+              <span class="font-display text-lg sm:text-2xl font-bold text-emerald-400 tracking-tight" id="heroCustomerDisplay">--</span>
+            </div>
+            <span class="font-mono text-[10px] sm:text-[11px] text-slate-400 text-center uppercase tracking-wider">Active Customers</span>
+          </div>
+          <div class="p-3 sm:p-4 flex flex-col items-center justify-center rounded-xl bg-white/[0.02] border border-white/5 sm:border-0 sm:bg-transparent lg:border-r border-white/5">
+            <span class="font-display text-lg sm:text-2xl font-bold text-white mb-1" id="heroQuotaDisplay">800M+</span>
+            <span class="font-mono text-[10px] sm:text-[11px] text-slate-400 text-center uppercase tracking-wider">Remaining Quota</span>
+          </div>
+          <div class="p-3 sm:p-4 flex flex-col items-center justify-center rounded-xl bg-white/[0.02] border border-white/5 sm:border-0 sm:bg-transparent lg:border-r border-white/5">
+            <span class="font-display text-base sm:text-2xl font-bold text-cyan-300 mb-1" id="heroModelsDisplay">Multi-Model</span>
+            <span class="font-mono text-[10px] sm:text-[11px] text-slate-400 text-center uppercase tracking-wider">DeepSeek, GLM, Kimi</span>
+          </div>
+          <div class="p-3 sm:p-4 flex flex-col items-center justify-center rounded-xl bg-white/[0.02] border border-white/5 sm:border-0 sm:bg-transparent lg:border-r border-white/5">
+            <span class="font-display text-lg sm:text-2xl font-bold text-white mb-1">7 &ndash; 28 Days</span>
+            <span class="font-mono text-[10px] sm:text-[11px] text-slate-400 text-center uppercase tracking-wider">Validity Period</span>
+          </div>
+          <div class="p-3 sm:p-4 flex flex-col items-center justify-center rounded-xl bg-white/[0.02] border border-white/5 sm:border-0 sm:bg-transparent">
+            <span class="font-display text-xs sm:text-lg font-bold text-emerald-400 mb-1 truncate max-w-full">011-6534 0306</span>
+            <span class="font-mono text-[10px] sm:text-[11px] text-slate-400 text-center uppercase tracking-wider">WhatsApp Admin</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: PRICING GRID (5 TIERS) -->
+    <section class="py-16 sm:py-20 px-4 sm:px-6 max-w-[1440px] mx-auto" id="pricing">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900/60 border border-white/10 text-slate-300 font-mono text-xs mb-3 backdrop-blur-md">
+          Pricing Options
+        </div>
+        <h2 class="font-display text-3xl sm:text-4xl font-bold text-white tracking-tight mb-3">
+          Token Credit Plans
+        </h2>
+        <p class="font-body text-base text-slate-300">
+          Prepaid billing with no hidden subscriptions. Contact admin via WhatsApp for instant activation.
+        </p>
+      </div>
+
+      <!-- Pricing Bento Cards Grid (5 Tiers) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5 items-stretch">
+
+        <!-- Tier 1: Starter -->
+        <div class="flex flex-col justify-between p-5 sm:p-6 rounded-2xl glass-card transition-all duration-200">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="font-display text-lg font-bold text-white">Starter</span>
+              <span class="font-mono text-xs text-slate-400">10M</span>
+            </div>
+            <div class="mb-4">
+              <div class="flex items-baseline gap-1">
+                <span class="font-mono text-sm text-slate-400">RM</span>
+                <span class="font-display text-4xl font-extrabold text-white">2.00</span>
+              </div>
+              <p class="font-mono text-xs text-slate-400 mt-1">RM 0.20 / 1M Tokens</p>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5 border border-white/5 mb-5">
+              <span class="font-display text-xl font-bold text-cyan-400">10,000,000</span>
+              <span class="font-mono text-xs text-slate-400 block">Token Credits</span>
+            </div>
+            <ul class="space-y-2.5 font-mono text-xs text-slate-300 mb-6">
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span class="font-semibold text-white">14 Days Validity</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>Access All AI Models</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>Code &amp; Vision Support</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>Instant Delivery via WhatsApp</span>
+              </li>
+            </ul>
+          </div>
+          <button class="w-full py-3 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-mono text-xs font-semibold hover:border-emerald-400/40 hover:text-emerald-400 transition-all active:scale-95" onclick="selectTierAndScrollWhatsApp('Starter', '10M Tokens', 'RM 2.00', '14 Hari')">
+            Select Plan (RM 2.00)
+          </button>
+        </div>
+
+        <!-- Tier 2: Standard -->
+        <div class="flex flex-col justify-between p-5 sm:p-6 rounded-2xl glass-card transition-all duration-200">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="font-display text-lg font-bold text-white">Standard</span>
+              <span class="font-mono text-xs text-slate-400">50M</span>
+            </div>
+            <div class="mb-4">
+              <div class="flex items-baseline gap-1">
+                <span class="font-mono text-sm text-slate-400">RM</span>
+                <span class="font-display text-4xl font-extrabold text-white">4.00</span>
+              </div>
+              <p class="font-mono text-xs text-slate-400 mt-1">RM 0.08 / 1M Tokens</p>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5 border border-white/5 mb-5">
+              <span class="font-display text-xl font-bold text-cyan-400">50,000,000</span>
+              <span class="font-mono text-xs text-slate-400 block">Token Credits</span>
+            </div>
+            <ul class="space-y-2.5 font-mono text-xs text-slate-300 mb-6">
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span class="font-semibold text-white">14 Days Validity</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>Access All AI Models</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>DeepSeek, Kimi &amp; GLM Support</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>Instant Delivery via WhatsApp</span>
+              </li>
+            </ul>
+          </div>
+          <button class="w-full py-3 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-mono text-xs font-semibold hover:border-emerald-400/40 hover:text-emerald-400 transition-all active:scale-95" onclick="selectTierAndScrollWhatsApp('Standard', '50M Tokens', 'RM 4.00', '14 Hari')">
+            Select Plan (RM 4.00)
+          </button>
+        </div>
+
+        <!-- Tier 3: 100M Plan (HERO CARD - RM 6.00 / 100M) -->
+        <div class="relative flex flex-col justify-between p-5 sm:p-7 rounded-2xl glass-hero-card lg:-translate-y-3 z-10 transition-all">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3.5 py-0.5 rounded-full bg-cyan-400 text-slate-950 font-mono text-xs font-bold uppercase tracking-wider shadow-sm">
+            Most Popular
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-3 pt-2">
+              <span class="font-display text-xl font-extrabold text-cyan-300">100M Plan</span>
+              <span class="font-mono text-xs text-emerald-400 bg-emerald-400/10 px-2.5 py-0.5 rounded-full border border-emerald-400/30 font-semibold">RM 6.00</span>
+            </div>
+            <div class="mb-4">
+              <div class="flex items-baseline gap-1">
+                <span class="font-mono text-base text-cyan-300">RM</span>
+                <span class="font-display text-5xl font-extrabold text-white">6.00</span>
+              </div>
+              <p class="font-mono text-xs text-emerald-400 font-semibold mt-1">RM 0.06 / 1M Tokens</p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-white/5 border border-cyan-400/30 mb-5">
+              <span class="font-display text-2xl font-extrabold text-cyan-300">100,000,000</span>
+              <span class="font-mono text-xs text-slate-300 block">Token Credits</span>
+            </div>
+            <ul class="space-y-2.5 font-mono text-xs text-slate-200 mb-6">
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-cyan-400 text-[18px]">verified</span>
+                <span class="font-semibold text-white">21 Days Validity</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-cyan-400 text-[18px]">verified</span>
+                <span>Access All AI Models</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-cyan-400 text-[18px]">verified</span>
+                <span>Personal Live Quota Dashboard</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-cyan-400 text-[18px]">verified</span>
+                <span>Ideal for VS Code, Cline &amp; Cursor</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-cyan-400 text-[18px]">verified</span>
+                <span>Direct WhatsApp Admin Support</span>
+              </li>
+            </ul>
+          </div>
+          <button class="w-full py-3.5 rounded-xl bg-whatsapp hover:bg-emerald-400 text-slate-950 font-display text-sm font-bold text-center tracking-tight shadow-md hover:shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-2" onclick="selectTierAndScrollWhatsApp('100M Plan', '100M Tokens', 'RM 6.00', '21 Hari')">
+            <svg class="w-4 h-4 fill-slate-950" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+            <span>Buy Now via WhatsApp (RM 6.00) &nearr;</span>
+          </button>
+        </div>
+
+        <!-- Tier 4: Pro -->
+        <div class="flex flex-col justify-between p-5 sm:p-6 rounded-2xl glass-card transition-all duration-200">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="font-display text-lg font-bold text-white">Pro</span>
+              <span class="font-mono text-xs text-slate-400">200M</span>
+            </div>
+            <div class="mb-4">
+              <div class="flex items-baseline gap-1">
+                <span class="font-mono text-sm text-slate-400">RM</span>
+                <span class="font-display text-4xl font-extrabold text-white">11.00</span>
+              </div>
+              <p class="font-mono text-xs text-slate-400 mt-1">RM 0.055 / 1M Tokens</p>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5 border border-white/5 mb-5">
+              <span class="font-display text-xl font-bold text-cyan-400">200,000,000</span>
+              <span class="font-mono text-xs text-slate-400 block">Token Credits</span>
+            </div>
+            <ul class="space-y-2.5 font-mono text-xs text-slate-300 mb-6">
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span class="font-semibold text-white">21 Days Validity</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>Access All AI Models</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>High Usage Quota Capacity</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>Instant Delivery via WhatsApp</span>
+              </li>
+            </ul>
+          </div>
+          <button class="w-full py-3 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-mono text-xs font-semibold hover:border-emerald-400/40 hover:text-emerald-400 transition-all active:scale-95" onclick="selectTierAndScrollWhatsApp('Pro', '200M Tokens', 'RM 11.00', '21 Hari')">
+            Select Plan (RM 11.00)
+          </button>
+        </div>
+
+        <!-- Tier 5: Max -->
+        <div class="flex flex-col justify-between p-5 sm:p-6 rounded-2xl glass-card transition-all duration-200">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="font-display text-lg font-bold text-white">Max</span>
+              <span class="font-mono text-xs text-slate-400">500M</span>
+            </div>
+            <div class="mb-4">
+              <div class="flex items-baseline gap-1">
+                <span class="font-mono text-sm text-slate-400">RM</span>
+                <span class="font-display text-4xl font-extrabold text-white">25.00</span>
+              </div>
+              <p class="font-mono text-xs text-slate-400 mt-1">RM 0.05 / 1M Tokens</p>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5 border border-white/5 mb-5">
+              <span class="font-display text-xl font-bold text-emerald-400">500,000,000</span>
+              <span class="font-mono text-xs text-slate-400 block">Token Credits</span>
+            </div>
+            <ul class="space-y-2.5 font-mono text-xs text-slate-300 mb-6">
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span class="font-semibold text-white">28 Days Validity</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>Access All AI Models</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>Best Token Rate Value</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>
+                <span>Instant Delivery via WhatsApp</span>
+              </li>
+            </ul>
+          </div>
+          <button class="w-full py-3 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-mono text-xs font-semibold hover:border-emerald-400/40 hover:text-emerald-400 transition-all active:scale-95" onclick="selectTierAndScrollWhatsApp('Max', '500M Tokens', 'RM 25.00', '28 Hari')">
+            Select Plan (RM 25.00)
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION: INTERACTIVE MODEL CATALOG (LIVE SYNC) -->
+    <section class="py-16 sm:py-20 px-4 sm:px-6 max-w-[1440px] mx-auto border-t border-outline-variant/20" id="models">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900/60 border border-white/10 text-slate-300 font-mono text-xs mb-3 backdrop-blur-md">
+            Model Catalog
+          </div>
+          <h2 class="font-display text-3xl sm:text-4xl font-bold text-white tracking-tight flex items-center flex-wrap gap-2.5">
+            <span>Active AI Model Catalog</span>
+            <span id="modelsCatalogCount" class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-cyan-400/15 border border-cyan-400/30 text-cyan-300">Syncing...</span>
+          </h2>
+          <p class="font-body text-slate-300 mt-1">
+            All AI models are production-ready with standard OpenAI API formatting. Auto-updated in real-time.
+          </p>
+        </div>
+
+        <!-- Action Cluster: Sync Now & Search Bar -->
+        <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div class="flex items-center gap-2">
+            <span id="modelsSyncStatus" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs whitespace-nowrap">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="syncStatusText">Auto-Sync Active</span>
+            </span>
+            <button onclick="loadModels(true)" title="Force Sync from Upstream API" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-cyan-300 font-mono text-xs transition-all active:scale-95 whitespace-nowrap">
+              <span class="material-symbols-outlined text-[16px]" id="syncSpinnerIcon">sync</span>
+              <span>Sync</span>
+            </button>
+          </div>
+          <div class="relative w-full md:w-72">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+            <input class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/60 border border-white/10 font-mono text-xs text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none backdrop-blur-md transition-all" id="modelSearchInput" oninput="filterModelCards()" placeholder="Search models e.g. deepseek, kimi, glm..." type="text"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model Status Toggle: Available (Online) vs Out of stock (Offline) - Gambar 1 BandelAI Style -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/5">
+        <!-- Availability Pills -->
+        <div class="flex items-center gap-2.5">
+          <button id="btnTabAvailable" class="avail-tab px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-500/10 transition-all active:scale-95" onclick="setAvailabilityFilter('available', this)">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Available</span>
+            <span id="availCountBadge" class="px-2 py-0.5 rounded-md bg-emerald-400/20 text-emerald-300 text-[11px]">--</span>
+          </button>
+
+          <button id="btnTabOutOfStock" class="avail-tab px-4 py-2 rounded-xl bg-white/5 text-slate-400 hover:text-white border border-white/10 font-mono text-xs font-semibold flex items-center gap-2 transition-all active:scale-95" onclick="setAvailabilityFilter('outofstock', this)">
+            <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+            <span>Out of stock</span>
+            <span id="outOfStockCountBadge" class="px-2 py-0.5 rounded-md bg-white/10 text-slate-300 text-[11px]">--</span>
+          </button>
+        </div>
+
+        <!-- Showing X of Y models indicator -->
+        <div class="font-mono text-xs text-slate-400" id="showingModelsSummary">
+          Showing <span class="text-cyan-400 font-bold" id="showingCountNum">--</span> of <span id="totalAvailableNum">--</span> models
+        </div>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6 sm:mb-8 font-mono text-xs no-scrollbar" id="categoryTabs">
+        <button class="category-btn active-tab px-3.5 sm:px-4 py-2 rounded-xl bg-cyan-400 text-slate-950 font-bold whitespace-nowrap shadow-md shadow-cyan-500/20" onclick="setCategoryFilter('all', this)">All</button>
+        <button class="category-btn px-3.5 sm:px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white whitespace-nowrap backdrop-blur-md" onclick="setCategoryFilter('deepseek', this)">DeepSeek</button>
+        <button class="category-btn px-3.5 sm:px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white whitespace-nowrap backdrop-blur-md" onclick="setCategoryFilter('glm', this)">GLM</button>
+        <button class="category-btn px-3.5 sm:px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white whitespace-nowrap backdrop-blur-md" onclick="setCategoryFilter('kimi', this)">Kimi</button>
+        <button class="category-btn px-3.5 sm:px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white whitespace-nowrap backdrop-blur-md" onclick="setCategoryFilter('gpt', this)">GPT &amp; Claude</button>
+        <button class="category-btn px-3.5 sm:px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white whitespace-nowrap backdrop-blur-md" onclick="setCategoryFilter('vision', this)">Vision &amp; Mod</button>
+        <button class="category-btn px-3.5 sm:px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white whitespace-nowrap backdrop-blur-md" onclick="setCategoryFilter('coding', this)">Coding</button>
+      </div>
+
+      <!-- Models Dynamic Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="modelsContainer">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- SECTION: QUICKSTART INTEGRATION SANDBOX -->
+    <section class="py-16 sm:py-20 px-4 sm:px-6 max-w-[1440px] mx-auto border-t border-outline-variant/20" id="sandbox">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <!-- Left Explanatory Column -->
+        <div class="lg:col-span-5 space-y-5">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900/60 border border-white/10 text-slate-300 font-mono text-xs backdrop-blur-md">
+            OpenAI Drop-In Compatible
+          </div>
+          <h2 class="font-display text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
+            Fast &amp; Seamless Integration
+          </h2>
+          <p class="font-body text-slate-300 leading-relaxed">
+            No need to install new SDKs. Sentinel API supports standard OpenAI syntax in cURL, Python, Node.js, Cursor, NextChat, and TypingMind.
+          </p>
+          <div class="space-y-3 font-mono text-xs">
+            <div class="p-3.5 rounded-2xl glass-card flex items-start gap-3">
+              <span class="material-symbols-outlined text-cyan-400 text-[22px]">dns</span>
+              <div>
+                <h4 class="font-bold text-white font-display text-sm">Dedicated Base URL</h4>
+                <p class="text-cyan-300 font-mono select-all">https://bandelbanget.xyz/v1</p>
+              </div>
+            </div>
+            <div class="p-3.5 rounded-2xl glass-card flex items-start gap-3">
+              <span class="material-symbols-outlined text-emerald-400 text-[22px]">verified_user</span>
+              <div>
+                <h4 class="font-bold text-white font-display text-sm">Standard Authentication</h4>
+                <p class="text-slate-400 font-mono">Bearer sk-qwen-xxxxxxxxxxxxxxxx</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Terminal / Code Snippet -->
+        <div class="lg:col-span-7">
+          <div class="rounded-2xl glass-card overflow-hidden shadow-2xl">
+            <!-- Terminal Header -->
+            <div class="px-3.5 sm:px-4 py-2.5 sm:py-3 bg-surface-container-low border-b border-outline-variant/30 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500/80"></span>
+                <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500/80"></span>
+                <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500/80"></span>
+                <span class="ml-2 font-mono text-xs text-slate-400 hidden sm:inline">sentinel-quickstart.sh</span>
+              </div>
+              <div class="flex items-center gap-1 font-mono text-xs overflow-x-auto no-scrollbar">
+                <button class="code-tab px-2.5 sm:px-3 py-1 rounded-md bg-surface-container text-cyan-400 font-semibold border border-cyan-400/30 whitespace-nowrap" onclick="setTab('curl', this)">cURL</button>
+                <button class="code-tab px-2.5 sm:px-3 py-1 rounded-md text-slate-400 hover:text-white whitespace-nowrap" onclick="setTab('python', this)">Python (OpenAI)</button>
+                <button class="code-tab px-2.5 sm:px-3 py-1 rounded-md text-slate-400 hover:text-white whitespace-nowrap" onclick="setTab('nodejs', this)">Node.js</button>
+              </div>
+            </div>
+            <!-- Code Area -->
+            <div class="p-5 font-mono text-xs bg-[#060b18] overflow-x-auto relative">
+              <button class="absolute top-4 right-4 px-3 py-1.5 rounded-lg bg-surface-container border border-outline-variant/50 text-white font-mono text-xs flex items-center gap-1.5 hover:border-cyan-400 hover:text-cyan-300 transition-all" onclick="copyCurrentCode()">
+                <span class="material-symbols-outlined text-[14px]">content_copy</span>
+                <span id="copyFeedback">Copy Code</span>
+              </button>
+              <pre class="text-slate-200 leading-relaxed" id="codeDisplay"><code></code></pre>
+            </div>
+            <!-- Terminal Response Simulation -->
+            <div class="p-4 bg-surface-container-low border-t border-outline-variant/30 font-mono text-xs">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-whatsapp flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px]">check_circle</span> Response: 200 OK (76ms)
+                </span>
+                <span class="text-slate-400">Tokens Burned: 42</span>
+              </div>
+              <div class="p-3 rounded-lg bg-[#060b18] text-slate-300 text-[11px] border border-outline-variant/30 overflow-x-auto">
+                <span class="text-cyan-400">"choices"</span>: [{ <span class="text-cyan-400">"message"</span>: { <span class="text-cyan-400">"role"</span>: <span class="text-secondary">"assistant"</span>, <span class="text-cyan-400">"content"</span>: <span class="text-white">"Hello! Sentinel Gateway node KL-01 is online and operational. Latency: 24ms, remaining quota: 100,000,000 tokens."</span> } }]
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: STEP-BY-STEP VS CODE SETUP & ALL MODELS JSON CONFIG -->
+    <section class="py-16 sm:py-20 px-4 sm:px-6 max-w-[1440px] mx-auto border-t border-outline-variant/20" id="vscode">
+      <div class="space-y-10">
+        <!-- Section Header -->
+        <div class="text-center max-w-3xl mx-auto space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 font-mono text-xs">
+            <span class="material-symbols-outlined text-[15px]">code</span>
+            VS Code &amp; Cursor Developer Integration
+          </div>
+          <h2 class="font-display text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+            Step-by-Step <span class="text-cyan-400 drop-shadow-[0_0_20px_rgba(0,240,255,0.4)]">VS Code Setup</span>
+          </h2>
+          <p class="font-body text-slate-300 text-sm sm:text-base leading-relaxed">
+            Simply copy and paste the JSON configuration below to load <strong class="text-white">ALL AI MODELS</strong> (DeepSeek V4, Kimi K2.7 Code, GLM-5.3, Vision &amp; Pentest) into your coding editor at once. No need to configure models one by one!
+          </p>
+        </div>
+
+        <!-- 4-Step Visual Workflow Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Step 1 -->
+          <div class="p-5 rounded-2xl glass-card relative overflow-hidden group hover:border-cyan-400/40 transition-all">
+            <div class="absolute top-3 right-4 font-mono font-extrabold text-4xl text-slate-800/40 select-none">01</div>
+            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-400 mb-3">
+              <span class="material-symbols-outlined text-[22px]">extension</span>
+            </div>
+            <h3 class="font-display font-bold text-white text-base mb-1">Install AI Extension</h3>
+            <p class="font-body text-slate-400 text-xs leading-relaxed">
+              Open VS Code, press <kbd class="px-1.5 py-0.5 rounded bg-white/5 text-cyan-300 font-mono">Ctrl+Shift+X</kbd>, search and install the <strong class="text-white">Continue</strong> extension (or <strong class="text-white">Roo Code / Cline</strong>).
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="p-5 rounded-2xl glass-card relative overflow-hidden group hover:border-cyan-400/40 transition-all">
+            <div class="absolute top-3 right-4 font-mono font-extrabold text-4xl text-slate-800/40 select-none">02</div>
+            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-400 mb-3">
+              <span class="material-symbols-outlined text-[22px]">settings_suggest</span>
+            </div>
+            <h3 class="font-display font-bold text-white text-base mb-1">Open config.json</h3>
+            <p class="font-body text-slate-400 text-xs leading-relaxed">
+              Press <kbd class="px-1.5 py-0.5 rounded bg-white/5 text-cyan-300 font-mono">Ctrl+Shift+P</kbd> (Mac: <kbd class="px-1.5 py-0.5 rounded bg-white/5 text-cyan-300 font-mono">Cmd+Shift+P</kbd>), type <strong class="text-white">Continue: Open config.json</strong> and press Enter.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="p-5 rounded-2xl glass-card relative overflow-hidden group hover:border-emerald-400/40 transition-all">
+            <div class="absolute top-3 right-4 font-mono font-extrabold text-4xl text-slate-800/40 select-none">03</div>
+            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-emerald-400 mb-3">
+              <span class="material-symbols-outlined text-[22px]">key</span>
+            </div>
+            <h3 class="font-display font-bold text-white text-base mb-1">Enter Your API Key</h3>
+            <p class="font-body text-slate-400 text-xs leading-relaxed">
+              Enter your Sentinel API Key in the box below &mdash; the JSON code will update with your key in real time!
+            </p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="p-5 rounded-2xl glass-card relative overflow-hidden group hover:border-cyan-400/40 transition-all">
+            <div class="absolute top-3 right-4 font-mono font-extrabold text-4xl text-slate-800/40 select-none">04</div>
+            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-400 mb-3">
+              <span class="material-symbols-outlined text-[22px]">rocket_launch</span>
+            </div>
+            <h3 class="font-display font-bold text-white text-base mb-1">Copy, Paste &amp; Done!</h3>
+            <p class="font-body text-slate-400 text-xs leading-relaxed">
+              Click <strong class="text-white">"Copy Full JSON Config"</strong>, paste into <code class="px-1.5 py-0.5 rounded bg-white/5 text-cyan-300 font-mono">config.json</code> &amp; save (<kbd class="px-1.5 py-0.5 rounded bg-white/5 text-cyan-300 font-mono">Ctrl+S</kbd>). Press <kbd class="px-1.5 py-0.5 rounded bg-white/5 text-cyan-300 font-mono">Ctrl+L</kbd> to start coding!
+            </p>
+          </div>
+        </div>
+
+        <!-- Interactive JSON Code Configurator Box -->
+        <div class="rounded-3xl glass-card overflow-hidden shadow-2xl">
+          <!-- Configurator Top Control Bar -->
+          <div class="p-3.5 sm:p-6 bg-slate-900/60 border-b border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+            <!-- Format Tabs -->
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <button class="vscode-tab px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-surface-container text-cyan-400 font-mono text-xs font-bold border border-cyan-400/40 flex items-center gap-1.5 sm:gap-2 shadow-sm" onclick="setVsCodeTab('continue', this)" id="tabBtnContinue">
+                <span class="material-symbols-outlined text-[16px]">data_object</span>
+                <span class="hidden sm:inline">Continue (config.json) &mdash; All AI Models</span>
+                <span class="sm:hidden">Continue (config.json)</span>
+              </button>
+              <button class="vscode-tab px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-slate-400 hover:text-white font-mono text-xs border border-outline-variant/30 flex items-center gap-1.5 sm:gap-2 transition-all" onclick="setVsCodeTab('cline', this)" id="tabBtnCline">
+                <span class="material-symbols-outlined text-[16px]">smart_toy</span>
+                <span class="hidden sm:inline">Roo Code / Cline (settings.json)</span>
+                <span class="sm:hidden">Roo Code / Cline</span>
+              </button>
+              <button class="vscode-tab px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-slate-400 hover:text-white font-mono text-xs border border-outline-variant/30 flex items-center gap-1.5 sm:gap-2 transition-all" onclick="setVsCodeTab('raw', this)" id="tabBtnRaw">
+                <span class="material-symbols-outlined text-[16px]">list</span>
+                <span class="hidden sm:inline">Model IDs List Only</span>
+                <span class="sm:hidden">Model IDs</span>
+              </button>
+            </div>
+
+            <!-- API Key Live Replacer Input -->
+            <div class="flex items-center gap-2 max-w-md w-full">
+              <div class="relative w-full">
+                <span class="absolute inset-y-0 left-3 flex items-center text-cyan-400 pointer-events-none">
+                  <span class="material-symbols-outlined text-[16px]">vpn_key</span>
+                </span>
+                <input id="vscodeApiKeyInput" type="text" placeholder="Enter your sk-qwen-... key (auto-updates JSON)" class="w-full pl-9 pr-3 py-2 rounded-xl bg-[#060b18] border border-outline-variant/50 text-xs font-mono text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none transition-all" oninput="updateVsCodeJson()"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub-header notification bar -->
+          <div class="px-4 sm:px-5 py-2.5 bg-[#0a0f22] border-b border-outline-variant/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs font-mono">
+            <div class="flex items-center gap-2 text-slate-300 flex-wrap">
+              <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shrink-0"></span>
+              <span id="vscodeFileTargetName" class="text-cyan-300 font-bold truncate max-w-full">~/.continue/config.json</span>
+              <span class="text-slate-500 hidden sm:inline">|</span>
+              <span class="text-whatsapp text-[11px] sm:text-xs">Active Models Loaded</span>
+            </div>
+            <button onclick="copyVsCodeJson()" class="inline-flex items-center justify-center gap-2 px-4 py-2 sm:py-1.5 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-display font-bold text-xs shadow-[0_0_15px_rgba(0,240,255,0.4)] active:scale-95 transition-all w-full sm:w-fit">
+              <span class="material-symbols-outlined text-[16px]">content_copy</span>
+              <span id="copyVsCodeFeedback">Copy Full JSON Config</span>
+            </button>
+          </div>
+
+          <!-- Code Snippet Display with Max-Height and Smooth Scroll -->
+          <div class="p-4 sm:p-5 font-mono text-xs bg-[#050813] max-h-[380px] sm:max-h-[460px] overflow-y-auto relative border-b border-outline-variant/30">
+            <pre class="text-slate-200 leading-relaxed font-mono select-all"><code id="vscodeCodeDisplay"></code></pre>
+          </div>
+
+          <!-- Tips Footer -->
+          <div class="p-3.5 sm:p-5 bg-surface-container-low/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400 font-mono">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-whatsapp text-[18px] shrink-0">lightbulb</span>
+              <span><strong>Tip:</strong> In VS Code, press <kbd class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/40 text-cyan-300">Ctrl + L</kbd> to open the AI chat panel, and select any model from the Continue dropdown menu.</span>
+            </div>
+            <a href="#checkout" class="text-cyan-400 hover:underline flex items-center gap-1 font-bold whitespace-nowrap">
+              Don't have an API Key? Buy here &nearr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: DIRECT WHATSAPP ORDERING HUB -->
+    <section class="py-16 sm:py-20 px-4 sm:px-6 max-w-[1440px] mx-auto border-t border-outline-variant/20" id="checkout">
+      <div class="max-w-4xl mx-auto rounded-3xl glass-card border border-white/10 p-5 sm:p-10 shadow-2xl relative overflow-hidden">
+        
+        <!-- Header of WhatsApp Checkout -->
+        <div class="text-center max-w-2xl mx-auto mb-8">
+          <span class="font-mono text-xs px-3.5 py-1 rounded-full bg-slate-900/60 border border-white/10 text-slate-300 inline-block mb-3 backdrop-blur-md">
+            WhatsApp Ordering
+          </span>
+          <h3 class="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Order Directly via WhatsApp
+          </h3>
+          <p class="font-body text-xs sm:text-sm text-slate-300 mt-2">
+            Select your package and click the button below to send your order directly to <strong class="text-emerald-400 font-bold">011-6534 0306</strong>.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-center">
+          
+          <!-- Left Column: Package Selected Card -->
+          <div class="md:col-span-5 p-5 sm:p-6 rounded-2xl bg-white/5 border border-white/10 space-y-4 backdrop-blur-md">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 font-mono text-xs">Selected Plan</span>
+              <span id="waPlanValidity" class="px-2 py-0.5 rounded bg-emerald-400/10 text-emerald-400 font-mono text-[11px] border border-emerald-400/30 font-semibold">21 Days Validity</span>
+            </div>
+            <div>
+              <h4 class="font-display text-2xl font-extrabold text-white" id="waPackageTitle">100M Plan (100M Tokens)</h4>
+              <div class="font-display text-4xl font-extrabold text-cyan-400 mt-1" id="waPackagePrice">RM 6.00</div>
+            </div>
+            
+            <ul class="text-xs font-mono text-slate-300 space-y-2 border-t border-white/10 pt-3">
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span> <strong id="waTokensCount">100,000,000</strong> Full Token Quota</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span> Access all AI Models (DeepSeek, GLM, Kimi)</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span> Personal Live Quota Check Dashboard</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span> No hidden charges or commitments</li>
+            </ul>
+
+            <button onclick="scrollToPricing()" class="text-xs font-mono text-cyan-400 hover:underline flex items-center gap-1 pt-1">
+              <span class="material-symbols-outlined text-[14px]">swap_horiz</span>
+              <span>Choose another plan</span>
+            </button>
+          </div>
+
+          <!-- Right Column: Direct WhatsApp Action -->
+          <div class="md:col-span-7 space-y-5">
+            
+            <div class="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4 shadow-inner backdrop-blur-md">
+              <div class="flex items-center justify-between border-b border-outline-variant/30 pb-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-whatsapp/20 border border-whatsapp flex items-center justify-center text-whatsapp">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h5 class="font-display font-bold text-white text-sm">Official WhatsApp Admin</h5>
+                    <p class="font-mono text-xs text-whatsapp font-bold">011-6534 0306</p>
+                  </div>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-whatsapp/20 text-whatsapp font-mono text-[10px] font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-whatsapp animate-ping"></span>
+                  Online
+                </span>
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-xs font-mono text-slate-300">Your Order Message Preview:</label>
+                <div class="p-3 rounded-xl bg-surface-container border border-outline-variant/40 font-mono text-xs text-slate-200" id="waMessagePreview">
+                  Hi admin, I would like to buy the 100M Plan (100M Tokens) for RM 6.00 from Sentinel API. Could I get your bank account / DuitNow details?
+                </div>
+              </div>
+
+              <!-- Main Big WhatsApp Button -->
+              <a id="btnWhatsAppSubmit" href="https://wa.me/601165340306?text=Hi%20admin%2C%20I%20would%20like%20to%20buy%20the%20100M%20Plan%20(100M%20Tokens)%20for%20RM%206.00%20from%20Sentinel%20API.%20Could%20I%20get%20your%20bank%20account%20%2F%20DuitNow%20details%3F" target="_blank" class="w-full py-4 rounded-xl bg-whatsapp hover:bg-emerald-400 text-slate-950 font-display font-extrabold text-sm sm:text-base tracking-tight whatsapp-glow active:scale-95 transition-all flex items-center justify-center gap-2.5">
+                <svg class="w-5 h-5 fill-slate-950" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                <span>Send Order via WhatsApp Now &nearr;</span>
+              </a>
+
+            </div>
+
+            <!-- Steps & Assurance -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center font-mono text-xs text-slate-300">
+              <div class="p-3 rounded-xl bg-surface-container border border-outline-variant/30">
+                <span class="font-bold text-cyan-300 block mb-1">1. Click WhatsApp</span>
+                <span class="text-[11px] text-slate-400">Your package order message is prepared automatically.</span>
+              </div>
+              <div class="p-3 rounded-xl bg-surface-container border border-outline-variant/30">
+                <span class="font-bold text-whatsapp block mb-1">2. Bank Transfer</span>
+                <span class="text-[11px] text-slate-400">Admin provides secure payment details in chat.</span>
+              </div>
+              <div class="p-3 rounded-xl bg-surface-container border border-outline-variant/30">
+                <span class="font-bold text-cyan-300 block mb-1">3. Receive API Key</span>
+                <span class="text-[11px] text-slate-400">Your API Key is issued immediately!</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FLOATING WHATSAPP BUTTON (BOTTOM RIGHT) -->
+  <aside class="fixed bottom-6 right-6 z-50">
+    <a href="https://wa.me/601165340306?text=Hi%20admin%2C%20I%20have%20an%20inquiry%20about%20Sentinel%20API%20packages" target="_blank" class="flex items-center gap-2.5 px-4 py-3 rounded-full bg-whatsapp text-slate-950 font-display font-extrabold text-sm shadow-[0_4px_25px_rgba(37,211,102,0.6)] hover:scale-105 active:scale-95 transition-all">
+      <svg class="w-5 h-5 fill-slate-950" viewBox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+      </svg>
+      <span class="hidden sm:inline">WhatsApp 011-6534 0306</span>
+      <span class="sm:hidden">WhatsApp</span>
+    </a>
+  </aside>
+
+  <!-- FOOTER -->
+  <footer class="w-full bg-surface-container-lowest border-t border-outline-variant/30 py-12 px-4 sm:px-6">
+    <div class="max-w-[1440px] mx-auto flex flex-col md:flex-row items-start justify-between gap-8 pb-8 border-b border-outline-variant/20">
+      <div class="max-w-md">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 p-1.5 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full">
+              <path d="M32 9 51 17v16.5C51 44.6 43.1 52.7 32 56 20.9 52.7 13 44.6 13 33.5V17z" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linejoin="round"/>
+              <path d="m23.5 33.8 6 6.2 11.5-13" fill="none" stroke="#00f0ff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="font-display font-bold text-lg text-white">SENTINEL API GATEWAY</span>
+        </div>
+        <p class="font-body text-xs text-slate-400 leading-relaxed mb-4">
+          High-performance AI model inference distribution gateway for regional developers, agencies, and software resellers. Contact admin directly via WhatsApp for sales and instant activation.
+        </p>
+        <div class="flex items-center gap-3 text-slate-400 font-mono text-xs">
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> WhatsApp: 011-6534 0306</span>
+          <span>&bull;</span>
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> System Online</span>
+        </div>
+      </div>
+
+      <!-- Footer Quick Links -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8 font-mono text-xs">
+        <div>
+          <h4 class="font-bold text-white mb-3 uppercase tracking-wider">Infrastructure</h4>
+          <ul class="space-y-2 text-slate-400">
+            <li><a class="hover:text-cyan-300 transition-colors" href="#hero">System Status</a></li>
+            <li><a class="hover:text-cyan-300 transition-colors" href="#models">AI Model Catalog</a></li>
+            <li><a class="hover:text-cyan-300 transition-colors" href="#sandbox">Quickstart Code</a></li>
+            <li><a class="hover:text-cyan-300 transition-colors" href="#vscode">VS Code Setup (JSON)</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold text-white mb-3 uppercase tracking-wider">Token Plans</h4>
+          <ul class="space-y-2 text-slate-400">
+            <li><a class="hover:text-cyan-300 transition-colors" href="#pricing">10M (RM 2.00)</a></li>
+            <li><a class="hover:text-cyan-300 transition-colors" href="#pricing">50M (RM 4.00)</a></li>
+            <li><a class="hover:text-cyan-300 transition-colors" href="#pricing">100M (RM 6.00)</a></li>
+            <li><a class="hover:text-cyan-300 transition-colors" href="#pricing">500M (RM 25.00)</a></li>
+          </ul>
+        </div>
+        <div class="col-span-2 sm:col-span-1">
+          <h4 class="font-bold text-white mb-3 uppercase tracking-wider">Contact</h4>
+          <ul class="space-y-2 text-slate-400">
+            <li><a class="hover:text-whatsapp transition-colors text-whatsapp font-bold" href="https://wa.me/601165340306" target="_blank">WhatsApp: 011-6534 0306</a></li>
+            <li><a class="hover:text-cyan-300 transition-colors" href="#checkout">How to Order</a></li>
+            <li><a class="hover:text-cyan-300 transition-colors" href="#sandbox">cURL / Python Docs</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-[1440px] mx-auto pt-6 flex flex-col sm:flex-row items-center justify-between text-slate-500 font-mono text-xs gap-4">
+      <p>&copy; 2025&ndash;2026 Sentinel API Gateway. All Rights Reserved.</p>
+      <div class="flex items-center gap-3">
+        <span class="flex items-center gap-1.5 text-cyan-400">
+          <span class="material-symbols-outlined text-[15px]">visibility</span>
+          <span id="footerVisitorCount">0</span> Visitors
+        </span>
+        <span class="text-outline-variant">|</span>
+        <span class="flex items-center gap-1.5 text-emerald-400">
+          <span class="material-symbols-outlined text-[15px]">group</span>
+          <span id="footerCustomerCount">0</span> Customers
+        </span>
+        <span class="text-outline-variant">|</span>
+        <span>OpenAI API Compatible</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    const WA_NUMBER = '601165340306';
+
+    // Tab switching for Code Sandbox
+    const codeSnippets = {
+      curl: `# Instant testing using standard OpenAI cURL
+curl https://bandelbanget.xyz/v1/chat/completions \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer sk-qwen-xxxxxxxxxxxxxxxx" \\
+  -d '{
+    "model": "deepseek-v4-flash",
+    "messages": [
+      {"role": "user", "content": "Hello! What is the status of node KL-01?"}
+    ],
+    "stream": false
+  }'`,
+
+      python: `# Python OpenAI SDK Drop-in Replacement
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://bandelbanget.xyz/v1",
+    api_key="sk-qwen-xxxxxxxxxxxxxxxx"  # Your Sentinel API Key
+)
+
+response = client.chat.completions.create(
+    model="deepseek-v4-flash",
+    messages=[{"role": "user", "content": "Hello Sentinel API!"}]
+)
+
+print(response.choices[0].message.content)`,
+
+      nodejs: `// Node.js OpenAI SDK Drop-in Replacement
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  baseURL: "https://bandelbanget.xyz/v1",
+  apiKey: "sk-qwen-xxxxxxxxxxxxxxxx"
+});
+
+async function main() {
+  const completion = await openai.chat.completions.create({
+    model: "deepseek-v4-flash",
+    messages: [{ role: "user", content: "Hello Sentinel!" }],
+  });
+  console.log(completion.choices[0].message.content);
+}
+main();`
+    };
+
+    let currentTab = 'curl';
+    let allActiveModels = [];
+
+    function setTab(tab, element) {
+      currentTab = tab;
+      document.querySelectorAll('.code-tab').forEach(el => {
+        el.classList.remove('bg-surface-container', 'text-cyan-400', 'font-semibold', 'border', 'border-cyan-400/30');
+        el.classList.add('text-slate-400');
+      });
+      element.classList.add('bg-surface-container', 'text-cyan-400', 'font-semibold', 'border', 'border-cyan-400/30');
+      element.classList.remove('text-slate-400');
+
+      document.getElementById('codeDisplay').querySelector('code').textContent = codeSnippets[tab];
+    }
+
+    function copyCurrentCode() {
+      const code = codeSnippets[currentTab];
+      navigator.clipboard.writeText(code).then(() => {
+        const feedback = document.getElementById('copyFeedback');
+        feedback.textContent = 'Copied!';
+        setTimeout(() => {
+          feedback.textContent = 'Copy Code';
+        }, 2000);
+      });
+    }
+
+    function copyModelID(modelId) {
+      navigator.clipboard.writeText(modelId).then(() => {
+        alert('Model ID "' + modelId + '" copied to clipboard!');
+      });
+    }
+
+    function scrollToPricing() {
+      document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Dynamic Package Selector for WhatsApp Flow
+    function selectTierAndScrollWhatsApp(title, tokens, price, validity = '21 Hari') {
+      document.getElementById('waPackageTitle').textContent = `${title} (${tokens})`;
+      document.getElementById('waPackagePrice').textContent = price;
+      document.getElementById('waTokensCount').textContent = tokens;
+
+      const valBadge = document.getElementById('waPlanValidity');
+      if (valBadge) valBadge.textContent = `${validity} Validity`;
+
+      const rawMsg = `Hi admin, I would like to buy the ${title} (${tokens}) with ${validity} validity for ${price} from Sentinel API. Could I get your bank account / DuitNow details?`;
+      document.getElementById('waMessagePreview').textContent = rawMsg;
+
+      const encoded = encodeURIComponent(rawMsg);
+      document.getElementById('btnWhatsAppSubmit').href = `https://wa.me/${WA_NUMBER}?text=${encoded}`;
+
+      // Smooth scroll to checkout station
+      document.getElementById('checkout').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Live Quota Fetch
+    async function loadQuota() {
+      try {
+        const res = await fetch('/api/bandel/quota');
+        const json = await res.json();
+        if (json.success && json.data) {
+          const q = json.data;
+          const quotaVal = q.resellerQuota !== undefined ? q.resellerQuota : (q.quota || 0);
+          const formatted = (quotaVal / 1000000).toFixed(0) + 'M';
+          
+          const navEl = document.getElementById('navQuotaStock');
+          if (navEl) navEl.textContent = `${quotaVal.toLocaleString()} TOKENS IN STOCK`;
+
+          const heroEl = document.getElementById('heroQuotaDisplay');
+          if (heroEl) heroEl.textContent = `${formatted}+`;
+        }
+      } catch (err) {
+        console.warn('Failed to load live quota:', err);
+      }
+    }
+
+    let currentAvailability = 'available'; // 'available' or 'outofstock'
+    let currentCategory = 'all';
+    let isSyncing = false;
+
+    function setAvailabilityFilter(status, button) {
+      currentAvailability = status;
+      const btnAvail = document.getElementById('btnTabAvailable');
+      const btnOutOfStock = document.getElementById('btnTabOutOfStock');
+      
+      if (status === 'available') {
+        if (btnAvail) {
+          btnAvail.className = 'avail-tab px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-500/10 transition-all active:scale-95';
+        }
+        if (btnOutOfStock) {
+          btnOutOfStock.className = 'avail-tab px-4 py-2 rounded-xl bg-white/5 text-slate-400 hover:text-white border border-white/10 font-mono text-xs font-semibold flex items-center gap-2 transition-all active:scale-95';
+        }
+      } else {
+        if (btnAvail) {
+          btnAvail.className = 'avail-tab px-4 py-2 rounded-xl bg-white/5 text-slate-400 hover:text-white border border-white/10 font-mono text-xs font-semibold flex items-center gap-2 transition-all active:scale-95';
+        }
+        if (btnOutOfStock) {
+          btnOutOfStock.className = 'avail-tab px-4 py-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-500/10 transition-all active:scale-95';
+        }
+      }
+      filterModelCards();
+    }
+
+    // Live Models Fetch with auto-caching, auto-refresh and cache-busting
+    async function loadModels(forceRefresh = false) {
+      if (isSyncing) return;
+      isSyncing = true;
+      const syncIcon = document.getElementById('syncSpinnerIcon');
+      const syncText = document.getElementById('syncStatusText');
+      if (syncIcon) syncIcon.classList.add('animate-spin');
+      if (syncText && forceRefresh) syncText.textContent = 'Syncing...';
+
+      try {
+        const url = `/api/bandel/models?t=${Date.now()}${forceRefresh ? '&refresh=1' : ''}`;
+        const res = await fetch(url, { cache: 'no-store' });
+        const json = await res.json();
+        if (json.success && json.models && json.models.length > 0) {
+          allActiveModels = json.models;
+
+          const activeModels = allActiveModels.filter(m => m.available !== false && m.enabled !== false);
+          const outOfStockModels = allActiveModels.filter(m => m.available === false || m.enabled === false);
+          const activeCount = activeModels.length;
+          const outOfStockCount = outOfStockModels.length;
+          const totalCount = allActiveModels.length;
+
+          // Update header and telemetry indicators
+          const availBadge = document.getElementById('availCountBadge');
+          if (availBadge) availBadge.textContent = activeCount;
+
+          const outOfStockBadge = document.getElementById('outOfStockCountBadge');
+          if (outOfStockBadge) outOfStockBadge.textContent = outOfStockCount;
+
+          const catCount = document.getElementById('modelsCatalogCount');
+          if (catCount) catCount.textContent = `${activeCount} Active / ${totalCount} Total`;
+
+          const heroMod = document.getElementById('heroModelsDisplay');
+          if (heroMod) heroMod.textContent = `${activeCount} Active`;
+
+          const countAll = document.getElementById('countAllTab');
+          if (countAll) countAll.textContent = totalCount;
+
+          const countActive = document.getElementById('countActiveTab');
+          if (countActive) countActive.textContent = activeCount;
+
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          if (syncText) syncText.textContent = `Synced ${timeStr}`;
+
+          filterModelCards();
+          updateVsCodeJson();
+          return;
+        }
+      } catch (err) {
+        console.warn('Failed to fetch live models, using current or default fallback:', err);
+        if (syncText) syncText.textContent = 'Offline Fallback';
+      } finally {
+        isSyncing = false;
+        if (syncIcon) syncIcon.classList.remove('animate-spin');
+      }
+
+      // Default models fallback (only if empty)
+      if (!allActiveModels || allActiveModels.length === 0) {
+        allActiveModels = [
+          { id: 'auto', vision: false, multiplier: 1, grade: 'B', available: true, enabled: true, desc: 'Smart auto-routing model that dynamically selects the best provider.' },
+          { id: 'auto-debug', vision: false, multiplier: 20, grade: 'B', available: false, enabled: false, desc: 'Automated multi-turn code debugging and self-healing error analysis.' },
+          { id: 'claude-opus-5', vision: true, multiplier: 20, grade: 'B', available: false, enabled: false, desc: 'Flagship Claude Opus 5 deep cognitive thinking & complex system design.' },
+          { id: 'claude-opus-5-5', vision: true, multiplier: 32, grade: 'B', available: false, enabled: false, desc: 'Anthropic Claude Opus 5.5 top-tier reasoning, software architecture & analysis.' },
+          { id: 'claude-sonnet-5', vision: true, multiplier: 10, grade: 'B', available: false, enabled: false, desc: 'Balanced high-performance coding, writing, and multimodal problem solving.' },
+          { id: 'deepseek-v4-flash', vision: false, multiplier: 2, grade: 'A', available: true, enabled: true, desc: 'High-speed code & chat inference engine with token cost optimization.' },
+          { id: 'deepseek-v4-flash-0731', vision: false, multiplier: 2, grade: 'A', available: true, enabled: true, desc: 'Production-ready stable checkpoint version for continuous coding.' },
+          { id: 'deepseek-v4-flash-vision-exp', vision: true, multiplier: 2.5, grade: 'A', available: true, enabled: true, desc: 'Image extraction, visual diagrams & screenshot analysis.' },
+          { id: 'deepseek-v4-mod', vision: false, multiplier: 3, grade: 'A', available: true, enabled: true, desc: 'Designed specifically for security simulations, pentesting & deep code audits.' },
+          { id: 'deepseek-v4-pro', vision: false, multiplier: 1.15, grade: 'A', available: true, enabled: true, desc: 'Deep reasoning engine for complex mathematical & algorithmic workflows.' },
+          { id: 'deepseek-v4-pro-0813', vision: false, multiplier: 1.8, grade: 'A', available: true, enabled: true, desc: 'Complex reasoning and pro-level code validation for technical analysis.' },
+          { id: 'deepseek-v4.1-flash', vision: true, multiplier: 2.56, grade: 'A', available: true, enabled: true, desc: 'Latest v4.1 generation with high-speed context caching efficiency & vision.' },
+          { id: 'deepseek-v4.1-flash-mod', vision: true, multiplier: 3.2, grade: 'A', available: true, enabled: true, desc: 'Advanced flexible model for intensive programming & code security.' },
+          { id: 'gemini-4-argon', vision: true, multiplier: 60, grade: '', available: false, enabled: false, desc: 'Google DeepMind massive multimodality and long-range cross-file synthesis.' },
+          { id: 'glm-5.2', vision: false, multiplier: 1.25, grade: 'A', available: true, enabled: true, desc: 'Bilingual English and Malay comprehension foundation model.' },
+          { id: 'glm-5.2-mod', vision: false, multiplier: 3, grade: 'A', available: true, enabled: true, desc: 'Specialized in strict JSON schemas, backend automation & workflow logic.' },
+          { id: 'glm-5.3', vision: false, multiplier: 2, grade: 'A', available: true, enabled: true, desc: 'Core GLM model for document drafting and summarization.' },
+          { id: 'glm-5.3-flash', vision: true, multiplier: 2, grade: 'A', available: true, enabled: true, desc: 'Ultra-low latency (~64ms) bilingual real-time conversational bot engine.' },
+          { id: 'glm-5.3-flash-mod', vision: true, multiplier: 3.5, grade: 'A', available: true, enabled: true, desc: 'Highspeed logic scripting, structured JSON output & function calling.' },
+          { id: 'glm-5.3-flashx', vision: true, multiplier: 2.5, grade: 'A', available: true, enabled: true, desc: 'Ultra-fast multimodal chat and real-time inference acceleration.' },
+          { id: 'glm-5.3-flashx-mod', vision: true, multiplier: 4, grade: 'A', available: true, enabled: true, desc: 'Maximum performance reasoning & advanced security mod workflows.' },
+          { id: 'glm-5.3-mod', vision: false, multiplier: 3.2, grade: 'A', available: true, enabled: true, desc: 'Specialized in strict JSON schemas, backend automation & workflow logic.' },
+          { id: 'gpt-5.6', vision: true, multiplier: 5, grade: 'B', available: false, enabled: false, desc: 'Next-gen GPT-5.6 core intelligence engine with full multimodality.' },
+          { id: 'gpt-5.6-luna', vision: true, multiplier: 5, grade: 'B', available: false, enabled: false, desc: 'Fast conversational & creative writing engine with high token efficiency.' },
+          { id: 'gpt-5.6-sol', vision: true, multiplier: 15, grade: 'B', available: false, enabled: false, desc: 'High-throughput reasoning model for heavy logic analysis and mathematics.' },
+          { id: 'gpt-5.6-terra', vision: true, multiplier: 10, grade: 'B', available: false, enabled: false, desc: 'OpenAI GPT-5.6 flagship model optimized for deep coding & autonomous reasoning.' },
+          { id: 'gpt-6-astra', vision: true, multiplier: 42, grade: 'B', available: false, enabled: false, desc: 'Next-frontier flagship GPT-6 reasoning engine with maximal context mastery.' },
+          { id: 'gpt-6-luna', vision: true, multiplier: 8, grade: 'B', available: true, enabled: true, desc: 'High-speed GPT-6 variant optimized for rapid chat and iterative coding.' },
+          { id: 'gpt-6-sol', vision: true, multiplier: 30, grade: '', available: false, enabled: false, desc: 'High-capacity logic & scientific modeling with frontier reasoning benchmarks.' },
+          { id: 'hy3', vision: false, multiplier: 1, grade: 'B', available: false, enabled: false, desc: 'Tencent Hunyuan 3 Enterprise foundation model.' },
+          { id: 'hy4', vision: false, multiplier: 1.4, grade: 'B', available: false, enabled: false, desc: 'Tencent Hunyuan 4 Generative high-throughput intelligence.' },
+          { id: 'kimi-k2.5', vision: false, multiplier: 1, grade: 'B', available: false, enabled: false, desc: 'Fast long-context chat and summarization foundation model.' },
+          { id: 'kimi-k2.6', vision: false, multiplier: 1, grade: 'B', available: false, enabled: false, desc: 'Enhanced conversational coherence and document reasoning.' },
+          { id: 'kimi-k2.7-code', vision: false, multiplier: 1, grade: 'B', available: true, enabled: true, desc: 'Specialized in Python, JS, Go, Rust syntax and deep bug detection.' },
+          { id: 'kimi-k2.7-code-highspeed', vision: false, multiplier: 1.5, grade: 'B', available: true, enabled: true, desc: 'Concurrent full-file code generation and refactoring specialist.' },
+          { id: 'kimi-k2.8', vision: true, multiplier: 2, grade: 'B', available: true, enabled: true, desc: 'High accuracy document OCR, receipt/invoice parsing & schematic diagrams.' },
+          { id: 'kimi-k3', vision: true, multiplier: 2, grade: 'B', available: false, enabled: false, desc: 'High accuracy document OCR, receipt/invoice parsing & schematic diagrams.' },
+          { id: 'kimi-k3-mod', vision: true, multiplier: 3.5, grade: 'B', available: false, enabled: false, desc: 'Multi-page document analysis, visual comparison and layout extraction.' },
+          { id: 'mimo-v2.5-pro', vision: false, multiplier: 1.4, grade: 'B', available: true, enabled: true, desc: 'Fast response model for continuous data parsing and text processing.' },
+          { id: 'mimo-v2.6-flash', vision: true, multiplier: 2, grade: 'B', available: true, enabled: true, desc: 'Ultra-fast continuous data parsing, lightweight chat and automation.' },
+          { id: 'mimo-v2.6-pro', vision: true, multiplier: 2, grade: 'B', available: true, enabled: true, desc: 'Pro reasoning for structured data and real-time decision flows.' },
+          { id: 'step-5-preview', vision: true, multiplier: 1.5, grade: '', available: false, enabled: false, desc: 'StepFun high-context multimodal reasoning and document intelligence.' }
+        ];
+        const activeFallback = allActiveModels.filter(m => m.available !== false && m.enabled !== false);
+        const outOfStockFallback = allActiveModels.filter(m => m.available === false || m.enabled === false);
+        const availBadge = document.getElementById('availCountBadge');
+        if (availBadge) availBadge.textContent = activeFallback.length;
+        const outOfStockBadge = document.getElementById('outOfStockCountBadge');
+        if (outOfStockBadge) outOfStockBadge.textContent = outOfStockFallback.length;
+        const catCount = document.getElementById('modelsCatalogCount');
+        if (catCount) catCount.textContent = `${activeFallback.length} Active / ${allActiveModels.length} Total`;
+
+        filterModelCards();
+        updateVsCodeJson();
+      }
+    }
+
+    function formatMultiplier(m) {
+      let raw = null;
+      if (m.multiplier !== undefined && m.multiplier !== null && m.multiplier !== '') {
+        raw = m.multiplier;
+      } else if (m.mult !== undefined && m.mult !== null && m.mult !== '') {
+        raw = m.mult;
+      } else if (m.pricing && m.pricing.multiplier !== undefined && m.pricing.multiplier !== null && m.pricing.multiplier !== '') {
+        raw = m.pricing.multiplier;
+      }
+
+      if (raw === null || raw === undefined) return '1.0x';
+
+      if (typeof raw === 'number') {
+        return Number.isInteger(raw) ? `${raw}.0x` : `${raw}x`;
+      }
+
+      const str = String(raw).trim();
+      if (!str) return '1.0x';
+      if (str.toLowerCase().endsWith('x')) return str;
+      const num = parseFloat(str);
+      if (!isNaN(num)) {
+        return Number.isInteger(num) ? `${num}.0x` : `${num}x`;
+      }
+      return `${str}x`;
+    }
+
+    function getModelContext(id) {
+      const lower = (id || '').toLowerCase();
+      if (lower.includes('minimax-m3')) return '245k';
+      if (lower.includes('gemini-4-argon')) return '1M';
+      if (lower.includes('kimi-k3') || lower.includes('kimi-k2.8') || lower.includes('gpt-5.6') || lower.includes('gpt-6') || lower.includes('claude')) return '200k';
+      return '128k';
+    }
+
+    function getModelDescription(id, rawDesc) {
+      if (rawDesc && rawDesc !== 'Standard OpenAI-compatible inference model.') return rawDesc;
+      const lower = (id || '').toLowerCase();
+      if (lower.startsWith('gpt-5.6-terra')) return 'OpenAI GPT-5.6 flagship model optimized for deep coding & autonomous reasoning.';
+      if (lower.startsWith('gpt-5.6-sol')) return 'High-throughput reasoning model for heavy logic analysis and mathematics.';
+      if (lower.startsWith('gpt-5.6-luna')) return 'Fast conversational & creative writing engine with high token efficiency.';
+      if (lower.startsWith('gpt-5.6')) return 'Next-gen GPT-5.6 core intelligence engine with full multimodality.';
+      if (lower.startsWith('gpt-6-astra')) return 'Next-frontier flagship GPT-6 reasoning engine with maximal context mastery.';
+      if (lower.startsWith('gpt-6-sol')) return 'High-capacity logic & scientific modeling with frontier reasoning benchmarks.';
+      if (lower.startsWith('gpt-6-luna')) return 'High-speed GPT-6 variant optimized for rapid chat and iterative coding.';
+      if (lower.startsWith('claude-opus-5-5')) return 'Anthropic Claude Opus 5.5 top-tier reasoning, software architecture & analysis.';
+      if (lower.startsWith('claude-opus-5')) return 'Flagship Claude Opus 5 deep cognitive thinking & complex system design.';
+      if (lower.startsWith('claude-sonnet-5')) return 'Balanced high-performance coding, writing, and multimodal problem solving.';
+      if (lower.startsWith('gemini-4-argon')) return 'Google DeepMind massive multimodality and long-range cross-file synthesis.';
+      if (lower.startsWith('deepseek-v4-mod') || lower.startsWith('deepseek-v4.1-flash-mod') || lower.includes('1017-mod')) return 'Designed specifically for security simulations, pentesting & deep code audits.';
+      if (lower.startsWith('deepseek-v4.1-flash') || lower.includes('1017')) return 'Latest v4.1 generation with high-speed context caching efficiency & vision.';
+      if (lower.startsWith('deepseek-v4-flash-vision-exp')) return 'Image extraction, visual diagrams & screenshot analysis.';
+      if (lower.startsWith('deepseek-v4-flash-0731')) return 'Production-ready stable checkpoint version for continuous coding.';
+      if (lower.startsWith('deepseek-v4-flash')) return 'High-speed code & chat inference engine with token cost optimization.';
+      if (lower.startsWith('deepseek-v4-pro-0813')) return 'Complex reasoning and pro-level code validation for technical analysis.';
+      if (lower.startsWith('deepseek-v4-pro')) return 'Deep reasoning engine for complex mathematical & algorithmic workflows.';
+      if (lower.startsWith('glm-5.3-flashx-mod') || lower.startsWith('glm-5.3-flash-mod')) return 'Highspeed logic scripting, structured JSON output & function calling.';
+      if (lower.startsWith('glm-5.3-flash') || lower.startsWith('glm-5.3-flashx')) return 'Ultra-low latency (~64ms) bilingual real-time conversational bot engine.';
+      if (lower.startsWith('glm-5.3-mod') || lower.startsWith('glm-5.2-mod')) return 'Specialized in strict JSON schemas, backend automation & workflow logic.';
+      if (lower.startsWith('glm-5.3') || lower.startsWith('glm-5.2') || lower.startsWith('glm-5.1')) return 'Fluent multilingual and Malay/English comprehension foundation model.';
+      if (lower.startsWith('kimi-k2.7-code-highspeed')) return 'Concurrent full-file code generation and refactoring specialist.';
+      if (lower.startsWith('kimi-k2.7-code')) return 'Specialized in Python, JS, Go, Rust syntax and deep bug detection.';
+      if (lower.startsWith('kimi-k3-mod')) return 'Multi-page document analysis, visual comparison and layout extraction.';
+      if (lower.startsWith('kimi-k3') || lower.startsWith('kimi-k2.8')) return 'High accuracy document OCR, receipt/invoice parsing & schematic diagrams.';
+      if (lower.startsWith('kimi-k2.5') || lower.startsWith('kimi-k2.6')) return 'Fast long-context chat and summarization foundation model.';
+      if (lower.startsWith('mimo-v2.6') || lower.startsWith('mimo-v2.5')) return 'Ultra-fast continuous data parsing, lightweight chat and automation.';
+      if (lower.startsWith('hy4') || lower.startsWith('hy3')) return 'Tencent Hunyuan enterprise foundation model with broad knowledge.';
+      if (lower.startsWith('step-5')) return 'StepFun high-context multimodal reasoning and document intelligence.';
+      if (lower.startsWith('minimax-m3')) return '245k long document context for books, thick archives, and large corpora.';
+      if (lower.startsWith('auto-debug')) return 'Automated multi-turn code debugging and self-healing error analysis.';
+      if (lower.startsWith('auto')) return 'Smart auto-routing model that dynamically selects the best provider.';
+      return 'Standard OpenAI-compatible inference model.';
+    }
+
+    function updateModelViews(models) {
+      filterModelCards();
+    }
+
+    function renderModelCards(models) {
+      const container = document.getElementById('modelsContainer');
+      if (!container) return;
+
+      if (!models || models.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-12 rounded-2xl glass-card text-slate-400 font-mono text-xs">
+          <span class="material-symbols-outlined text-[32px] text-slate-500 mb-2 block">search_off</span>
+          No models match the selected category or search query.
+        </div>`;
+        return;
+      }
+
+      container.innerHTML = models.map(m => {
+        const id = m.id || '';
+        const isModelAvailable = m.available !== false && m.enabled !== false;
+        const isVision = m.vision || id.includes('vision') || id.includes('k3');
+        const isMod = id.includes('mod');
+        const isCode = id.includes('code') || id.includes('flash') || id.includes('pro');
+        const isDeepseek = id.includes('deepseek');
+        const isGlm = id.includes('glm');
+        const isKimi = id.includes('kimi');
+        const isGpt = id.includes('gpt') || id.includes('claude') || id.includes('gemini');
+        const multiplier = formatMultiplier(m);
+        const desc = getModelDescription(id, m.desc);
+        const contextLen = getModelContext(id);
+
+        const numMult = parseFloat(multiplier);
+        const multiplierClass = (!isNaN(numMult) && numMult >= 10)
+          ? 'text-amber-300 font-bold'
+          : ((!isNaN(numMult) && numMult > 2)
+            ? 'text-yellow-300 font-bold'
+            : 'text-cyan-300 font-bold');
+
+        const gradeBadge = m.grade ? `<span class="ml-1 px-1.5 py-0.5 rounded bg-cyan-400/10 text-cyan-300 font-bold text-[10px] border border-cyan-400/20">Grade ${m.grade}</span>` : '';
+
+        const statusBadge = isModelAvailable
+          ? `<span class="flex items-center gap-1.5 font-mono text-[11px] text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Available
+              ${gradeBadge}
+            </span>`
+          : `<span class="flex items-center gap-1.5 font-mono text-[11px] text-slate-400" title="Model temporarily out of stock upstream">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Out of stock
+              ${gradeBadge}
+            </span>`;
+
+        const cardClasses = isModelAvailable
+          ? 'glass-card'
+          : 'glass-card border-white/5 opacity-75';
+
+        const cats = [];
+        if (isDeepseek) cats.push('deepseek');
+        if (isGlm) cats.push('glm');
+        if (isKimi) cats.push('kimi');
+        if (isGpt) cats.push('gpt');
+        if (isVision || isMod) cats.push('vision');
+        if (isCode) cats.push('coding');
+        if (isModelAvailable) cats.push('active');
+
+        return `
+          <div class="model-item ${cats.join(' ')} p-5 rounded-2xl ${cardClasses} transition-all flex flex-col justify-between hover:border-cyan-400/30">
+            <div>
+              <div class="flex items-center justify-between mb-2.5">
+                <span class="px-2 py-0.5 rounded bg-white/5 text-cyan-300 font-mono text-[11px] border border-white/10">POST /v1/chat/completions</span>
+                ${statusBadge}
+              </div>
+              <h3 class="font-display text-base font-bold text-white mb-1 tracking-tight">${id}</h3>
+              <p class="font-body text-xs text-slate-300 mb-4 leading-relaxed">${desc}</p>
+              
+              <div class="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-white/5 font-mono text-[11px] mb-4">
+                <div>
+                  <span class="text-slate-400 block">Multiplier</span>
+                  <span class="${multiplierClass}">${multiplier}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block">Context</span>
+                  <span class="text-white">${contextLen}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block">Modality</span>
+                  <span class="text-emerald-400">${isVision ? 'Vision + Text' : 'Text / Code'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-2 pt-3 border-t border-white/5 font-mono text-xs">
+              <span class="text-slate-400 truncate flex-1 min-w-0" title="${id}">${id}</span>
+              <button class="text-cyan-400 hover:text-cyan-300 font-semibold hover:underline shrink-0 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 transition-all" onclick="copyModelID('${id}')">Copy ID</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Real-time Model Search & Category Filter
+    function filterModelCards() {
+      const q = (document.getElementById('modelSearchInput')?.value || '').toLowerCase().trim();
+      let list = allActiveModels || [];
+
+      // 1. Filter by Availability tab (Gambar 1 BandelAI style)
+      if (currentAvailability === 'available') {
+        list = list.filter(m => m.available !== false && m.enabled !== false);
+      } else if (currentAvailability === 'outofstock') {
+        list = list.filter(m => m.available === false || m.enabled === false);
+      }
+      const totalForCurrentStatus = list.length;
+
+      // 2. Filter by Category tab
+      if (currentCategory === 'deepseek') {
+        list = list.filter(m => (m.id || '').toLowerCase().includes('deepseek'));
+      } else if (currentCategory === 'glm') {
+        list = list.filter(m => (m.id || '').toLowerCase().includes('glm'));
+      } else if (currentCategory === 'kimi') {
+        list = list.filter(m => (m.id || '').toLowerCase().includes('kimi'));
+      } else if (currentCategory === 'gpt') {
+        list = list.filter(m => {
+          const id = (m.id || '').toLowerCase();
+          return id.includes('gpt') || id.includes('claude') || id.includes('gemini');
+        });
+      } else if (currentCategory === 'vision') {
+        list = list.filter(m => {
+          const id = (m.id || '').toLowerCase();
+          return m.vision || id.includes('vision') || id.includes('k3') || id.includes('mod');
+        });
+      } else if (currentCategory === 'coding') {
+        list = list.filter(m => {
+          const id = (m.id || '').toLowerCase();
+          return id.includes('code') || id.includes('flash') || id.includes('pro');
+        });
+      }
+
+      // 3. Filter by search query
+      if (q) {
+        list = list.filter(m => (m.id || '').toLowerCase().includes(q) || (m.desc || '').toLowerCase().includes(q));
+      }
+
+      // 4. Update Showing summary text (e.g. Showing 25 of 25 models)
+      const showingCountEl = document.getElementById('showingCountNum');
+      const totalAvailEl = document.getElementById('totalAvailableNum');
+      if (showingCountEl) showingCountEl.textContent = list.length;
+      if (totalAvailEl) totalAvailEl.textContent = totalForCurrentStatus;
+
+      renderModelCards(list);
+    }
+
+    // Category Filter Tabs
+    function setCategoryFilter(category, button) {
+      currentCategory = category;
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('bg-cyan-400', 'text-slate-950', 'font-bold', 'shadow-md', 'shadow-cyan-500/20');
+        btn.classList.add('bg-white/5', 'text-slate-300');
+      });
+      button.classList.remove('bg-white/5', 'text-slate-300');
+      button.classList.add('bg-cyan-400', 'text-slate-950', 'font-bold', 'shadow-md', 'shadow-cyan-500/20');
+
+      filterModelCards();
+    }
+
+    // VS Code Configuration Generator (Dynamic from Live Models)
+    let currentVsCodeTab = 'continue';
+
+    function getVsCodeModelsList() {
+      if (allActiveModels && allActiveModels.length > 0) {
+        // Prefer active models
+        const activeList = allActiveModels.filter(m => m.available !== false && m.enabled !== false);
+        const listToUse = activeList.length > 0 ? activeList : allActiveModels;
+        return listToUse.map(m => ({
+          id: m.id,
+          title: `${m.id} (${formatMultiplier(m)})`,
+          desc: getModelDescription(m.id, m.desc)
+        }));
+      }
+      return [
+        { id: 'deepseek-v4-flash', title: 'DeepSeek V4 Flash (Coding + Speed)', desc: 'Code generation & conversational model' },
+        { id: 'deepseek-v4.1-flash', title: 'DeepSeek V4.1 Flash (Multimodal)', desc: 'v4.1 generation with multimodal vision' },
+        { id: 'deepseek-v4-pro', title: 'DeepSeek V4 Pro (Reasoning o1-Level)', desc: 'Deep reasoning for algorithms & mathematics' },
+        { id: 'deepseek-v4-mod', title: 'DeepSeek V4 Mod (Security & Pentest)', desc: 'Security auditing & code security simulation' },
+        { id: 'kimi-k2.7-code', title: 'Kimi K2.7 Code (Code Specialist)', desc: 'Specialized in Python, JS, Go, Rust & bug detection' },
+        { id: 'kimi-k2.7-code-highspeed', title: 'Kimi K2.7 Code Highspeed', desc: 'Concurrent full-file code generation' },
+        { id: 'glm-5.3-flash', title: 'GLM 5.3 Flash (Fast 64ms)', desc: '~64ms response latency for conversational AI' },
+        { id: 'glm-5.3-mod', title: 'GLM 5.3 Mod (Logic & Scripting)', desc: 'Backend scripting automation & workflows' },
+        { id: 'glm-5.2', title: 'GLM 5.2 (Chat EN/MS)', desc: 'Bilingual English & Malay comprehension' }
+      ];
+    }
+
+    function getCleanVsCodeApiKey() {
+      const input = document.getElementById('vscodeApiKeyInput');
+      const val = input ? input.value.trim() : '';
+      return val || 'sk-qwen-ENTER_YOUR_KEY';
+    }
+
+    function generateContinueJson(apiKey) {
+      const modelsList = getVsCodeModelsList();
+      const config = {
+        models: modelsList.map(m => ({
+          title: `${m.title} - Sentinel`,
+          provider: "openai",
+          model: m.id,
+          apiKey: apiKey,
+          apiBase: "https://bandelbanget.xyz/v1"
+        })),
+        tabAutocompleteModel: {
+          title: "Kimi Code Highspeed - Sentinel",
+          provider: "openai",
+          model: "kimi-k2.7-code-highspeed",
+          apiKey: apiKey,
+          apiBase: "https://bandelbanget.xyz/v1"
+        },
+        customCommands: [
+          {
+            name: "review",
+            prompt: "Please review this code and suggest improvements for security, performance, and stability: {{{ input }}}",
+            description: "Comprehensive Code Review"
+          },
+          {
+            name: "test",
+            prompt: "Write comprehensive unit tests for the following function: {{{ input }}}",
+            description: "Generate Automated Unit Tests"
+          }
+        ]
+      };
+      return JSON.stringify(config, null, 2);
+    }
+
+    function generateClineJson(apiKey) {
+      const modelsList = getVsCodeModelsList();
+      const config = {
+        "cline.apiProvider": "openai-compatible",
+        "cline.openAiBaseUrl": "https://bandelbanget.xyz/v1",
+        "cline.openAiApiKey": apiKey,
+        "cline.openAiModelId": "deepseek-v4-flash",
+        "cline.customModels": modelsList.map(m => m.id)
+      };
+      return JSON.stringify(config, null, 2);
+    }
+
+    function generateRawModelsJson() {
+      const modelsList = getVsCodeModelsList();
+      return JSON.stringify(modelsList.map(m => m.id), null, 2);
+    }
+
+    function updateVsCodeJson() {
+      const key = getCleanVsCodeApiKey();
+      const codeDisplay = document.getElementById('vscodeCodeDisplay');
+      const targetLabel = document.getElementById('vscodeFileTargetName');
+      if (!codeDisplay) return;
+
+      if (currentVsCodeTab === 'continue') {
+        codeDisplay.textContent = generateContinueJson(key);
+        if (targetLabel) targetLabel.textContent = '~/.continue/config.json';
+      } else if (currentVsCodeTab === 'cline') {
+        codeDisplay.textContent = generateClineJson(key);
+        if (targetLabel) targetLabel.textContent = 'VS Code settings.json (Roo Code / Cline)';
+      } else {
+        codeDisplay.textContent = generateRawModelsJson();
+        if (targetLabel) targetLabel.textContent = 'models-list.json (Active Model IDs)';
+      }
+    }
+
+    function setVsCodeTab(tab, el) {
+      currentVsCodeTab = tab;
+      document.querySelectorAll('.vscode-tab').forEach(b => {
+        b.classList.remove('bg-surface-container', 'text-cyan-400', 'font-bold', 'border-cyan-400/40', 'shadow-sm');
+        b.classList.add('text-slate-400', 'border-outline-variant/30');
+      });
+      el.classList.add('bg-surface-container', 'text-cyan-400', 'font-bold', 'border-cyan-400/40', 'shadow-sm');
+      el.classList.remove('text-slate-400', 'border-outline-variant/30');
+      updateVsCodeJson();
+    }
+
+    function copyVsCodeJson() {
+      const codeDisplay = document.getElementById('vscodeCodeDisplay');
+      if (!codeDisplay) return;
+      navigator.clipboard.writeText(codeDisplay.textContent).then(() => {
+        const btn = document.getElementById('copyVsCodeFeedback');
+        if (btn) {
+          btn.textContent = 'Copied to Clipboard!';
+          setTimeout(() => {
+            btn.textContent = 'Copy Full JSON Config';
+          }, 2000);
+        }
+      });
+    }
+
+    // Live Visitor Tracking & Customer Telemetry
+    async function registerVisitAndLoadStats() {
+      try {
+        const res = await fetch('/api/stats/visit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: window.location.pathname })
+        });
+        const json = await res.json();
+        if (json.success) {
+          const visitors = json.visitors !== undefined ? json.visitors : 0;
+          const customers = json.customers !== undefined ? json.customers : 0;
+
+          const heroVis = document.getElementById('heroVisitorDisplay');
+          if (heroVis) heroVis.textContent = Number(visitors).toLocaleString();
+
+          const heroCust = document.getElementById('heroCustomerDisplay');
+          if (heroCust) heroCust.textContent = Number(customers).toLocaleString();
+
+          const navCust = document.getElementById('navCustomersCount');
+          if (navCust) navCust.textContent = `${Number(customers).toLocaleString()} Customers`;
+
+          const footerVis = document.getElementById('footerVisitorCount');
+          if (footerVis) footerVis.textContent = Number(visitors).toLocaleString();
+
+          const footerCust = document.getElementById('footerCustomerCount');
+          if (footerCust) footerCust.textContent = Number(customers).toLocaleString();
+        }
+      } catch (err) {
+        console.warn('Failed to load visitor statistics:', err);
+      }
+    }
+
+    // Initialization on DOM Ready & Auto-refresh Polling
+    document.addEventListener('DOMContentLoaded', () => {
+      setTab('curl', document.querySelector('.code-tab'));
+      loadQuota();
+      loadModels();
+      registerVisitAndLoadStats();
+
+      // Periodic Auto-Update: Every 30 seconds, automatically re-sync models and quota
+      setInterval(() => {
+        loadModels(false);
+        loadQuota();
+      }, 30000);
+    });
+  </script>
+  <script defer src="./sentinel.js"></script>
+</body>
+</html>
