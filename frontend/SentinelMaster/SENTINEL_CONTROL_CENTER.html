@@ -438,16 +438,16 @@
       </div>
 
       <div class="top-actions">
-        <button class="btn btn-green" onclick="controlAll('start')">ðŸŸ¢ Turn ON All Websites</button>
-        <button class="btn btn-red" onclick="controlAll('stop')">ðŸ”´ Turn OFF All Websites</button>
-        <button class="btn btn-outline" onclick="controlAll('restart')">ðŸ”„ Restart All</button>
-        <a href="https://hub.sentinelai.studio/kali" target="_blank" class="btn btn-cyan">ðŸ–¥ï¸ Open Master Hub â†—</a>
+        <button class="btn btn-green" onclick="controlAll('start')">🟢 Turn ON All Websites</button>
+        <button class="btn btn-red" onclick="controlAll('stop')">🔴 Turn OFF All Websites</button>
+        <button class="btn btn-outline" onclick="controlAll('restart')">🔄 Restart All</button>
+        <a href="https://hub.sentinelai.studio/kali" target="_blank" class="btn btn-cyan">🖥️ Open Master Hub ↗</a>
       </div>
     </header>
 
     <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('websites', this)">ðŸŒ Website Controls (ON / OFF)</button>
-      <button class="tab-btn" onclick="switchTab('logos', this)">ðŸŽ¨ 20 Logos Master Catalog & Reference</button>
+      <button class="tab-btn active" onclick="switchTab('websites', this)">🌐 Website Controls (ON / OFF)</button>
+      <button class="tab-btn" onclick="switchTab('logos', this)">🎨 20 Logos Master Catalog & Reference</button>
     </div>
 
     <!-- TAB 1: WEBSITE ON/OFF CONTROLS -->
@@ -528,7 +528,7 @@
               <h3>
                 ${svc.name}
                 <span class="badge ${svc.status === 'online' ? 'badge-green' : 'badge-red'}" id="status-${svc.id}">
-                  â— ${svc.status}
+                  ● ${svc.status}
                 </span>
               </h3>
               <p>${svc.desc}</p>
@@ -541,13 +541,13 @@
 
           <div class="service-actions">
             <div>
-              ${svc.url ? `<a href="${svc.url}" target="_blank" class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;">Open Web â†—</a>` : ''}
+              ${svc.url ? `<a href="${svc.url}" target="_blank" class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;">Open Web ↗</a>` : ''}
             </div>
 
             <div class="power-buttons">
-              <button class="btn btn-green" onclick="controlService('${svc.id}', 'start')">ðŸŸ¢ ON</button>
-              <button class="btn btn-red" onclick="controlService('${svc.id}', 'stop')">ðŸ”´ OFF</button>
-              <button class="btn btn-outline" onclick="controlService('${svc.id}', 'restart')">ðŸ”„ Restart</button>
+              <button class="btn btn-green" onclick="controlService('${svc.id}', 'start')">🟢 ON</button>
+              <button class="btn btn-red" onclick="controlService('${svc.id}', 'stop')">🔴 OFF</button>
+              <button class="btn btn-outline" onclick="controlService('${svc.id}', 'restart')">🔄 Restart</button>
             </div>
           </div>
         </div>
@@ -567,7 +567,7 @@
             <div style="font-size: 11px; color: var(--text-faint); margin-top: 2px;">${logo.domain}</div>
           </div>
           <div class="logo-assigned">
-            âœ“ Assigned: ${logo.assigned}
+            ✓ Assigned: ${logo.assigned}
           </div>
         </div>
       `).join('');
@@ -576,22 +576,22 @@
     async function controlService(target, action) {
       showToast(`Executing '${action.toUpperCase()}' for ${target}...`);
       try {
-        const resp = await fetch('http://192.168.68.132:3000/api/kali/action', {
+        const resp = await fetch((window.location.origin.includes(':3000') ? '' : 'http://localhost:3000') + '/api/kali/action', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action, target })
         });
         const data = await resp.json();
         if (resp.ok) {
-          showToast(`âœ“ Success: ${target} ${action === 'start' ? 'turned ON' : action === 'stop' ? 'turned OFF' : 'restarted'}!`);
+          showToast(`✓ Success: ${target} ${action === 'start' ? 'turned ON' : action === 'stop' ? 'turned OFF' : 'restarted'}!`);
           const badge = document.getElementById('status-' + target);
           if (badge) {
             if (action === 'start') {
               badge.className = 'badge badge-green';
-              badge.innerText = 'â— online';
+              badge.innerText = '● online';
             } else if (action === 'stop') {
               badge.className = 'badge badge-red';
-              badge.innerText = 'â— offline';
+              badge.innerText = '● offline';
             }
           }
         } else {
@@ -605,12 +605,12 @@
     async function controlAll(action) {
       showToast(`Executing '${action.toUpperCase()}' on ALL websites...`);
       try {
-        await fetch('http://192.168.68.132:3000/api/kali/action', {
+        await fetch((window.location.origin.includes(':3000') ? '' : 'http://localhost:3000') + '/api/kali/action', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action, target: 'all' })
         });
-        showToast(`âœ“ All services command '${action}' sent successfully!`);
+        showToast(`✓ All services command '${action}' sent successfully!`);
       } catch (err) {
         showToast(`Action '${action}' broadcasted to all services.`);
       }
