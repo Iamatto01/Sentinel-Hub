@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PageBody } from './PageHeader';
 import { usePoll } from './useApi';
 import { useSidebar, ThemeToggle, MobileMenuButton } from './HubShell';
+import FrierenDesktopShell from './FrierenDesktopShell';
 import type { OverviewPayload } from '@/lib/overview';
 import type { RouterCredentials } from '@/lib/router-types';
 
@@ -12,7 +13,28 @@ export default function OverviewView() {
   const overview = usePoll<OverviewPayload>('/api/overview', 30_000);
   const credentials = usePoll<RouterCredentials>('/api/router/credentials', 120_000);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [viewMode, setViewModeState] = useState<'desktop' | 'grid'>('desktop');
   const { isSidebarHidden, toggleSidebar } = useSidebar();
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('sentinel_hub_view_mode');
+      if (saved === 'grid' || saved === 'desktop') {
+        setViewModeState(saved);
+      }
+    } catch {
+      // Ignore
+    }
+  }, []);
+
+  const setViewMode = (mode: 'desktop' | 'grid') => {
+    setViewModeState(mode);
+    try {
+      localStorage.setItem('sentinel_hub_view_mode', mode);
+    } catch {
+      // Ignore
+    }
+  };
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -55,6 +77,63 @@ export default function OverviewView() {
         </div>
         <div className="topbar-spacer" />
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Frieren Desktop OS vs Bento Grid Switcher */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(167, 139, 250, 0.22)',
+              borderRadius: '12px',
+              padding: '2px',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setViewMode('desktop')}
+              style={{
+                padding: '4px 10px',
+                borderRadius: '10px',
+                border: 'none',
+                background: viewMode === 'desktop' ? 'rgba(167, 139, 250, 0.25)' : 'transparent',
+                color: viewMode === 'desktop' ? '#ffffff' : 'var(--text-faint)',
+                fontSize: '11.5px',
+                fontWeight: viewMode === 'desktop' ? 650 : 500,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                transition: 'all 0.15s ease',
+              }}
+              title="Frieren AIOS Desktop Canvas Mode"
+            >
+              <span>🖥️</span>
+              <span>Frieren Desktop</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              style={{
+                padding: '4px 10px',
+                borderRadius: '10px',
+                border: 'none',
+                background: viewMode === 'grid' ? 'rgba(167, 139, 250, 0.25)' : 'transparent',
+                color: viewMode === 'grid' ? '#ffffff' : 'var(--text-faint)',
+                fontSize: '11.5px',
+                fontWeight: viewMode === 'grid' ? 650 : 500,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                transition: 'all 0.15s ease',
+              }}
+              title="Classic Bento Grid Mode"
+            >
+              <span>📊</span>
+              <span>Bento Grid</span>
+            </button>
+          </div>
+
           <span className="topbar-ip-badge" style={{ fontSize: '11.5px', color: 'var(--text-faint)', fontFamily: 'var(--mono)' }}>
             192.168.68.132
           </span>
@@ -79,7 +158,14 @@ export default function OverviewView() {
         </div>
       </div>
 
-      <PageBody>
+      {viewMode === 'desktop' ? (
+        <FrierenDesktopShell
+          overviewData={overview.data}
+          credentialsData={credentials.data}
+          onSwitchToGrid={() => setViewMode('grid')}
+        />
+      ) : (
+        <PageBody>
         {/* Apple-Style Monochrome Glass Hero Banner */}
         <div className="hero-card">
           <div className="hero-header">
@@ -527,6 +613,7 @@ export default function OverviewView() {
           </div>
         </div>
       </PageBody>
+      )}
     </>
   );
 }
