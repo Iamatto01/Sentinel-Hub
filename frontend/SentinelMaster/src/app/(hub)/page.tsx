@@ -1,5 +1,8 @@
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
+import OverviewView from '@/components/OverviewView';
 
-export default function RootPage() {
-  redirect('/router');
+export const metadata: Metadata = { title: 'Overview' };
+
+export default function OverviewPage() {
+  return <OverviewView />;
 }
