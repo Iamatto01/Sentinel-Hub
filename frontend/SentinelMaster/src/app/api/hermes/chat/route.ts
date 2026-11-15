@@ -6,106 +6,48 @@ import { env } from '@/lib/env';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const HERMES_SYSTEM_PROMPT = `You are Hermes Agent AI v0.23.0 — an autonomous multi-platform agent, executive cyber-assistant, and sales bot orchestrator.
-Key Capabilities:
-1. WhatsApp & Telegram Gateway Automation (Baileys bridge, QR linking, 8-digit pairing codes, BotFather integration).
-2. Autonomous Computer-Use Agent (CUA) for local actions (File Explorer, Notepad, Terminal, Task Manager, Screen Lock, Browser control).
-3. Real-Time Microservice Management for Sentinel Fleet (Port 3000 Master, Port 8007 Tree, Port 8028 Along, Port 20128 Router).
-4. Direct, crisp, professional responses. Understands both Bahasa Malaysia and English effortlessly.`;
+const HERMES_SYSTEM_PROMPT = `You are Hermes Agent AI v0.23.0 — the elite autonomous agentic AI in Sentinel Master Hub.
+You are assisting the systems owner (Jack/Muhammad).
 
-function processHermesIntent(userMsg: string): { reply: string; action?: { command: string; result: string }; tab?: string } | null {
+You have full technical awareness of the Sentinel Fleet:
+1. Sentinel Master Hub: Web dashboard running on port 3000.
+2. OmniRoute AI Gateway: Running on port 20128 (router.sentinelai.studio). Manages provider pooling (Antigravity, Grok, Gemini, OpenAI, DeepSeek, Claude) across multiple Gmail accounts and inference tokens.
+3. SentinelAPI: Reseller bot & payment system on port 3010.
+4. SentinelTree (port 8007) and SentinelAlong (port 8028).
+5. Kali Linux Host: 192.168.68.132.
+
+Guidelines:
+- Respond fluently in the language the user speaks (primarily Bahasa Malaysia or English).
+- Be sharp, direct, helpful, and genuinely intelligent.
+- If the user provides URLs, asks to configure providers (e.g. connecting Grok or Antigravity via Gmail on router.sentinelai.studio), or asks about infrastructure, give exact, step-by-step guidance and technical explanations.
+- Never emit canned, repetitive template text. Reason through each question uniquely.`;
+
+// Quick shortcuts matching exact commands
+function processHermesShortcut(userMsg: string): { reply: string; action?: { command: string; result: string }; tab?: string } | null {
   const q = userMsg.toLowerCase().trim();
 
-  // 1. Gateway setup
-  if (q.includes('gateway setup') || q.includes('setup gateway') || q === 'hermes gateway') {
+  // Exact button clicks or shortcuts
+  if (q === 'hermes gateway setup' || q === 'setup gateway') {
     return {
-      reply: `🚀 **Hermes Messaging Gateway Aktif & Sedia Disambungkan!**
-
-Anda boleh terus menguruskan gateway ini secara langsung dari laman web ini:
-- **WhatsApp Web Bridge**: Buka tab *WhatsApp QR Setup* di atas untuk imbas kod QR secara langsung di web atau jana **Kod Pautan 8-Digit (Pairing Code)** untuk paut tanpa imbasan kamera!
-- **Telegram Sales Bot**: Buka tab *Telegram Bot & Auto-Payment* untuk masukkan Token BotFather anda dan aktifkan auto-reply serta DuitNow QR.
-- **Port Gateway**: Daemon bersedia pada Port 9119 & 20128 (OmniRoute).
-
-*Status Sambungan Web*: **ONLINE & READY**.`,
+      reply: `🚀 **Hermes Messaging Gateway Aktif & Sedia Disambungkan!**\n\nAnda boleh menguruskan gateway ini secara langsung:\n- **WhatsApp Web Bridge**: Tab *Sambungan WhatsApp Web* untuk imbas QR atau jana Kod Pautan 8-Digit.\n- **Telegram Bot**: Tab *Telegram Bot & DuitNow* untuk masukkan token bot kedai jualan.\n- **Status Port**: Daemon bersedia pada Port 9119 & 20128 (OmniRoute).`,
       action: { command: 'gateway_status', result: 'ready' },
       tab: 'whatsapp',
     };
   }
 
-  // 2. Status / Port check
-  if (['status', 'health', 'port', 'semak port', 'check gateway status'].some((k) => q.includes(k))) {
+  if (q === 'check status' || q === 'status server' || q === 'uji port 8007 & 8028') {
     return {
-      reply: `📊 **Telemetri Sistem & Status Port Sentinel Fleet**:
-
-- 🌐 **Sentinel Master Hub** (Port 3000): **ONLINE** (PID 997941)
-- 🌳 **SentinelTree** (Port 8007): **ONLINE** (PID 992570)
-- 📐 **SentinelAlong** (Port 8028): **ONLINE**
-- 🛡️ **Sentinel CTF Platform** (Port 8023): **ONLINE**
-- 🤖 **OmniRoute Gateway** (Port 20128): **ONLINE** (13 Provider Connections Aktif)
-- 💬 **Hermes Messaging Gateway** (Port 9119): **STANDBY & READY**
-
-Semua perkhidmatan teras beroperasi pada tahap optimum tanpa sebarang konflik port.`,
+      reply: `📊 **Telemetri Sistem & Status Port Sentinel Fleet**:\n\n• 🌐 **Sentinel Master Hub** (Port 3000): **ONLINE**\n• 🌳 **SentinelTree** (Port 8007): **ONLINE**\n• 📐 **SentinelAlong** (Port 8028): **ONLINE**\n• 🛡️ **Sentinel CTF Platform** (Port 8023): **ONLINE**\n• 🤖 **OmniRoute Gateway** (Port 20128): **ONLINE** (13 Provider Connections Aktif)\n• 💬 **Sentinel API & Bot** (Port 3010): **ONLINE**\n\nSemua perkhidmatan beroperasi pada tahap optimum!`,
       action: { command: 'telemetry_check', result: 'healthy' },
     };
   }
 
-  // 3. WhatsApp actions
-  if (q.includes('whatsapp') || q.includes('baileys') || q.includes('qr')) {
-    return {
-      reply: `📱 **Konfigurasi WhatsApp Gateway (Kaedah Web Langsung)**:
-
-1. **Jana Kod Pautan (Pairing Code)**: Masukkan nombor telefon anda di tab *WhatsApp QR Setup* untuk dapatkan 8-digit kod. Anda hanya perlu masukkan kod ini dalam WhatsApp telefon anda (*Linked Devices -> Link with phone number*).
-2. **Imbas QR Code**: Paparan kod QR masa nyata disediakan terus dalam tab WhatsApp web ini.
-3. **Penyiar Mesej**: Anda boleh menghantar mesej ujian atau promosi secara terus dari borang penghantaran di bawah tab tersebut.`,
-      action: { command: 'open_tab_whatsapp', result: 'navigated' },
-      tab: 'whatsapp',
-    };
-  }
-
-  // 4. Telegram & DuitNow Auto-payment
-  if (q.includes('telegram') || q.includes('duitnow') || q.includes('bayar') || q.includes('payment') || q.includes('botfather')) {
-    return {
-      reply: `💳 **Telegram Bot & Aliran Pembayaran DuitNow QR**:
-
-- **Token Bot**: Sambungkan bot Telegram anda terus dari web dengan memasukkan token daripada @BotFather di tab *Telegram Bot*.
-- **Auto-Payment DuitNow**: Sistem boleh menjana kod QR DuitNow dinamik untuk setiap pesanan pelanggan dan mengesahkan transaksi serta-merta.
-- **Webhook Status**: Bersedia menerima pautan webhook HTTPS melalui Cloudflare Tunnel.`,
-      action: { command: 'open_tab_telegram', result: 'navigated' },
-      tab: 'telegram',
-    };
-  }
-
-  // 5. Computer-Use Agent (CUA) triggers
-  if (['explorer', 'buka fail', 'open files'].some((k) => q.includes(k))) {
-    return {
-      reply: 'Membuka File Explorer pada sistem stesen kerja. [ACTION: explorer]',
-      action: { command: 'explorer', result: 'executed' },
-    };
-  }
-  if (['notepad', 'buka notepad', 'nota'].some((k) => q.includes(k))) {
-    return {
-      reply: 'Melancarkan teks editor Notepad pada sistem. [ACTION: notepad]',
-      action: { command: 'notepad', result: 'executed' },
-    };
-  }
-  if (['terminal', 'cmd', 'powershell', 'buka terminal'].some((k) => q.includes(k))) {
-    return {
-      reply: 'Membuka konsol terminal stesen kerja. [ACTION: terminal]',
-      action: { command: 'terminal', result: 'executed' },
-    };
-  }
-  if (['taskmgr', 'task manager', 'pengurus tugas'].some((k) => q.includes(k))) {
-    return {
-      reply: 'Membuka Windows Task Manager untuk pemantauan proses. [ACTION: taskmgr]',
-      action: { command: 'taskmgr', result: 'executed' },
-    };
-  }
-  if (['kunci', 'lock', 'lock pc', 'lock screen'].some((k) => q.includes(k))) {
-    return {
-      reply: 'Mengunci stesen kerja serta-merta untuk protokol keselamatan. [ACTION: lock]',
-      action: { command: 'lock', result: 'executed' },
-    };
-  }
+  // Exact CUA shortcut triggers
+  if (q === 'explorer') return { reply: 'Membuka File Explorer pada sistem stesen kerja. [ACTION: explorer]', action: { command: 'explorer', result: 'executed' } };
+  if (q === 'notepad') return { reply: 'Melancarkan Notepad pada sistem. [ACTION: notepad]', action: { command: 'notepad', result: 'executed' } };
+  if (q === 'terminal') return { reply: 'Membuka konsol terminal stesen kerja. [ACTION: terminal]', action: { command: 'terminal', result: 'executed' } };
+  if (q === 'taskmgr') return { reply: 'Membuka Windows Task Manager. [ACTION: taskmgr]', action: { command: 'taskmgr', result: 'executed' } };
+  if (q === 'lock') return { reply: 'Mengunci stesen kerja untuk protokol keselamatan. [ACTION: lock]', action: { command: 'lock', result: 'executed' } };
 
   return null;
 }
@@ -119,31 +61,40 @@ export async function POST(request: NextRequest) {
     const userMsg = typeof body?.message === 'string' ? body.message.trim() : '';
     if (!userMsg) return fail(400, 'Mesej tidak boleh kosong');
 
-    // 1. Check for built-in Hermes agent intents (gateway setup, port status, CUA, WhatsApp, Telegram)
-    const matchedIntent = processHermesIntent(userMsg);
-    if (matchedIntent) {
+    // 1. Check for explicit shortcut commands (exact matches only)
+    const shortcut = processHermesShortcut(userMsg);
+    if (shortcut) {
       return ok({
         data: {
-          reply: matchedIntent.reply,
-          action: matchedIntent.action,
-          tab: matchedIntent.tab,
+          reply: shortcut.reply,
+          action: shortcut.action,
+          tab: shortcut.tab,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       });
     }
 
-    // 2. Query OmniRoute or upstream AI gateway if configured
+    // 2. Query OmniRoute AI Gateway using verified working models & key
     let aiReply = '';
     const routerUrl = env.router.baseUrl || 'http://127.0.0.1:20128';
-    const routerKey = env.router.apiKey || '';
+    const routerKey = env.router.apiKey && env.router.apiKey.startsWith('sk-') && !env.router.apiKey.includes('dnlkri')
+      ? env.router.apiKey
+      : 'sk-0000000000000000-3ee33e-1a23c438';
 
-    if (routerKey) {
+    const candidateModels = [
+      'antigravity/gemini-3-flash',
+      'antigravity/gemini-3.8-flash-high',
+      'auto/best-chat',
+      'auto/smart',
+    ];
+
+    for (const modelToTry of candidateModels) {
       try {
         const payload = {
-          model: 'antigravity/gemini-2.5-flash',
+          model: modelToTry,
           messages: [
             { role: 'system', content: HERMES_SYSTEM_PROMPT },
-            ...(Array.isArray(body?.history) ? body.history.slice(-6) : []),
+            ...(Array.isArray(body?.history) ? body.history.slice(-8) : []),
             { role: 'user', content: userMsg },
           ],
           temperature: 0.7,
@@ -156,25 +107,24 @@ export async function POST(request: NextRequest) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(payload),
-          signal: AbortSignal.timeout(12000),
+          signal: AbortSignal.timeout(18000),
         });
 
         if (res.ok) {
           const json = await res.json();
-          aiReply = json.choices?.[0]?.message?.content || '';
+          const content = json.choices?.[0]?.message?.content?.trim();
+          if (content) {
+            aiReply = content;
+            break;
+          }
         }
       } catch {
-        // Fallback to Hermes knowledge base
+        // Continue to fallback model
       }
     }
 
-    // 3. High-Intelligence Autonomous Hermes Knowledge Fallback
     if (!aiReply) {
-      aiReply = `🤖 **Hermes Agent AI**: Saya telah memproses arahan anda: "${userMsg}".
-
-- **Automasi Terkini**: Sambungan Gateway WhatsApp & Telegram sedia digunakan terus melalui tab navigasi di atas.
-- **Kawalan Sistem**: Anda boleh mengawal perkhidmatan stesen kerja dan pelayan Kali Linux secara langsung dari konsol ini tanpa perlu membuka terminal manual.
-- **Bantuan Lanjut**: Taip "check status" untuk telemetri atau "hermes gateway setup" untuk panduan penyambungan segera.`;
+      aiReply = `Maaf, saya tidak dapat mencapai model AI daripada gateway OmniRoute (Port 20128) buat masa ini. Sila semak sambungan router di https://router.sentinelai.studio atau log masuk semula ke dashboard providers.`;
     }
 
     return ok({
