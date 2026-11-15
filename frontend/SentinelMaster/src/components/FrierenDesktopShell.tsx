@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import HermesDesktopChat from './HermesDesktopChat';
 import type { OverviewPayload } from '@/lib/overview';
 import type { RouterCredentials } from '@/lib/router-types';
 
@@ -120,34 +121,6 @@ export default function FrierenDesktopShell({
             </div>
           </div>
         </div>
-
-        <div className="hud-divider" />
-
-        {/* View Switcher button to toggle Bento Grid */}
-        {onSwitchToGrid && (
-          <button
-            type="button"
-            onClick={onSwitchToGrid}
-            className="btn ghost sm"
-            style={{
-              padding: '6px 12px',
-              borderRadius: '12px',
-              border: '1px solid rgba(167, 139, 250, 0.3)',
-              color: '#c4b5fd',
-              fontSize: '11px',
-              fontWeight: 600,
-              background: 'rgba(167, 139, 250, 0.1)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-            title="Switch to Classic Bento Grid View"
-          >
-            <span>📊</span>
-            <span>Bento Grid</span>
-          </button>
-        )}
       </div>
 
       {/* ── TOP-LEFT: THE MONOCHROME GLASS PIE APPLICATION WHEEL ── */}
@@ -322,141 +295,10 @@ export default function FrierenDesktopShell({
         </svg>
       </div>
 
-      {/* ── DESKTOP RIGHT TELEMETRY CARD ── */}
-      <div className="desktop-telemetry-card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div
-            style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '12px',
-              background: 'rgba(167, 139, 250, 0.15)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '22px',
-              border: '1px solid rgba(167, 139, 250, 0.3)',
-            }}
-          >
-            🧝‍♀️
-          </div>
-          <div>
-            <div style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff' }}>
-              Frieren AIOS Companion
-            </div>
-            <div style={{ fontSize: '11px', color: '#a78bfa', fontFamily: 'var(--mono)' }}>
-              Port 20128 · OmniRoute Connected
-            </div>
-          </div>
-        </div>
+      {/* ── DESKTOP RIGHT: HERMES AGENT AI CHAT CARD (SHARED CHAT STREAM) ── */}
+      <HermesDesktopChat />
 
-        <div style={{ fontSize: '12.5px', color: 'var(--text-dim)', lineHeight: '1.6' }}>
-          Welcome, Commander Jack. All Sentinel microservices and background daemon wards are online.
-          Select any application sector from the radial glass wheel or bottom dock to begin.
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '4px' }}>
-          <div
-            style={{
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(167, 139, 250, 0.15)',
-              borderRadius: '12px',
-              padding: '10px 12px',
-            }}
-          >
-            <div style={{ fontSize: '10px', color: '#a1a1aa', textTransform: 'uppercase', fontWeight: 600 }}>
-              Fleet Nodes
-            </div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: '#34d399', marginTop: '2px' }}>
-              10 PM2 Online
-            </div>
-          </div>
-
-          <div
-            style={{
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(167, 139, 250, 0.15)',
-              borderRadius: '12px',
-              padding: '10px 12px',
-            }}
-          >
-            <div style={{ fontSize: '10px', color: '#a1a1aa', textTransform: 'uppercase', fontWeight: 600 }}>
-              Database
-            </div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: '#c4b5fd', marginTop: '2px' }}>
-              fyp2.db · WAL
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
-          <Link
-            href="/frieren"
-            className="btn primary"
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              borderRadius: '10px',
-              padding: '8px',
-              fontSize: '12px',
-              background: 'linear-gradient(135deg, #7c3aed, #6366f1)',
-              borderColor: 'rgba(167, 139, 250, 0.4)',
-            }}
-          >
-            Open Copilot Terminal →
-          </Link>
-          <Link
-            href="/router"
-            className="btn ghost"
-            style={{
-              borderRadius: '10px',
-              padding: '8px 12px',
-              fontSize: '12px',
-              border: '1px solid rgba(167, 139, 250, 0.25)',
-              color: '#c4b5fd',
-            }}
-          >
-            AI Gateway
-          </Link>
-        </div>
-      </div>
-
-      {/* ── 1. BOTTOM-LEFT: VERTICAL SETTINGS & UTILITIES TASKBAR ── */}
-      <div className="vertical-settings-bar">
-        <Link href="/settings" className="v-dock-item" title="Settings">
-          <img src="/assets/frieren/radial/mono/settings.svg" alt="Settings" />
-          <div className="v-dock-tooltip">Settings (Hub &amp; Auth)</div>
-        </Link>
-
-        <div className="v-dock-item" title="Cloudflare Tunnel Wards">
-          <img src="/assets/frieren/radial/mono/wifi.svg" alt="Wi-Fi" />
-          <div className="v-dock-tooltip">Tunnel: ssh.sentinelai.studio</div>
-        </div>
-
-        <Link href="/voice-studio" className="v-dock-item" title="Voice Studio">
-          <img src="/assets/frieren/radial/mono/sound.svg" alt="Volume" />
-          <div className="v-dock-tooltip">Voice Studio &amp; Audio</div>
-        </Link>
-
-        <Link href="/kali" className="v-dock-item" title="Task Manager & Fleet">
-          <img src="/assets/frieren/radial/mono/taskmgr.svg" alt="Task Manager" />
-          <div className="v-dock-tooltip">PM2 Taskmgr &amp; Fleet</div>
-        </Link>
-
-        {onSwitchToGrid && (
-          <div
-            className="v-dock-item"
-            title="Toggle Bento Grid View"
-            onClick={onSwitchToGrid}
-            style={{ cursor: 'pointer' }}
-          >
-            <span style={{ fontSize: '18px' }}>📊</span>
-            <div className="v-dock-tooltip">Toggle Bento Grid</div>
-          </div>
-        )}
-      </div>
-
-      {/* ── 2. BOTTOM-CENTER: RUNNING SOFTWARE TASKBAR (DOCK) ── */}
+      {/* ── BOTTOM-CENTER: RUNNING SOFTWARE TASKBAR (DOCK) ── */}
       <div className="running-software-dock">
         <div className="running-apps-container">
           {RUNNING_SERVICES.map((srv) => (

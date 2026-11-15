@@ -93,7 +93,7 @@ export function MobileMenuButton() {
 
 export function HubShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const [isSidebarHidden, setIsSidebarHidden] = useState<boolean>(false);
+  const [isSidebarHidden, setIsSidebarHidden] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [theme, setThemeState] = useState<ThemeMode>('dark');
   // Track whether the initial mobile detection has happened to avoid SSR mismatch.
@@ -114,12 +114,16 @@ export function HubShell({ children }: { children: ReactNode }) {
           setIsSidebarHidden(true);
           return;
         }
-        // On desktop: restore persisted preference.
+        // On desktop: restore persisted preference, default to collapsed (true).
         try {
           const stored = localStorage.getItem('sentinel_sidebar_hidden');
-          if (stored !== null) setIsSidebarHidden(stored === 'true');
+          if (stored !== null) {
+            setIsSidebarHidden(stored === 'true');
+          } else {
+            setIsSidebarHidden(true);
+          }
         } catch {
-          // Ignore
+          setIsSidebarHidden(true);
         }
         return;
       }

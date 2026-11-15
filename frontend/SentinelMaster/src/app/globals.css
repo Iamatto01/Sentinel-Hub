@@ -3770,8 +3770,8 @@ body:has(.login-page) .lp-grid-matrix {
 /* THE MONOCHROME GLASS PIE APPLICATION WHEEL (THE CIRCLE THING) */
 .pie-menu-stage {
   position: absolute;
-  top: 45%;
-  left: 28%;
+  top: 280px;
+  left: 270px;
   transform: translate(-50%, -50%);
   width: 480px;
   height: 480px;
@@ -3781,10 +3781,21 @@ body:has(.login-page) .lp-grid-matrix {
   justify-content: center;
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1300px) {
   .pie-menu-stage {
-    left: 50%;
-    top: 38%;
+    left: 250px;
+    top: 260px;
+    transform: translate(-50%, -50%) scale(0.88);
+  }
+}
+
+@media (max-width: 900px) {
+  .pie-menu-stage {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin: 20px auto;
   }
 }
 
@@ -4019,30 +4030,301 @@ svg.pie-wheel-svg {
   margin: 0 2px;
 }
 
-/* DESKTOP RIGHT TELEMETRY CARD */
-.desktop-telemetry-card {
+/* DESKTOP RIGHT HERMES CHAT CARD */
+.desktop-hermes-chat-card {
   position: absolute;
   top: 50%;
-  right: 40px;
+  right: 36px;
   transform: translateY(-50%);
-  width: 380px;
-  background: rgba(14, 11, 24, 0.78);
-  backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  width: 460px;
+  max-width: calc(100vw - 72px);
+  height: min(650px, calc(100vh - 130px));
+  background: rgba(14, 11, 24, 0.84);
+  backdrop-filter: blur(36px) saturate(190%);
+  -webkit-backdrop-filter: blur(36px) saturate(190%);
   border: 1px solid rgba(167, 139, 250, 0.22);
   border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(167, 139, 250, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  z-index: 10;
+  padding: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(167, 139, 250, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 15;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
-@media (max-width: 1280px) {
-  .desktop-telemetry-card {
-    display: none;
+@media (max-width: 1100px) {
+  .desktop-hermes-chat-card {
+    position: relative;
+    top: auto;
+    right: auto;
+    transform: none;
+    width: 100%;
+    margin: 20px auto;
   }
+}
+
+.hermes-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(167, 139, 250, 0.16);
+  flex-shrink: 0;
+}
+
+.hermes-avatar-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.25), rgba(124, 58, 237, 0.35));
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.3);
+}
+
+.hermes-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #34d399;
+  letter-spacing: 0.5px;
+}
+
+.hermes-live-pill .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 6px #34d399;
+  animation: frieren-float-bubble 2s infinite ease-in-out;
+}
+
+.hermes-expand-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  background: rgba(167, 139, 250, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  color: #c4b5fd;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.hermes-expand-btn:hover {
+  background: rgba(167, 139, 250, 0.22);
+  border-color: rgba(167, 139, 250, 0.5);
+  transform: translateY(-1px);
+}
+
+.hermes-quick-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  flex-shrink: 0;
+}
+
+.hermes-chip {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(167, 139, 250, 0.18);
+  color: #c4b5fd;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.hermes-chip:hover {
+  background: rgba(167, 139, 250, 0.16);
+  border-color: rgba(167, 139, 250, 0.45);
+  transform: translateY(-1px);
+}
+
+.hermes-chip.clear {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.25);
+  background: rgba(248, 113, 113, 0.06);
+  margin-left: auto;
+}
+
+.hermes-chip.clear:hover {
+  background: rgba(248, 113, 113, 0.16);
+  border-color: rgba(248, 113, 113, 0.5);
+}
+
+.hermes-messages-stream {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+  min-height: 120px;
+}
+
+.hermes-msg-row {
+  display: flex;
+  gap: 8px;
+  max-width: 90%;
+  animation: frieren-fade-in 0.22s ease forwards;
+}
+
+.hermes-msg-row.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.hermes-msg-row.bot {
+  align-self: flex-start;
+}
+
+.hermes-msg-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: rgba(167, 139, 250, 0.2);
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.hermes-msg-bubble {
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.hermes-msg-row.user .hermes-msg-bubble {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.45), rgba(99, 102, 241, 0.35));
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+
+.hermes-msg-row.bot .hermes-msg-bubble {
+  background: rgba(22, 17, 36, 0.85);
+  border: 1px solid rgba(167, 139, 250, 0.18);
+  color: #e2e8f0;
+  border-bottom-left-radius: 4px;
+}
+
+.hermes-msg-bubble.thinking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(22, 17, 36, 0.6);
+}
+
+.hermes-typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.hermes-typing-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #a78bfa;
+  animation: frieren-float-bubble 1s infinite alternate;
+}
+
+.hermes-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.hermes-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+.hermes-msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 9.5px;
+  color: var(--text-faint);
+  font-family: var(--mono);
+}
+
+.hermes-msg-model {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #c4b5fd;
+}
+
+.hermes-input-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(20, 16, 34, 0.9);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 14px;
+  padding: 4px 6px 4px 14px;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hermes-input-box:focus-within {
+  border-color: rgba(167, 139, 250, 0.6);
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.25);
+}
+
+.hermes-chat-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-family: inherit;
+}
+
+.hermes-chat-input::placeholder {
+  color: var(--text-faint);
+}
+
+.hermes-chat-send-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.hermes-chat-send-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.5);
+}
+
+.hermes-chat-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 

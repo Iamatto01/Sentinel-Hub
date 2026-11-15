@@ -3,16 +3,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PageHeader, PageBody } from './PageHeader';
 import { Card } from './ui';
-
-interface ChatMessage {
-  id: string;
-  sender: 'user' | 'hermes';
-  text: string;
-  timestamp: string;
-  action?: string;
-  model?: string;
-  persona?: string;
-}
+import {
+  type ChatMessage,
+  getStoredHermesMessages,
+  saveStoredHermesMessages,
+  HERMES_CHAT_EVENT,
+} from '@/lib/hermes-chat';
 
 export default function HermesView() {
   const [activeTab, setActiveTab] = useState<'console' | 'swarm' | 'whatsapp' | 'telegram' | 'cua' | 'dashboard'>('console');
@@ -32,17 +28,32 @@ export default function HermesView() {
   const [loadingMemories, setLoadingMemories] = useState(false);
 
   // Live Console state
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'welcome-1',
-      sender: 'hermes',
-      text: 'Salam & Selamat datang ke Hermes Agent AI v0.23.0. Saya adalah ejen autonomi pelbagai platform anda yang bersambung terus ke rangkaian Sentinel Fleet. Anda kini boleh mengawal CUA, menghubungkan WhatsApp Gateway, dan mengaktifkan bot Telegram secara langsung dari laman web ini.',
-      timestamp: 'Sedia',
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isSending, setIsSending] = useState(false);
   const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  // Synchronize messages with shared storage
+  useEffect(() => {
+    setMessages(getStoredHermesMessages());
+
+    const handleSync = (e: Event) => {
+      const customEvt = e as CustomEvent<ChatMessage[]>;
+      if (customEvt.detail && Array.isArray(customEvt.detail)) {
+        setMessages(customEvt.detail);
+      } else {
+        setMessages(getStoredHermesMessages());
+      }
+    };
+
+    window.addEventListener(HERMES_CHAT_EVENT, handleSync);
+    window.addEventListener('storage', handleSync);
+
+    return () => {
+      window.removeEventListener(HERMES_CHAT_EVENT, handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
+  }, []);
 
   // WhatsApp Tab State
   const [waPhone, setWaPhone] = useState('601');
@@ -127,7 +138,9 @@ export default function HermesView() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const nextMessages = [...messages, userMsg];
+    setMessages(nextMessages);
+    saveStoredHermesMessages(nextMessages);
     if (!customPrompt) setInputValue('');
     setIsSending(true);
 
@@ -140,7 +153,7 @@ export default function HermesView() {
           message: textToSend,
           model: selectedModel,
           persona: selectedPersona,
-          history: messages.slice(-4).map((m) => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text })),
+          history: nextMessages.slice(-4).map((m) => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text })),
         }),
       });
 
@@ -149,18 +162,19 @@ export default function HermesView() {
         const data = json.data;
         const reply = data?.reply || 'Perintah diproses oleh Hermes Agent.';
 
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `hermes-${Date.now()}`,
-            sender: 'hermes',
-            text: reply,
-            model: data?.model || selectedModel,
-            persona: data?.persona || selectedPersona,
-            timestamp: data?.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            action: data?.action?.command,
-          },
-        ]);
+        const botMsg: ChatMessage = {
+          id: `hermes-${Date.now()}`,
+          sender: 'hermes',
+          text: reply,
+          model: data?.model || selectedModel,
+          persona: data?.persona || selectedPersona,
+          timestamp: data?.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          action: data?.action?.command,
+        };
+
+        const finalMessages = [...nextMessages, botMsg];
+        setMessages(finalMessages);
+        saveStoredHermesMessages(finalMessages);
 
         if (data?.tab && (data.tab === 'whatsapp' || data.tab === 'telegram' || data.tab === 'cua')) {
           setActiveTab(data.tab);
@@ -171,15 +185,15 @@ export default function HermesView() {
     } catch {
       // Offline fallback
       setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `hermes-${Date.now()}`,
-            sender: 'hermes',
-            text: `Hermes Agent: Arahan "${textToSend}" telah diproses. Anda boleh menguruskan sambungan WhatsApp & Telegram secara terus di tab atas.`,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          },
-        ]);
+        const fallbackMsg: ChatMessage = {
+          id: `hermes-${Date.now()}`,
+          sender: 'hermes',
+          text: `Hermes Agent: Arahan "${textToSend}" telah diproses. Anda boleh menguruskan sambungan WhatsApp & Telegram secara terus di tab atas.`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        const finalMessages = [...nextMessages, fallbackMsg];
+        setMessages(finalMessages);
+        saveStoredHermesMessages(finalMessages);
       }, 500);
     } finally {
       setIsSending(false);

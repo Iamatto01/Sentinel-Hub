@@ -134,26 +134,6 @@ export default function OverviewView() {
             </button>
           </div>
 
-          <span className="topbar-ip-badge" style={{ fontSize: '11.5px', color: 'var(--text-faint)', fontFamily: 'var(--mono)' }}>
-            192.168.68.132
-          </span>
-          <span
-            className="topbar-kali-badge"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '3px 10px',
-              borderRadius: '9999px',
-              background: 'var(--panel-2)',
-              border: '1px solid var(--line)',
-              fontSize: '11px',
-              color: 'var(--text)',
-            }}
-          >
-            <span className={`pulse-dot ${overview.data?.kali?.state === 'ok' ? 'green' : 'amber'}`} style={{ width: '6px', height: '6px' }} />
-            <span>Node {overview.data?.kali?.state === 'ok' ? 'Online' : 'Checking'}</span>
-          </span>
           <ThemeToggle />
         </div>
       </div>
