@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { guard } from '@/lib/guard';
 import { ok, fail, readJson } from '@/lib/http';
 import { env } from '@/lib/env';
+import { routerSnapshot } from '@/lib/router';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -81,6 +82,23 @@ export async function POST(request: NextRequest) {
       ? env.router.apiKey
       : 'sk-0000000000000000-3ee33e-1a23c438';
 
+    // Dynamic real telemetry/provider context if user asks about accounts/providers
+    let dynamicSystemPrompt = HERMES_SYSTEM_PROMPT;
+    const qLower = userMsg.toLowerCase();
+    if (['provider', 'account', 'akaun', 'gmail', 'omniroute', 'sambungan', 'connection', 'aktif', 'active'].some((k) => qLower.includes(k))) {
+      try {
+        const snap = await routerSnapshot();
+        if (snap.connections && snap.connections.length > 0) {
+          const list = snap.connections
+            .map((c) => `- Provider: ${c.provider} | Email: ${c.email || c.name || 'N/A'} | Status: ${c.isActive ? 'Active (Aktif)' : 'Not Active (Perlu Login Semula)'}`)
+            .join('\n');
+          dynamicSystemPrompt += `\n\nREAL LIVE OMNIROUTE CONNECTIONS DATA (${snap.connections.length} total connections):\n${list}\n\nIMPORTANT: Use ONLY these exact real accounts when listing or discussing providers. Never invent or hallucinate dummy email addresses.`;
+        }
+      } catch {
+        // Continue with static prompt
+      }
+    }
+
     const candidateModels = [
       'antigravity/gemini-3-flash',
       'antigravity/gemini-3.8-flash-high',
@@ -93,7 +111,7 @@ export async function POST(request: NextRequest) {
         const payload = {
           model: modelToTry,
           messages: [
-            { role: 'system', content: HERMES_SYSTEM_PROMPT },
+            { role: 'system', content: dynamicSystemPrompt },
             ...(Array.isArray(body?.history) ? body.history.slice(-8) : []),
             { role: 'user', content: userMsg },
           ],
