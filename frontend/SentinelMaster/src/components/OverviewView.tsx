@@ -90,18 +90,18 @@ export default function OverviewView() {
                 </span>
               </div>
               <div className="hero-sub" style={{ marginTop: '8px' }}>
-                Your unified AI powerhouse. Coding with unlimited free models via Sentinel Router, generating daily video assets, and orchestrating 24/7 server workloads.
+                Your unified central powerhouse. Orchestrating coding models via Sentinel Router, interactive web platforms (Tree, Along, CTF, MLBB), and 24/7 server workloads under one roof.
               </div>
             </div>
           </div>
         </div>
 
-        {/* 5 Core App Cards (CyberMaster Removed) */}
+        {/* Unified Sentinel Systems & Workspaces */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h2 style={{ fontSize: '16px', fontWeight: 650, color: 'var(--text)', letterSpacing: '-0.02em' }}>
-                Core Applications & Workspaces
+                Unified Systems & Web Platforms
               </h2>
               <span
                 style={{
@@ -114,7 +114,7 @@ export default function OverviewView() {
                   border: '1px solid var(--line)',
                 }}
               >
-                5 Active
+                All Under Hub
               </span>
             </div>
           </div>
@@ -123,15 +123,13 @@ export default function OverviewView() {
             {/* Sentinel Router AI Gateway */}
             <div className="app-card featured">
               <div className="app-card-head">
-                <div className="app-icon">
-                  ⚡
-                </div>
+                <div className="app-icon">⚡</div>
                 <div className="app-title-group">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div className="app-title">Sentinel AI Gateway</div>
                     <span className="app-badge">Unlimited Free AI</span>
                   </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Proxy & Token Saver for Coding Tools</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>OmniRoute Proxy & Token Saver</div>
                 </div>
               </div>
 
@@ -147,62 +145,197 @@ export default function OverviewView() {
 
               <div className="app-actions">
                 <a
-                  href={credentials.data?.baseUrl ?? '#'}
+                  href={credentials.data?.baseUrl ?? 'https://router.sentinelai.studio'}
                   target="_blank"
                   rel="noreferrer"
                   className="btn-primary-action"
                 >
-                  Open Sentinel Router UI ↗
+                  Open Router UI ↗
                 </a>
                 <Link href="/router" className="btn-secondary-action">
-                  Setup Guide
+                  Setup Guide →
                 </Link>
               </div>
             </div>
 
-            {/* Voice Studio */}
+            {/* Antigravity AI Console */}
             <div className="app-card">
               <div className="app-card-head">
-                <div className="app-icon">🎙️</div>
+                <div className="app-icon">💬</div>
                 <div className="app-title-group">
-                  <div className="app-title">Voice Studio</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Neural Speech Synthesis</div>
+                  <div className="app-title">Antigravity Chat</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Embedded AI Command Console</div>
                 </div>
               </div>
               <div className="app-desc">
-                Ultra-realistic speech narration using Microsoft Edge-TTS with 20+ multilingual neural voices for videos, tutorials, and bots.
+                Minimalist AI Chat console with multi-project organization, prompt chaining, and direct gateway integration.
               </div>
               <div className="app-meta">
-                <span className="app-tag">20+ Neural Voices</span>
-                <span className="app-tag">SubRip / VTT</span>
+                <span className="app-tag">Multi-Model</span>
+                <span className="app-tag">In-Hub Embedded</span>
               </div>
               <div className="app-actions">
-                <Link href="/voice-studio" className="btn-secondary-action">
-                  Open Voice Studio →
+                <Link href="/chat" className="btn-secondary-action">
+                  Open Chat Console →
                 </Link>
               </div>
             </div>
 
-            {/* Video Studio */}
+            {/* SentinelTree */}
             <div className="app-card">
               <div className="app-card-head">
-                <div className="app-icon">🎬</div>
+                <div className="app-icon">🌳</div>
                 <div className="app-title-group">
-                  <div className="app-title">Video Studio (OpenCut)</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Programmatic Video Rendering</div>
+                  <div className="app-title">SentinelTree</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Warisan Jamal Awang Family Tree</div>
                 </div>
               </div>
               <div className="app-desc">
-                Automated canvas generator using Pillow and FFmpeg. Renders 16:9 widescreen tutorials and 9:16 vertical shorts with synced subtitles.
+                Interactive family heritage tree with 93 members, dynamic branch vs full-tree dual view modes, relationship editor, and photo gallery.
               </div>
               <div className="app-meta">
-                <span className="app-tag">Pillow + FFmpeg</span>
-                <span className="app-tag">1080p & 9:16</span>
+                <span className="app-tag">93 Ahli</span>
+                <span className="app-tag">Dual View Mode</span>
+                <span className="app-tag">Port 8007</span>
               </div>
               <div className="app-actions">
-                <Link href="/opencut" className="btn-secondary-action">
-                  Open Video Studio →
+                <Link href="/tree" className="btn-primary-action">
+                  Open in Hub →
                 </Link>
+                <a
+                  href="https://tree.sentinelai.studio"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-secondary-action"
+                >
+                  Direct Site ↗
+                </a>
+              </div>
+            </div>
+
+            {/* SentinelAlong */}
+            <div className="app-card">
+              <div className="app-card-head">
+                <div className="app-icon">📐</div>
+                <div className="app-title-group">
+                  <div className="app-title">SentinelAlong</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>CAD & Floorplan Room Sketcher</div>
+                </div>
+              </div>
+              <div className="app-desc">
+                Minimalist CAD architecture and vector floor plan sketcher designed for fast room layout drafting and measurement.
+              </div>
+              <div className="app-meta">
+                <span className="app-tag">Vector Canvas</span>
+                <span className="app-tag">Realtime CAD</span>
+                <span className="app-tag">Port 8028</span>
+              </div>
+              <div className="app-actions">
+                <Link href="/along" className="btn-primary-action">
+                  Open in Hub →
+                </Link>
+                <a
+                  href="https://along.sentinelai.studio"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-secondary-action"
+                >
+                  Direct Site ↗
+                </a>
+              </div>
+            </div>
+
+            {/* Sentinel CTF Platform */}
+            <div className="app-card">
+              <div className="app-card-head">
+                <div className="app-icon">🚩</div>
+                <div className="app-title-group">
+                  <div className="app-title">Sentinel CTF</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Cybersecurity Challenge Arena</div>
+                </div>
+              </div>
+              <div className="app-desc">
+                Automated security challenge platform equipped with 63 specialized tools spanning crypto, pwn, reversing, forensics, and web exploits.
+              </div>
+              <div className="app-meta">
+                <span className="app-tag">63 Tools</span>
+                <span className="app-tag">CTF Arena</span>
+                <span className="app-tag">Port 8023</span>
+              </div>
+              <div className="app-actions">
+                <Link href="/ctf" className="btn-primary-action">
+                  Open in Hub →
+                </Link>
+                <a
+                  href="https://ctf.sentinelai.studio"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-secondary-action"
+                >
+                  Direct Site ↗
+                </a>
+              </div>
+            </div>
+
+            {/* Sentinel MLBB */}
+            <div className="app-card">
+              <div className="app-card-head">
+                <div className="app-icon">🎮</div>
+                <div className="app-title-group">
+                  <div className="app-title">Sentinel MLBB</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Mobile Legends Tournament Platform</div>
+                </div>
+              </div>
+              <div className="app-desc">
+                Next.js gaming analytics platform with live player match scraping, game logs, and automated bot telemetry.
+              </div>
+              <div className="app-meta">
+                <span className="app-tag">Next.js App</span>
+                <span className="app-tag">Port 3005</span>
+              </div>
+              <div className="app-actions">
+                <Link href="/mlbb" className="btn-primary-action">
+                  Open in Hub →
+                </Link>
+                <a
+                  href="https://mlbb.sentinelai.studio"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-secondary-action"
+                >
+                  Direct Site ↗
+                </a>
+              </div>
+            </div>
+
+            {/* SentinelAI Studio */}
+            <div className="app-card">
+              <div className="app-card-head">
+                <div className="app-icon">🛡️</div>
+                <div className="app-title-group">
+                  <div className="app-title">SentinelAI Platform</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Core Analysis & Audit Portal</div>
+                </div>
+              </div>
+              <div className="app-desc">
+                Central cybersecurity auditing portal with automated exploit verification, security scoring, and telemetry reporting.
+              </div>
+              <div className="app-meta">
+                <span className="app-tag">Vite Preview</span>
+                <span className="app-tag">Port 5173</span>
+              </div>
+              <div className="app-actions">
+                <Link href="/sentinelai" className="btn-primary-action">
+                  Open in Hub →
+                </Link>
+                <a
+                  href="https://sentinelai.studio"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-secondary-action"
+                >
+                  Direct Site ↗
+                </a>
               </div>
             </div>
 
@@ -216,12 +349,12 @@ export default function OverviewView() {
                 </div>
               </div>
               <div className="app-desc">
-                24/7 node at <code style={{ color: 'var(--text)' }}>192.168.68.132</code> with 156GB NVMe SSD storage. Runs PM2 microservices, Sentinel Router Docker container, and Cloudflare tunnels.
+                24/7 dedicated node at <code style={{ color: 'var(--text)' }}>192.168.68.132</code>. Runs PM2 microservices, Docker containers, and Cloudflare tunnels.
               </div>
               <div className="app-meta">
-                <span className="app-tag">156 GB Free</span>
                 <span className="app-tag">{totals ? `${totals.kaliOnline} PM2 Online` : '9 PM2 Online'}</span>
                 <span className="app-tag">Docker Active</span>
+                <span className="app-tag">RAM / CPU Telemetry</span>
               </div>
               <div className="app-actions">
                 <Link href="/kali" className="btn-secondary-action">
@@ -230,13 +363,13 @@ export default function OverviewView() {
               </div>
             </div>
 
-            {/* All Projects */}
+            {/* All Projects & Workspaces */}
             <div className="app-card">
               <div className="app-card-head">
                 <div className="app-icon">📁</div>
                 <div className="app-title-group">
-                  <div className="app-title">Sentinel Projects</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Workspace Directory</div>
+                  <div className="app-title">Sentinel Workspaces</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Master Workspace Directory</div>
                 </div>
               </div>
               <div className="app-desc">
@@ -244,11 +377,11 @@ export default function OverviewView() {
               </div>
               <div className="app-meta">
                 <span className="app-tag">{totals ? `${totals.projects} Workspaces` : '30+ Workspaces'}</span>
-                <span className="app-tag">Git Management</span>
+                <span className="app-tag">Git Tracking</span>
               </div>
               <div className="app-actions">
-                <Link href="/kali?tab=projects" className="btn-secondary-action">
-                  Browse All Projects →
+                <Link href="/god-view" className="btn-secondary-action">
+                  Browse All Repos →
                 </Link>
               </div>
             </div>

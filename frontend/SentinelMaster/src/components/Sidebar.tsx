@@ -38,11 +38,17 @@ interface NavLink {
 const CORE_APPS: NavLink[] = [
   { href: '/', label: 'Dashboard' },
   { href: '/chat', label: 'Antigravity Chat' },
-  { href: '/router', label: 'Sentinel Router (AI Gateway)' },
+  { href: '/router', label: 'Sentinel AI Gateway' },
+  { href: '/sentinelai', label: 'SentinelAI Platform' },
   { href: '/hermes', label: 'Hermes Agent AI' },
   { href: '/orchestrator', label: 'AI Swarm IDE' },
-  { href: '/voice-studio', label: 'Voice Studio' },
-  { href: '/opencut', label: 'Video Studio' },
+];
+
+const PLATFORM_APPS: NavLink[] = [
+  { href: '/tree', label: 'SentinelTree (Family Tree)' },
+  { href: '/along', label: 'SentinelAlong (CAD Sketcher)' },
+  { href: '/ctf', label: 'Sentinel CTF Platform' },
+  { href: '/mlbb', label: 'Sentinel MLBB' },
 ];
 
 const SYSTEM_LINKS: NavLink[] = [
@@ -57,17 +63,8 @@ const SYSTEM_LINKS: NavLink[] = [
     count: (totals) => totals.databases,
     alert: (totals) => (totals.divergedDatabases ?? 0) > 0,
   },
+  { href: '/god-view', label: 'God View (All Repos)' },
   { href: '/settings', label: 'Settings' },
-];
-
-const ADVANCED_TOOLS: NavLink[] = [
-  { href: '/cybermaster', label: 'CyberMaster AI' },
-  { href: '/god-view', label: 'God View (Repos)' },
-  { href: '/touch', label: 'SentinelTouch' },
-  { href: '/grok-bot', label: 'Grok Bot Hub' },
-  { href: '/github', label: 'GitHub Sync' },
-  { href: '/fame', label: 'SentinelFame' },
-  { href: '/autobot', label: 'Autobot' },
 ];
 
 function isActive(pathname: string, href: string): boolean {
@@ -84,7 +81,6 @@ export default function Sidebar() {
   const { toggleSidebar } = useSidebar();
   const [totals, setTotals] = useState<OverviewTotals | null>(null);
   const [signingOut, setSigningOut] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -183,7 +179,21 @@ export default function Sidebar() {
         ))}
 
         <div className="nav-section" style={{ marginTop: '14px', color: 'var(--text-faint)', fontWeight: 600, fontSize: '10.5px' }}>
-          System & Workspaces
+          Platforms & Web Apps
+        </div>
+        {PLATFORM_APPS.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={isActive(pathname, link.href) ? 'nav-item active' : 'nav-item'}
+            aria-current={isActive(pathname, link.href) ? 'page' : undefined}
+          >
+            <span style={{ flex: 1 }}>{link.label}</span>
+          </Link>
+        ))}
+
+        <div className="nav-section" style={{ marginTop: '14px', color: 'var(--text-faint)', fontWeight: 600, fontSize: '10.5px' }}>
+          Infrastructure & Fleet
         </div>
         {SYSTEM_LINKS.map((link) => {
           const count = totals && link.count ? link.count(totals) : null;
@@ -201,42 +211,6 @@ export default function Sidebar() {
             </Link>
           );
         })}
-
-        <div style={{ marginTop: '16px', padding: '0 4px' }}>
-          <button
-            type="button"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className="btn sm ghost"
-            style={{
-              width: '100%',
-              justifyContent: 'space-between',
-              color: 'var(--text-faint)',
-              fontSize: '11.5px',
-              padding: '6px 10px',
-              borderRadius: '9999px',
-              border: '1px solid rgba(255, 255, 255, 0.05)',
-            }}
-          >
-            <span>Advanced Tools ({ADVANCED_TOOLS.length})</span>
-            <span style={{ fontSize: '9px' }}>{showAdvanced ? '▲' : '▼'}</span>
-          </button>
-        </div>
-
-        {showAdvanced && (
-          <div style={{ marginTop: '6px', paddingLeft: '8px', borderLeft: '1px solid rgba(255, 255, 255, 0.08)', marginLeft: '14px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            {ADVANCED_TOOLS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={isActive(pathname, link.href) ? 'nav-item active' : 'nav-item'}
-                aria-current={isActive(pathname, link.href) ? 'page' : undefined}
-                style={{ fontSize: '12.5px', padding: '6px 10px' }}
-              >
-                <span>{link.label}</span>
-              </Link>
-            ))}
-          </div>
-        )}
       </nav>
 
       <div className="sidebar-foot">
