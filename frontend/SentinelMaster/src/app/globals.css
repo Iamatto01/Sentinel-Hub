@@ -1,33 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --bg: #000000;
-  --bg-soft: #08080a;
-  --panel: rgba(255, 255, 255, 0.035);
-  --panel-solid: #0e0e11;
-  --panel-2: rgba(255, 255, 255, 0.055);
-  --panel-2-solid: #141418;
-  --panel-3: rgba(255, 255, 255, 0.085);
-  --line: rgba(255, 255, 255, 0.12);
-  --line-soft: rgba(255, 255, 255, 0.06);
-  --glass-border: rgba(255, 255, 255, 0.22);
-  --glass-border-hover: rgba(255, 255, 255, 0.65);
-  --glass-glow: 0 0 30px rgba(255, 255, 255, 0.16);
-  --glass-blur: blur(20px);
-  --glass-blur-heavy: blur(32px);
-  --text: #ffffff;
-  --text-dim: #a1a1a6;
-  --text-faint: #6e6e73;
-  --accent: #ffffff;
-  --accent-soft: rgba(255, 255, 255, 0.1);
+  --bg: #030206;
+  --bg-soft: #0a0814;
+  --panel: rgba(18, 15, 30, 0.74);
+  --panel-solid: #120e20;
+  --panel-2: rgba(25, 21, 40, 0.65);
+  --panel-2-solid: #161225;
+  --panel-3: rgba(167, 139, 250, 0.12);
+  --line: rgba(167, 139, 250, 0.16);
+  --line-soft: rgba(167, 139, 250, 0.08);
+  --glass-border: rgba(167, 139, 250, 0.22);
+  --glass-border-hover: rgba(167, 139, 250, 0.55);
+  --glass-glow: 0 0 35px rgba(167, 139, 250, 0.22);
+  --glass-blur: blur(28px);
+  --glass-blur-heavy: blur(36px);
+  --text: #f8f9fc;
+  --text-dim: #b0b4c2;
+  --text-faint: #6e7486;
+  --accent: #a78bfa;
+  --accent-soft: rgba(167, 139, 250, 0.16);
   --green: #34d399;
   --green-soft: rgba(52, 211, 153, 0.12);
   --amber: #fbbf24;
   --amber-soft: rgba(251, 191, 36, 0.12);
   --red: #f87171;
   --red-soft: rgba(248, 113, 113, 0.12);
-  --violet: #d1d5db;
-  --violet-soft: rgba(255, 255, 255, 0.08);
+  --violet: #c4b5fd;
+  --violet-soft: rgba(167, 139, 250, 0.16);
   --cyan: #e2e8f0;
   --indigo: #cbd5e1;
   --radius: 16px;
@@ -37,7 +37,7 @@
   --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Plus Jakarta Sans', system-ui, sans-serif;
   --serif: 'Instrument Serif', Georgia, serif;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-  --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.3), 0 0 20px -2px rgba(255, 255, 255, 0.1), 0 16px 40px -10px rgba(0, 0, 0, 0.7);
+  --glass-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 0 24px -2px rgba(167, 139, 250, 0.12), 0 16px 45px -10px rgba(0, 0, 0, 0.75);
 }
 
 /* ── Apple White Mode (Light Theme Variables) ─────────────────────────── */
@@ -76,7 +76,16 @@ body {
 }
 
 body {
-  background: var(--bg);
+  background-color: #030206;
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(167, 139, 250, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 82% 78%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 50% 92%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+    url('/assets/frieren/wallpaper-dark.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: var(--text);
   font-family: var(--sans);
   font-size: 14px;
@@ -87,7 +96,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Apple-Grade Ambient Background & Lighting ────────────────────────── */
+/* ── Frieren Desktop Ambient Background & Cosmic Lighting ───────────── */
 
 .lp-ambient-bg {
   position: fixed;
@@ -95,41 +104,99 @@ body {
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
-  background: #000000;
+  background-color: #030206;
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(167, 139, 250, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 82% 78%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 50% 92%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+    url('/assets/frieren/wallpaper-dark.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+[data-theme="light"] .lp-ambient-bg {
+  background-image: none;
+  background-color: #f5f5f7;
 }
 
 .lp-grid-matrix {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(167, 139, 250, 0.06) 1px, transparent 1px);
   background-size: 32px 32px;
   mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 40%, transparent 100%);
   -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 40%, transparent 100%);
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .lp-glow-1 {
   position: absolute;
-  top: -220px;
-  left: 25%;
-  width: 800px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 45%, transparent 70%);
-  filter: blur(100px);
+  top: -200px;
+  left: 20%;
+  width: 900px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.14) 0%, rgba(139, 92, 246, 0.05) 45%, transparent 70%);
+  filter: blur(120px);
   border-radius: 50%;
   animation: lp-glow-pulse 14s ease-in-out infinite alternate;
 }
 
 .lp-glow-2 {
   position: absolute;
-  top: -180px;
-  right: 20%;
-  width: 700px;
-  height: 450px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.035) 0%, transparent 70%);
-  filter: blur(110px);
+  top: 35%;
+  right: 15%;
+  width: 800px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.09) 0%, rgba(99, 102, 241, 0.04) 50%, transparent 70%);
+  filter: blur(130px);
   border-radius: 50%;
-  animation: lp-glow-pulse 16s ease-in-out infinite alternate-reverse;
+  animation: lp-glow-pulse 18s ease-in-out infinite alternate-reverse;
+}
+
+/* Twinkling Star Particles from Frieren Desktop */
+.lp-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+[data-theme="light"] .lp-stars {
+  display: none;
+}
+
+.star {
+  position: absolute;
+  background: #ffffff;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(167, 139, 250, 0.9), 0 0 12px rgba(255, 255, 255, 0.8);
+  animation: frieren-twinkle 4s infinite ease-in-out;
+}
+
+.star.s1  { top: 14%; left: 18%; width: 2px;   height: 2px;   animation-delay: 0s; }
+.star.s2  { top: 28%; left: 45%; width: 1.5px; height: 1.5px; animation-delay: 1.2s; }
+.star.s3  { top: 12%; left: 72%; width: 2.5px; height: 2.5px; animation-delay: 2.4s; }
+.star.s4  { top: 35%; left: 88%; width: 1.5px; height: 1.5px; animation-delay: 0.8s; }
+.star.s5  { top: 48%; left: 24%; width: 2px;   height: 2px;   animation-delay: 3.1s; }
+.star.s6  { top: 62%; left: 65%; width: 2.5px; height: 2.5px; animation-delay: 1.7s; }
+.star.s7  { top: 75%; left: 12%; width: 1.5px; height: 1.5px; animation-delay: 2.8s; }
+.star.s8  { top: 82%; left: 42%; width: 2px;   height: 2px;   animation-delay: 0.5s; }
+.star.s9  { top: 68%; left: 84%; width: 1.5px; height: 1.5px; animation-delay: 3.6s; }
+.star.s10 { top: 88%; left: 70%; width: 2px;   height: 2px;   animation-delay: 1.9s; }
+.star.s11 { top: 22%; left: 95%; width: 2.5px; height: 2.5px; animation-delay: 2.2s; }
+.star.s12 { top: 92%; left: 30%; width: 1.5px; height: 1.5px; animation-delay: 4.1s; }
+
+@keyframes frieren-twinkle {
+  0%, 100% {
+    opacity: 0.18;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.35);
+  }
 }
 
 @keyframes lp-glow-pulse {
@@ -250,7 +317,7 @@ pre {
 }
 
 .sidebar {
-  background: rgba(10, 10, 12, 0.82);
+  background: rgba(13, 10, 22, 0.84);
   backdrop-filter: blur(30px) saturate(190%);
   -webkit-backdrop-filter: blur(30px) saturate(190%);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
@@ -444,7 +511,7 @@ pre {
   align-items: center;
   gap: 14px;
   padding: 12px 22px;
-  background: rgba(5, 7, 13, 0.7);
+  background: rgba(13, 10, 24, 0.75);
   backdrop-filter: var(--glass-blur-heavy);
   -webkit-backdrop-filter: var(--glass-blur-heavy);
   border-bottom: 1px solid var(--glass-border);
@@ -1170,20 +1237,19 @@ a.tile-main:hover .tile-title {
   padding: 24px;
   position: relative;
   z-index: 1;
-  background: #000000 !important;
   color: #ffffff !important;
 }
 
 /* Force dark canvas regardless of previous local storage setting */
 html:has(.login-page),
 body:has(.login-page) {
-  background: #000000 !important;
+  background-color: #030206 !important;
   color: #ffffff !important;
 }
 
 [data-theme="light"]:has(.login-page) .lp-ambient-bg,
 body:has(.login-page) .lp-ambient-bg {
-  background: #000000 !important;
+  background-color: #030206 !important;
 }
 
 [data-theme="light"]:has(.login-page) .lp-grid-matrix,
@@ -1648,24 +1714,23 @@ body:has(.login-page) .lp-grid-matrix {
 /* ── Apple-Grade Monochrome Glassmorphic Dashboard ────────────────────── */
 
 .hero-card {
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(18, 15, 30, 0.76);
   backdrop-filter: var(--glass-blur-heavy);
   -webkit-backdrop-filter: var(--glass-blur-heavy);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(167, 139, 250, 0.28);
   border-radius: var(--radius);
   padding: 30px 32px;
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.35), 0 20px 48px -12px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 35px rgba(167, 139, 250, 0.16), inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 20px 48px -12px rgba(0, 0, 0, 0.75);
   display: flex;
   flex-direction: column;
   gap: 16px;
   position: relative;
   overflow: hidden;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hero-card:hover {
-  border-color: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 0 35px rgba(255, 255, 255, 0.22), inset 0 1px 0 0 rgba(255, 255, 255, 0.55), 0 24px 54px -10px rgba(0, 0, 0, 0.85);
+  border-color: rgba(167, 139, 250, 0.6);
+  box-shadow: 0 0 50px rgba(167, 139, 250, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.4), 0 24px 54px -10px rgba(0, 0, 0, 0.85);
 }
 
 .hero-header {
@@ -1777,38 +1842,38 @@ body:has(.login-page) .lp-grid-matrix {
   gap: 20px;
 }
 
-/* Apple Specular Glass Bento Card with Glowing White Borders */
+/* Frieren Obsidian Glass Bento Card */
 .app-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(18, 15, 30, 0.72);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(167, 139, 250, 0.2);
   border-radius: var(--radius);
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.24s ease, box-shadow 0.24s ease, background 0.24s ease;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease, box-shadow 0.28s ease, background 0.28s ease;
   position: relative;
-  box-shadow: 0 0 20px -2px rgba(255, 255, 255, 0.09), inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 24px -2px rgba(167, 139, 250, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.18), 0 14px 36px -8px rgba(0, 0, 0, 0.75);
 }
 
 .app-card:hover {
   transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.65);
-  box-shadow: 0 0 32px rgba(255, 255, 255, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.5), 0 24px 48px -12px rgba(0, 0, 0, 0.8);
+  background: rgba(26, 21, 42, 0.84);
+  border-color: rgba(167, 139, 250, 0.6);
+  box-shadow: 0 0 38px rgba(167, 139, 250, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.35), 0 24px 48px -12px rgba(0, 0, 0, 0.85);
 }
 
 .app-card.featured {
-  border-color: rgba(255, 255, 255, 0.32);
-  background: rgba(255, 255, 255, 0.045);
-  box-shadow: 0 0 24px -2px rgba(255, 255, 255, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.35), 0 14px 36px -8px rgba(0, 0, 0, 0.65);
+  border-color: rgba(167, 139, 250, 0.35);
+  background: linear-gradient(135deg, rgba(28, 22, 48, 0.82) 0%, rgba(18, 15, 30, 0.74) 100%);
+  box-shadow: 0 0 30px rgba(167, 139, 250, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.25), 0 16px 40px -8px rgba(0, 0, 0, 0.75);
 }
 
 .app-card.featured:hover {
-  border-color: rgba(255, 255, 255, 0.75);
-  box-shadow: 0 0 38px rgba(255, 255, 255, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.65), 0 26px 52px -10px rgba(0, 0, 0, 0.85);
+  border-color: rgba(167, 139, 250, 0.75);
+  box-shadow: 0 0 45px rgba(167, 139, 250, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.45), 0 28px 56px -10px rgba(0, 0, 0, 0.9);
 }
 
 .app-card-head {

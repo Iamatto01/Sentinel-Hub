@@ -10,11 +10,26 @@ interface ChatMessage {
   text: string;
   timestamp: string;
   action?: string;
+  model?: string;
+  persona?: string;
 }
 
 export default function HermesView() {
-  const [activeTab, setActiveTab] = useState<'console' | 'whatsapp' | 'telegram' | 'cua' | 'dashboard'>('console');
+  const [activeTab, setActiveTab] = useState<'console' | 'swarm' | 'whatsapp' | 'telegram' | 'cua' | 'dashboard'>('console');
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
+
+  // Model & Persona State (integrated from Antigravity & Frieren)
+  const [selectedModel, setSelectedModel] = useState('antigravity/gemini-3.8-flash-high');
+  const [selectedPersona, setSelectedPersona] = useState<'hermes' | 'frieren' | 'sentinel'>('hermes');
+
+  // Swarm Mission State (integrated from Orchestrator / Swarm IDE)
+  const [swarmGoal, setSwarmGoal] = useState('Audit target website, discover login endpoints, check interactive elements, and synthesize defensive findings');
+  const [swarmConcurrency, setSwarmConcurrency] = useState(4);
+  const [swarmRunning, setSwarmRunning] = useState(false);
+  const [swarmResult, setSwarmResult] = useState<any>(null);
+  const [swarmError, setSwarmError] = useState<string | null>(null);
+  const [swarmMemories, setSwarmMemories] = useState<any[]>([]);
+  const [loadingMemories, setLoadingMemories] = useState(false);
 
   // Live Console state
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -123,6 +138,8 @@ export default function HermesView() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: textToSend,
+          model: selectedModel,
+          persona: selectedPersona,
           history: messages.slice(-4).map((m) => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text })),
         }),
       });
@@ -138,6 +155,8 @@ export default function HermesView() {
             id: `hermes-${Date.now()}`,
             sender: 'hermes',
             text: reply,
+            model: data?.model || selectedModel,
+            persona: data?.persona || selectedPersona,
             timestamp: data?.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             action: data?.action?.command,
           },
@@ -164,6 +183,55 @@ export default function HermesView() {
       }, 500);
     } finally {
       setIsSending(false);
+    }
+  };
+
+  // Launch Swarm Mission (integrated from Orchestrator)
+  const handleLaunchSwarm = async () => {
+    if (!swarmGoal.trim() || swarmRunning) return;
+    setSwarmRunning(true);
+    setSwarmError(null);
+    setSwarmResult(null);
+
+    try {
+      const res = await fetch('/api/orchestrator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          goal: swarmGoal.trim(),
+          concurrency: swarmConcurrency,
+          model: selectedModel,
+          useBrowser: true,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Failed with status ${res.status}`);
+      }
+
+      const json = await res.json();
+      setSwarmResult(json.data);
+    } catch (err) {
+      setSwarmError(err instanceof Error ? err.message : 'Swarm mission dispatch failed');
+    } finally {
+      setSwarmRunning(false);
+    }
+  };
+
+  // Load Swarm Memories
+  const loadSwarmMemories = async () => {
+    setLoadingMemories(true);
+    try {
+      const res = await fetch('/api/orchestrator/memory');
+      if (res.ok) {
+        const json = await res.json();
+        setSwarmMemories(json.data?.items || []);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setLoadingMemories(false);
     }
   };
 
@@ -449,12 +517,29 @@ export default function HermesView() {
               border: activeTab === 'console' ? '1px solid #38bdf8' : '1px solid transparent',
               background: activeTab === 'console' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.04)',
               color: activeTab === 'console' ? '#38bdf8' : '#a1a1aa',
-              fontWeight: 600,
+              fontWeight: 650,
               cursor: 'pointer',
               fontSize: '0.85rem',
             }}
           >
             💬 Sembang Web Langsung (Konsol Ejen)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('swarm')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: activeTab === 'swarm' ? '1px solid #c084fc' : '1px solid transparent',
+              background: activeTab === 'swarm' ? 'rgba(192, 132, 252, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+              color: activeTab === 'swarm' ? '#c084fc' : '#a1a1aa',
+              fontWeight: 650,
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+            }}
+          >
+            🛸 Swarm Missions (AI Swarm IDE)
           </button>
 
           <button
@@ -538,38 +623,114 @@ export default function HermesView() {
                 boxShadow: '0 10px 30px rgba(0, 0, 0, 0.6)',
                 display: 'flex',
                 flexDirection: 'column',
-                height: '620px',
+                height: '640px',
                 overflow: 'hidden',
               }}
             >
-              {/* CONSOLE TOP BAR */}
+              {/* CONSOLE TOP BAR WITH MODEL & PERSONA SELECTOR */}
               <div
                 style={{
-                  padding: '12px 18px',
+                  padding: '10px 16px',
                   background: 'rgba(255, 255, 255, 0.03)',
                   borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '8px',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontWeight: 600, color: '#f8fafc', fontSize: '0.9rem' }}>Hermes Interactive Terminal</span>
-                  <span style={{ fontSize: '0.75rem', color: '#34d399' }}>&bull; Sambungan Web Langsung</span>
+                {/* Persona selector */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPersona('hermes')}
+                    style={{
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: 650,
+                      background: selectedPersona === 'hermes' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
+                      color: selectedPersona === 'hermes' ? '#38bdf8' : '#94a3b8',
+                      border: selectedPersona === 'hermes' ? '1px solid #38bdf8' : '1px solid transparent',
+                      cursor: 'pointer',
+                    }}
+                    title="Hermes Autonomous Agent"
+                  >
+                    ⚡ Hermes Agent
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPersona('frieren')}
+                    style={{
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: 650,
+                      background: selectedPersona === 'frieren' ? 'rgba(167, 139, 250, 0.2)' : 'transparent',
+                      color: selectedPersona === 'frieren' ? '#c4b5fd' : '#94a3b8',
+                      border: selectedPersona === 'frieren' ? '1px solid #c4b5fd' : '1px solid transparent',
+                      cursor: 'pointer',
+                    }}
+                    title="Frieren AIOS Copilot Persona & Spells"
+                  >
+                    🪄 Frieren Copilot
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPersona('sentinel')}
+                    style={{
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: 650,
+                      background: selectedPersona === 'sentinel' ? 'rgba(239, 68, 68, 0.2)' : 'transparent',
+                      color: selectedPersona === 'sentinel' ? '#ef4444' : '#94a3b8',
+                      border: selectedPersona === 'sentinel' ? '1px solid #ef4444' : '1px solid transparent',
+                      cursor: 'pointer',
+                    }}
+                    title="Sentinel Cybersecurity Specialist"
+                  >
+                    🛡️ Sentinel Cyber
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setMessages([{ id: 'init', sender: 'hermes', text: 'Konsol dibersihkan. Bersedia untuk arahan anda.', timestamp: 'Kini' }])}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#64748b',
-                    cursor: 'pointer',
-                    fontSize: '0.75rem',
-                  }}
-                >
-                  Padam Log
-                </button>
+
+                {/* Model switcher & Clear */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <select
+                    value={selectedModel}
+                    onChange={(e) => setSelectedModel(e.target.value)}
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.6)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      borderRadius: '6px',
+                      color: '#38bdf8',
+                      fontSize: '11.5px',
+                      padding: '3px 8px',
+                      outline: 'none',
+                    }}
+                  >
+                    <option value="antigravity/gemini-3.8-flash-high">⚡ Gemini 3.8 Flash High</option>
+                    <option value="kiro/claude-sonnet-4.5">🧠 Claude 3.5/4.5 Sonnet</option>
+                    <option value="grok-cli/grok-composer-2.5-fast">🚀 Grok Composer 2.5</option>
+                    <option value="deepseek-v4.1">⚡ DeepSeek V3</option>
+                    <option value="auto/best-chat">🔄 Auto Load-Balancer</option>
+                  </select>
+
+                  <button
+                    type="button"
+                    onClick={() => setMessages([{ id: 'init', sender: 'hermes', text: 'Konsol dibersihkan. Bersedia untuk arahan anda.', timestamp: 'Kini' }])}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#64748b',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                    }}
+                  >
+                    Padam Log
+                  </button>
+                </div>
               </div>
 
               {/* MESSAGE LOG */}
@@ -614,39 +775,41 @@ export default function HermesView() {
                         </div>
                       )}
                     </div>
-                    <span style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px', padding: '0 4px' }}>
-                      {m.timestamp}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', padding: '0 4px', fontSize: '0.7rem', color: '#64748b' }}>
+                      <span>{m.timestamp}</span>
+                      {m.model && <span style={{ fontFamily: 'var(--mono)', color: '#38bdf8' }}>({m.model})</span>}
+                    </div>
                   </div>
                 ))}
 
                 {isSending && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontSize: '0.82rem', padding: '6px' }}>
-                    <span style={{ animation: 'pulse 1.5s infinite' }}>Hermes sedang memproses arahan...</span>
+                    <span style={{ animation: 'pulse 1.5s infinite' }}>Hermes &amp; OmniRoute sedang memproses arahan...</span>
                   </div>
                 )}
               </div>
 
-              {/* QUICK PROMPTS */}
+              {/* QUICK PROMPTS & SPELLS */}
               <div style={{ padding: '8px 16px', background: 'rgba(0, 0, 0, 0.2)', borderTop: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', gap: '6px', overflowX: 'auto' }}>
                 {[
+                  '✦ Mana Scan (Fleet Health)',
+                  '📜 DB WAL Audit',
+                  '⚡ Zoltraak',
+                  '🛡️ Barrier Magic',
                   'hermes gateway setup',
                   'check status',
-                  'Jana Kod Pautan WhatsApp',
-                  'Konfigurasi Bot Telegram',
-                  'Uji Port 8007 & 8028',
                 ].map((chip) => (
                   <button
                     key={chip}
                     type="button"
                     onClick={() => handleSendMessage(chip)}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
+                      background: chip.startsWith('✦') ? 'rgba(168, 85, 247, 0.15)' : chip.startsWith('⚡') ? 'rgba(234, 179, 8, 0.15)' : 'rgba(255, 255, 255, 0.05)',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
                       borderRadius: '9999px',
                       padding: '4px 10px',
                       fontSize: '0.75rem',
-                      color: '#cbd5e1',
+                      color: chip.startsWith('✦') ? '#c084fc' : chip.startsWith('⚡') ? '#facc15' : '#cbd5e1',
                       whiteSpace: 'nowrap',
                       cursor: 'pointer',
                     }}
@@ -817,6 +980,181 @@ export default function HermesView() {
                 </div>
               </Card>
             </div>
+          </div>
+        )}
+
+        {/* TAB 1.5: AUTONOMOUS SWARM MISSIONS */}
+        {activeTab === 'swarm' && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.8fr) minmax(320px, 1fr)', gap: '16px', alignItems: 'start' }}>
+            <Card
+              style={{
+                background: 'rgba(15, 23, 42, 0.75)',
+                border: '1px solid rgba(168, 85, 247, 0.3)',
+                padding: '24px',
+                borderRadius: '16px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                <h3 style={{ color: '#c084fc', fontSize: '1.2rem', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  🛸 Autonomous AI Swarm Missions
+                </h3>
+                <span
+                  style={{
+                    background: 'rgba(168, 85, 247, 0.1)',
+                    color: '#c084fc',
+                    border: '1px solid rgba(168, 85, 247, 0.3)',
+                    padding: '2px 8px',
+                    borderRadius: '999px',
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  Multi-Agent Orchestrator
+                </span>
+              </div>
+
+              <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '16px' }}>
+                Dispatch autonomous multi-agent teams across browser recon, security auditing, and memory consolidation.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: 600 }}>
+                    Mission Objective / Goal
+                  </label>
+                  <textarea
+                    rows={3}
+                    className="input"
+                    value={swarmGoal}
+                    onChange={(e) => setSwarmGoal(e.target.value)}
+                    style={{ width: '100%', fontSize: '0.88rem' }}
+                    placeholder="Enter mission objective..."
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: 600 }}>
+                      Swarm Supervisor Model
+                    </label>
+                    <select
+                      className="input"
+                      value={selectedModel}
+                      onChange={(e) => setSelectedModel(e.target.value)}
+                      style={{ width: '100%', fontSize: '0.85rem' }}
+                    >
+                      <option value="antigravity/gemini-3.8-flash-high">⚡ Gemini 3.8 Flash High</option>
+                      <option value="kiro/claude-sonnet-4.5">🧠 Claude 3.5/4.5 Sonnet</option>
+                      <option value="grok-cli/grok-composer-2.5-fast">🚀 Grok Composer 2.5</option>
+                      <option value="auto/best-chat">🔄 Auto Router Load-Balancer</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: 600 }}>
+                      Concurrency: {swarmConcurrency} Agents
+                    </label>
+                    <input
+                      type="range"
+                      min={1}
+                      max={8}
+                      value={swarmConcurrency}
+                      onChange={(e) => setSwarmConcurrency(Number(e.target.value))}
+                      style={{ width: '100%', marginTop: '8px' }}
+                    />
+                  </div>
+                </div>
+
+                {swarmError && (
+                  <div style={{ color: '#ef4444', fontSize: '0.85rem', padding: '8px 12px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px' }}>
+                    ⚠️ {swarmError}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  className="btn primary"
+                  disabled={swarmRunning || !swarmGoal.trim()}
+                  onClick={handleLaunchSwarm}
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: '0.9rem',
+                    fontWeight: 650,
+                    background: 'linear-gradient(135deg, #9333ea 0%, #4f46e5 100%)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    cursor: swarmRunning ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {swarmRunning ? '🚀 Swarm Executing Concurrently...' : '⚡ Launch Swarm Mission'}
+                </button>
+              </div>
+
+              {/* Swarm Result */}
+              {swarmResult && (
+                <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <h4 style={{ margin: 0, color: '#f8fafc', fontSize: '0.95rem' }}>
+                      Executive Synthesis · Run {swarmResult.runId}
+                    </h4>
+                    <span style={{ fontSize: '0.75rem', color: '#34d399', background: 'rgba(52, 211, 153, 0.1)', padding: '2px 8px', borderRadius: '4px' }}>
+                      {swarmResult.status?.toUpperCase()} ({swarmResult.durationMs}ms)
+                    </span>
+                  </div>
+                  <div style={{ padding: '12px', background: 'rgba(0,0,0,0.4)', borderRadius: '8px', fontSize: '0.85rem', color: '#e2e8f0', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                    {swarmResult.synthesis}
+                  </div>
+                </div>
+              )}
+            </Card>
+
+            {/* Right: Swarm Memory Inspector */}
+            <Card
+              style={{
+                background: 'rgba(15, 23, 42, 0.75)',
+                border: '1px solid rgba(168, 85, 247, 0.3)',
+                padding: '20px',
+                borderRadius: '16px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <h4 style={{ color: '#c084fc', fontSize: '0.95rem', margin: 0 }}>
+                  🧠 Collective Memory Bank
+                </h4>
+                <button
+                  type="button"
+                  className="btn sm ghost"
+                  onClick={loadSwarmMemories}
+                  style={{ fontSize: '0.75rem', padding: '2px 8px' }}
+                >
+                  {loadingMemories ? 'Loading...' : 'Refresh'}
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '420px', overflowY: 'auto' }}>
+                {swarmMemories.length === 0 ? (
+                  <div style={{ color: '#64748b', fontSize: '0.8rem', textAlign: 'center', padding: '24px 0' }}>
+                    Click Refresh to inspect persistent swarm memories and credentials.
+                  </div>
+                ) : (
+                  swarmMemories.map((m, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        padding: '8px 10px',
+                        background: 'rgba(0,0,0,0.3)',
+                        borderRadius: '6px',
+                        fontSize: '0.8rem',
+                        border: '1px solid rgba(255,255,255,0.05)',
+                      }}
+                    >
+                      <strong style={{ color: '#38bdf8' }}>{m.entity || 'Fact'}:</strong>{' '}
+                      <span style={{ color: '#cbd5e1' }}>{m.fact}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </Card>
           </div>
         )}
 

@@ -158,6 +158,36 @@ export default function OverviewView() {
               </div>
             </div>
 
+            {/* Frieren AIOS Copilot & Workspace */}
+            <div className="app-card featured" style={{ borderColor: 'rgba(167, 139, 250, 0.45)' }}>
+              <div className="app-card-head">
+                <div className="app-icon" style={{ background: 'rgba(167, 139, 250, 0.15)', color: '#c4b5fd' }}>🧝‍♀️</div>
+                <div className="app-title-group">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div className="app-title">Frieren AIOS Copilot</div>
+                    <span className="app-badge" style={{ background: 'rgba(167, 139, 250, 0.2)', color: '#c4b5fd', borderColor: 'rgba(167, 139, 250, 0.4)' }}>✦ Neural Workspace</span>
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>OmniRoute AI & Fleet Intelligence</div>
+                </div>
+              </div>
+
+              <div className="app-desc">
+                Desktop companion & neural workspace powered by OmniRoute on Port 20128. Fleet supervisor audit, SQLite WAL monitor, and grimoire intelligence.
+              </div>
+
+              <div className="app-meta">
+                <span className="app-tag" style={{ color: '#c4b5fd' }}>Chibi Pet (Alt+F)</span>
+                <span className="app-tag">Gemini 3.8 Flash</span>
+                <span className="app-tag">AIOS Shell</span>
+              </div>
+
+              <div className="app-actions">
+                <Link href="/frieren" className="btn-primary-action" style={{ background: 'linear-gradient(135deg, #7c3aed, #6366f1)' }}>
+                  Launch AIOS Workspace →
+                </Link>
+              </div>
+            </div>
+
             {/* Antigravity AI Console */}
             <div className="app-card">
               <div className="app-card-head">
