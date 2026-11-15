@@ -17,27 +17,27 @@ type ModalStage = 'input' | 'looping' | 'confirm' | 'published';
 
 const PROMPT_PRESETS = [
   {
-    icon: '🚀',
+    tag: 'CI/CD',
     title: 'Automated CI/CD Pipeline',
     prompt: 'Add GitHub Actions CI workflow (.github/workflows/ci.yml) to test, build, and lint on every push and PR.',
   },
   {
-    icon: '🛡️',
+    tag: 'SECURITY',
     title: 'Security Hardening & Secret Guards',
     prompt: 'Audit and harden repository security: enforce strict .gitignore for credentials, add security headers, and prevent token leaks.',
   },
   {
-    icon: '📝',
+    tag: 'DOCS',
     title: 'Documentation & Architecture Guide',
     prompt: 'Create a comprehensive README.md with clear architecture overview, installation instructions, environment variables, and usage examples.',
   },
   {
-    icon: '⚡',
+    tag: 'REFACTOR',
     title: 'Refactor Error Handling & Logging',
     prompt: 'Refactor core API endpoints to include standardized error response formats, structured request logging, and defensive boundary guards.',
   },
   {
-    icon: '🧪',
+    tag: 'TESTS',
     title: 'Add Unit & Integration Tests',
     prompt: 'Add unit and integration test suites with mock coverage for core business logic and API routes.',
   },
@@ -333,25 +333,10 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(192, 132, 252, 0.25))',
-                border: '1px solid rgba(56, 189, 248, 0.4)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '18px',
-              }}
-            >
-              ⚡
-            </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--text)' }}>
-                  Sentinel AI GitHub Loop · {repo.fullName}
+                  Sentinel Autonomous Agent · {repo.fullName}
                 </h3>
                 {localProject && (
                   <span
@@ -362,7 +347,7 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                       background: 'rgba(16, 185, 129, 0.15)',
                       color: '#10b981',
                       border: '1px solid rgba(16, 185, 129, 0.3)',
-                      fontWeight: 600,
+                      fontWeight: 650,
                     }}
                   >
                     Local: {localProject}
@@ -370,7 +355,7 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                 )}
               </div>
               <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
-                Autonomous Plan → Execute → Verify Loop → Human Confirmation Before Publishing
+                Plan → Execute → Verify Loop → Human Confirmation Before Publishing
               </span>
             </div>
           </div>
@@ -403,8 +388,8 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
               }}
             >
               {stage === 'input' && '1. Goal & Context'}
-              {stage === 'looping' && `2. Autonomous Loop (It ${currentIteration})`}
-              {stage === 'confirm' && '3. Confirm Before Publish'}
+              {stage === 'looping' && `2. Autonomous Agent (Cycle ${currentIteration})`}
+              {stage === 'confirm' && '3. Review & Confirm'}
               {stage === 'published' && '4. Published to GitHub'}
             </span>
 
@@ -496,7 +481,19 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                       onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)')}
                       onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--line-soft)')}
                     >
-                      <span style={{ fontSize: '16px' }}>{p.icon}</span>
+                      <span
+                        className="mono dim"
+                        style={{
+                          fontSize: '10.5px',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          background: 'var(--panel)',
+                          border: '1px solid var(--line-soft)',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {p.tag}
+                      </span>
                       <div>
                         <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text)' }}>{p.title}</div>
                         <div style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '2px', lineHeight: '1.3' }}>
@@ -541,7 +538,7 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                 </div>
 
                 <div style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
-                  Max Verification Loops: <strong style={{ color: 'var(--text)' }}>3 Iterations</strong>
+                  Max Verification Loops: <strong style={{ color: 'var(--text)' }}>3 Cycles</strong>
                 </div>
               </div>
 
@@ -554,7 +551,7 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                   disabled={!objective.trim() || isLoopRunning}
                   style={{
                     padding: '10px 24px',
-                    fontSize: '14px',
+                    fontSize: '13.5px',
                     fontWeight: 650,
                     background: 'linear-gradient(135deg, #0284c7, #6366f1)',
                     color: '#ffffff',
@@ -564,7 +561,7 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                     cursor: !objective.trim() ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  🚀 Generate To-Do Plan & Start AI Loop
+                  Generate Plan & Start Agent
                 </button>
               </div>
             </div>
@@ -633,7 +630,7 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
               {/* Dynamic To-Do Checklist */}
               <div>
                 <h4 style={{ margin: '0 0 10px', fontSize: '13.5px', fontWeight: 650, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span>📋</span> Autonomous To-Do List ({tasks.length} items)
+                  Autonomous Task Plan ({tasks.length} tasks)
                 </h4>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -655,11 +652,8 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                       >
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ fontSize: '16px' }}>
-                              {t.status === 'completed' && '✅'}
-                              {t.status === 'running' && '⚡'}
-                              {t.status === 'pending' && '⏳'}
-                              {t.status === 'failed' && '❌'}
+                            <span className="mono dim" style={{ fontSize: '12px', minWidth: '20px' }}>
+                              {idx + 1}.
                             </span>
                             <div>
                               <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text)' }}>
@@ -673,28 +667,14 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
 
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             {t.iteration && t.iteration > 1 && (
-                              <Badge tone="violet">Iteration {t.iteration}</Badge>
+                              <Badge tone="violet">Cycle {t.iteration}</Badge>
                             )}
                             <Badge tone={t.type === 'code' ? 'blue' : t.type === 'security' ? 'amber' : t.type === 'test' ? 'green' : 'grey'}>
                               {t.type.toUpperCase()}
                             </Badge>
-                            <span
-                              style={{
-                                fontSize: '11px',
-                                fontWeight: 600,
-                                textTransform: 'uppercase',
-                                color:
-                                  t.status === 'completed'
-                                    ? '#10b981'
-                                    : t.status === 'running'
-                                      ? '#38bdf8'
-                                      : t.status === 'failed'
-                                        ? '#ef4444'
-                                        : 'var(--text-faint)',
-                              }}
-                            >
-                              {t.status}
-                            </span>
+                            <Badge tone={t.status === 'completed' ? 'green' : t.status === 'running' ? 'blue' : t.status === 'failed' ? 'red' : 'grey'}>
+                              {t.status.toUpperCase()}
+                            </Badge>
                           </div>
                         </div>
 
@@ -755,7 +735,7 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                   }}
                 >
                   <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 650, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>🛡️</span> AI Verification & Satisfaction Audits ({verifications.length})
+                    Verification & Satisfaction Audits ({verifications.length})
                   </h4>
                   {verifications.map((v, i) => (
                     <div
@@ -769,7 +749,7 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <strong>Iteration {v.iteration} Audit</strong>
+                        <strong>Cycle {v.iteration} Audit</strong>
                         <span style={{ color: v.score >= 95 ? '#10b981' : '#eab308', fontWeight: 700 }}>
                           Satisfaction: {v.score}%
                         </span>
@@ -800,34 +780,17 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                   gap: '16px',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div
-                    style={{
-                      width: '42px',
-                      height: '42px',
-                      borderRadius: '50%',
-                      background: 'rgba(16, 185, 129, 0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '22px',
-                      color: '#10b981',
-                    }}
-                  >
-                    ✓
-                  </div>
-                  <div>
-                    <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#10b981' }}>
-                      All Objectives Satisfied & Verified (Score: {lastVerification?.score ?? 100}%)
-                    </h4>
-                    <p style={{ margin: '3px 0 0', fontSize: '12.5px', color: 'var(--text-dim)' }}>
-                      The AI loop completed {tasks.length} tasks across {currentIteration} iteration(s).
-                      Please review all generated files and confirm below before publishing to GitHub.
-                    </p>
-                  </div>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#10b981' }}>
+                    All Objectives Satisfied & Verified (Score: {lastVerification?.score ?? 100}%)
+                  </h4>
+                  <p style={{ margin: '3px 0 0', fontSize: '12.5px', color: 'var(--text-dim)' }}>
+                    The agent completed {tasks.length} tasks across {currentIteration} cycle(s).
+                    Review all generated files and confirm below before publishing to GitHub.
+                  </p>
                 </div>
 
-                <Badge tone="green">READY TO PUBLISH</Badge>
+                <Badge tone="green">VERIFIED · READY</Badge>
               </div>
 
               {/* Code Changes Inspector */}
@@ -1026,7 +989,7 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                       cursor: isPublishing ? 'wait' : 'pointer',
                     }}
                   >
-                    {isPublishing ? <span className="spinner" /> : '🚀'} Confirm & Publish to GitHub
+                    {isPublishing ? <span className="spinner" /> : null} Confirm & Publish to GitHub
                   </button>
                 </div>
               </div>
@@ -1047,8 +1010,8 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
             >
               <div
                 style={{
-                  width: '64px',
-                  height: '64px',
+                  width: '56px',
+                  height: '56px',
                   borderRadius: '50%',
                   background: 'rgba(16, 185, 129, 0.15)',
                   border: '2px solid #10b981',
@@ -1056,10 +1019,11 @@ export default function GithubAiLoopModal({ repo, localProject, onClose, onPubli
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '32px',
                 }}
               >
-                ✓
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
               </div>
 
               <div>

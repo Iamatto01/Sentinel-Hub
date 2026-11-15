@@ -375,9 +375,9 @@ Provide a 3-part intelligence briefing:
                 borderColor: 'rgba(56, 189, 248, 0.45)',
                 fontWeight: 650,
               }}
-              title="Launch Autonomous AI Loop for repository"
+              title="Launch Autonomous Agent for repository"
             >
-              ⚡ AI Loop
+              Autonomous Agent
             </button>
           )}
           {overview && (
@@ -505,7 +505,7 @@ Provide a 3-part intelligence briefing:
 
               {connectError && (
                 <div style={{ marginTop: '10px', fontSize: '12.5px', color: '#ef4444' }}>
-                  ⚠️ {connectError}
+                  {connectError}
                 </div>
               )}
 
@@ -525,7 +525,7 @@ Provide a 3-part intelligence briefing:
                 }}
               >
                 <span>
-                  💡 <strong>Keperluan Scope:</strong> Pastikan token mempunyai scope <code className="mono">repo</code>,{' '}
+                  <strong>Token Scopes:</strong> Ensure the token has scopes <code className="mono">repo</code>,{' '}
                   <code className="mono">read:user</code>, <code className="mono">read:org</code>, dan{' '}
                   <code className="mono">admin:public_key</code>.
                 </span>
@@ -851,16 +851,16 @@ Provide a 3-part intelligence briefing:
                               )}
 
                               <span title="Stars" style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                ⭐ {formatNumber(repo.stars)}
+                                {formatNumber(repo.stars)} stars
                               </span>
 
                               <span title="Forks" style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                🍴 {formatNumber(repo.forks)}
+                                {formatNumber(repo.forks)} forks
                               </span>
 
                               {repo.openIssues > 0 && (
                                 <span title="Open Issues" style={{ display: 'flex', alignItems: 'center', gap: '3px', color: '#eab308' }}>
-                                  ⚠️ {formatNumber(repo.openIssues)}
+                                  {formatNumber(repo.openIssues)} issues
                                 </span>
                               )}
 
@@ -914,7 +914,7 @@ Provide a 3-part intelligence briefing:
                                     fontWeight: 500,
                                   }}
                                 >
-                                  🌐 Live App
+                                  Live App
                                 </span>
                               )}
                             </div>
@@ -932,7 +932,7 @@ Provide a 3-part intelligence briefing:
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              {/* AI Loop Button */}
+                              {/* Task Agent Button */}
                               <button
                                 type="button"
                                 className="btn sm"
@@ -948,9 +948,9 @@ Provide a 3-part intelligence briefing:
                                   borderColor: 'rgba(56, 189, 248, 0.45)',
                                   fontWeight: 650,
                                 }}
-                                title="Autonomous AI Loop: To-Do → Execute → Verify → Confirm & Publish"
+                                title="Autonomous Task Agent: Plan, Execute, Verify & Confirm"
                               >
-                                ⚡ AI Loop
+                                Task Agent
                               </button>
 
                               {/* Live Preview Button */}
@@ -967,7 +967,7 @@ Provide a 3-part intelligence briefing:
                                 }}
                                 title="Open Live Preview & Code Inspector"
                               >
-                                🌐 Preview
+                                Preview
                               </button>
 
                               {/* Audit Button */}
@@ -984,7 +984,7 @@ Provide a 3-part intelligence briefing:
                                 }}
                                 title="Run Security & Code Audit"
                               >
-                                🛡️ Audit
+                                Audit
                               </button>
 
                               {/* Update / Sync Button */}
@@ -996,7 +996,7 @@ Provide a 3-part intelligence briefing:
                                 style={{ fontSize: '11.5px', padding: '4px 9px' }}
                                 title="Sync with remote git / pull updates"
                               >
-                                {isSyncing ? <span className="spinner" /> : '🔄'} Update
+                                {isSyncing ? <span className="spinner" /> : null} Update
                               </button>
                             </div>
 
@@ -1009,7 +1009,7 @@ Provide a 3-part intelligence briefing:
                                 style={{ fontSize: '11.5px', padding: '4px 8px', color: '#c084fc' }}
                                 title="AI Repository Architecture Intel"
                               >
-                                ✨ Intel
+                                Intel
                               </button>
 
                               {/* Open on GitHub */}
@@ -1019,7 +1019,7 @@ Provide a 3-part intelligence briefing:
                                 rel="noreferrer noopener"
                                 className="btn sm ghost"
                                 style={{ fontSize: '11.5px', padding: '4px 8px', textDecoration: 'none' }}
-                                title="Open on GitHub ↗"
+                                title="Open on GitHub"
                               >
                                 ↗
                               </a>
@@ -1106,9 +1106,9 @@ Provide a 3-part intelligence briefing:
                                       borderColor: 'rgba(56, 189, 248, 0.4)',
                                       fontWeight: 650,
                                     }}
-                                    title="Autonomous AI Loop"
+                                    title="Autonomous Task Agent"
                                   >
-                                    ⚡ Loop
+                                    Agent
                                   </button>
                                   <button
                                     type="button"
@@ -1307,7 +1307,7 @@ Provide a 3-part intelligence briefing:
                       onClick={() => setPreviewTab('live')}
                       style={{ borderRadius: 0, fontSize: '12px' }}
                     >
-                      🌐 Live Web
+                      Live Web
                     </button>
                     <button
                       type="button"
@@ -1315,7 +1315,7 @@ Provide a 3-part intelligence briefing:
                       onClick={() => setPreviewTab('readme')}
                       style={{ borderRadius: 0, fontSize: '12px' }}
                     >
-                      📖 README
+                      README
                     </button>
                     <button
                       type="button"
@@ -1323,7 +1323,7 @@ Provide a 3-part intelligence briefing:
                       onClick={() => setPreviewTab('files')}
                       style={{ borderRadius: 0, fontSize: '12px' }}
                     >
-                      📁 Files ({repoFiles.length})
+                      Files ({repoFiles.length})
                     </button>
                   </div>
 
@@ -1335,7 +1335,7 @@ Provide a 3-part intelligence briefing:
                         onClick={() => setPreviewViewport('desktop')}
                         title="Desktop 1280px"
                       >
-                        🖥️
+                        Desktop
                       </button>
                       <button
                         type="button"
@@ -1343,7 +1343,7 @@ Provide a 3-part intelligence briefing:
                         onClick={() => setPreviewViewport('tablet')}
                         title="Tablet 768px"
                       >
-                        📱 Tablet
+                        Tablet
                       </button>
                       <button
                         type="button"
@@ -1351,7 +1351,7 @@ Provide a 3-part intelligence briefing:
                         onClick={() => setPreviewViewport('mobile')}
                         title="Mobile 375px"
                       >
-                        📱 Phone
+                        Mobile
                       </button>
                     </div>
                   )}
@@ -1375,7 +1375,6 @@ Provide a 3-part intelligence briefing:
                     if (!url) {
                       return (
                         <div style={{ margin: 'auto', textAlign: 'center', padding: '40px', maxWidth: '480px' }}>
-                          <div style={{ fontSize: '36px', marginBottom: '12px' }}>🌐</div>
                           <h4 style={{ margin: '0 0 8px', fontSize: '17px' }}>No Public Live URL Deployed</h4>
                           <p style={{ fontSize: '13px', color: 'var(--text-dim)', marginBottom: '16px' }}>
                             Repositori ini belum mempunyai domain web aktif atau GitHub Pages yang dikonfigurasi. Anda boleh menyemak dokumentasi README atau struktur fail kod melalui tab di atas.
@@ -1471,7 +1470,7 @@ Provide a 3-part intelligence briefing:
                             fontSize: '12.5px',
                           }}
                         >
-                          <span>{file.type === 'dir' ? '📁' : '📄'}</span>
+                          <span className="mono dim" style={{ fontSize: '11px', minWidth: '40px' }}>{file.type === 'dir' ? '[DIR]' : '[FILE]'}</span>
                           <span className="truncate mono" style={{ flex: 1 }}>{file.name}</span>
                           {file.size ? <span style={{ fontSize: '10.5px', color: 'var(--text-faint)' }}>{formatBytes(file.size)}</span> : null}
                         </div>
@@ -1523,16 +1522,13 @@ Provide a 3-part intelligence briefing:
                   background: 'var(--panel-2)',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '20px' }}>🛡️</span>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 650 }}>
-                      Sentinel Security Audit · {auditTarget.name}
-                    </h3>
-                    <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
-                      Automated code hygiene, secret leak prevention, and policy verification
-                    </span>
-                  </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 650 }}>
+                    Sentinel Security Audit · {auditTarget.name}
+                  </h3>
+                  <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
+                    Automated code hygiene, secret leak prevention, and policy verification
+                  </span>
                 </div>
 
                 <button
@@ -1684,16 +1680,13 @@ Provide a 3-part intelligence briefing:
                   background: 'var(--panel-2)',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '20px' }}>✨</span>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 650 }}>
-                      AI Architecture Intel · {intelRepo.fullName}
-                    </h3>
-                    <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
-                      Synthesized by Sentinel Router & Hermes Intelligence Engine
-                    </span>
-                  </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 650 }}>
+                    AI Architecture Intel · {intelRepo.fullName}
+                  </h3>
+                  <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
+                    Synthesized by Sentinel Router & Hermes Intelligence Engine
+                  </span>
                 </div>
 
                 <button
