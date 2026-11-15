@@ -8,6 +8,7 @@ import { useAction, usePoll } from './useApi';
 import { apiDelete, apiPost } from './api';
 import { formatBytes, formatNumber, timeAgo } from './format';
 import type { GithubOrg, GithubRepo, GithubRepoAuditResult, GithubSshKey, GithubUser } from '@/lib/github';
+import GithubAiLoopModal from './GithubAiLoopModal';
 
 interface GithubOverview {
   configured: true;
@@ -114,6 +115,10 @@ export default function GithubView() {
   const [intelRepo, setIntelRepo] = useState<GithubRepo | null>(null);
   const [intelLoading, setIntelLoading] = useState(false);
   const [intelAnalysis, setIntelAnalysis] = useState<string | null>(null);
+
+  // Autonomous AI Loop state
+  const [aiLoopTarget, setAiLoopTarget] = useState<GithubRepo | null>(null);
+  const [aiLoopLocalProject, setAiLoopLocalProject] = useState<string | undefined>(undefined);
 
   // Sync state
   const [syncingRepo, setSyncingRepo] = useState<string | null>(null);
@@ -350,6 +355,31 @@ Provide a 3-part intelligence briefing:
         syncedAt={github.generatedAt}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {overview && overview.repos.length > 0 && (
+            <button
+              type="button"
+              className="btn sm"
+              onClick={() => {
+                const target = filteredRepos[0] || overview.repos[0];
+                if (target) {
+                  setAiLoopTarget(target);
+                  setAiLoopLocalProject(overview.localBySlug[target.fullName.toLowerCase()]);
+                }
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(192, 132, 252, 0.22))',
+                color: '#38bdf8',
+                borderColor: 'rgba(56, 189, 248, 0.45)',
+                fontWeight: 650,
+              }}
+              title="Launch Autonomous AI Loop for repository"
+            >
+              ⚡ AI Loop
+            </button>
+          )}
           {overview && (
             <button
               type="button"
@@ -902,6 +932,27 @@ Provide a 3-part intelligence briefing:
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              {/* AI Loop Button */}
+                              <button
+                                type="button"
+                                className="btn sm"
+                                onClick={() => {
+                                  setAiLoopTarget(repo);
+                                  setAiLoopLocalProject(localProj);
+                                }}
+                                style={{
+                                  fontSize: '11.5px',
+                                  padding: '4px 10px',
+                                  background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.2))',
+                                  color: '#38bdf8',
+                                  borderColor: 'rgba(56, 189, 248, 0.45)',
+                                  fontWeight: 650,
+                                }}
+                                title="Autonomous AI Loop: To-Do → Execute → Verify → Confirm & Publish"
+                              >
+                                ⚡ AI Loop
+                              </button>
+
                               {/* Live Preview Button */}
                               <button
                                 type="button"
@@ -1041,6 +1092,24 @@ Provide a 3-part intelligence briefing:
                               <td className="nowrap dim">{timeAgo(repo.pushedAt)}</td>
                               <td className="nowrap" style={{ textAlign: 'right' }}>
                                 <div style={{ display: 'inline-flex', gap: '4px' }}>
+                                  <button
+                                    type="button"
+                                    className="btn sm"
+                                    onClick={() => {
+                                      setAiLoopTarget(repo);
+                                      setAiLoopLocalProject(localProj);
+                                    }}
+                                    style={{
+                                      padding: '2px 7px',
+                                      fontSize: '11px',
+                                      color: '#38bdf8',
+                                      borderColor: 'rgba(56, 189, 248, 0.4)',
+                                      fontWeight: 650,
+                                    }}
+                                    title="Autonomous AI Loop"
+                                  >
+                                    ⚡ Loop
+                                  </button>
                                   <button
                                     type="button"
                                     className="btn sm"
@@ -1656,6 +1725,26 @@ Provide a 3-part intelligence briefing:
               </div>
             </div>
           </div>
+        )}
+
+        {/* Autonomous AI Loop Modal */}
+        {aiLoopTarget && (
+          <GithubAiLoopModal
+            repo={aiLoopTarget}
+            localProject={aiLoopLocalProject}
+            onClose={() => {
+              setAiLoopTarget(null);
+              setAiLoopLocalProject(undefined);
+            }}
+            onPublished={(res) => {
+              github.refresh();
+              setSyncStatus({
+                id: aiLoopTarget.fullName,
+                msg: `AI Loop published successfully (${res.branch})! ${res.publishedFiles.length} file(s) updated.`,
+                ok: true,
+              });
+            }}
+          />
         )}
       </PageBody>
     </>
