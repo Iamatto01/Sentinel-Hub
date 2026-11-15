@@ -8,7 +8,8 @@ class PaymentService {
    * Cipta pesanan baharu dan maklumat pembayaran
    */
   async createPaymentOrder({ userId, userName, packageItem, type = 'new_key', targetKeyId = null, targetKeyToken = null }) {
-    const randomCents = Math.floor(Math.random() * 90) + 10; // 10 - 99 sen untuk pengesahan unik
+    const enableRandomCents = db.getSetting('enable_random_cents', 'false') === 'true';
+    const randomCents = enableRandomCents ? (Math.floor(Math.random() * 90) + 10) : 0; // 0 sen secara lalai melainkan diaktifkan
     const basePrice = packageItem.price_myr;
     const amountPaid = parseFloat((basePrice + (randomCents / 100)).toFixed(2));
     const orderRef = `ORD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;

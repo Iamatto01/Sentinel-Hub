@@ -405,12 +405,16 @@ async function showMainMenu(ctx, isEdit = false) {
 
 // Arahan Pembayaran QR / DuitNow
 async function showPaymentInstructions(ctx, orderInfo, pkg) {
+  const isCentsAdded = orderInfo.amountPaid !== orderInfo.basePrice;
+  const centsNotice = isCentsAdded
+    ? `\n_(Sila bayar jumlah tepat *RM ${orderInfo.amountPaid.toFixed(2)}* termasuk sen untuk pengesahan automatik)_\n`
+    : '';
+
   const text = `💳 *ARAHAN PEMBAYARAN QR*\n\n` +
     `📌 *No. Pesanan:* \`${orderInfo.orderRef}\`\n` +
     `📦 *Pakej:* ${pkg.name}\n` +
     `⚡ *Kuota:* \`${pkg.tokens.toLocaleString()} Tokens\` (${pkg.valid_days} Hari)\n\n` +
-    `💵 *JUMLAH PERLU DIBAYAR:* *RM ${orderInfo.amountPaid.toFixed(2)}*\n` +
-    `_(Sila bayar jumlah tepat *RM ${orderInfo.amountPaid.toFixed(2)}* termasuk sen untuk pengesahan automatik)_\n\n` +
+    `💵 *JUMLAH PERLU DIBAYAR:* *RM ${orderInfo.amountPaid.toFixed(2)}*${centsNotice}\n\n` +
     `🏦 *Maklumat Bank / QR DuitNow:*\n` +
     `• Bank: *${orderInfo.bankName}*\n` +
     `• No. Akaun / Tel: \`${orderInfo.accountNo}\`\n` +

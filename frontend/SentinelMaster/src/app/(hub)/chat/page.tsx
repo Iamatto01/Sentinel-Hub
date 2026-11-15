@@ -227,7 +227,50 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#039;');
 }
 
-/** Lightweight React-safe Markdown renderer with code block syntax highlighting & copy support */
+/** Helper for parsing inline markdown formatting: **bold**, *italic*, `code` */
+function renderInline(text: string): React.ReactNode {
+  if (!text) return null;
+  const regex = /(\*\*[^*]+?\*\*|\*[^*]+?\*|`[^`]+?`)/g;
+  const parts = text.split(regex);
+
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
+      return (
+        <strong key={i} style={{ color: '#ffffff', fontWeight: 650 }}>
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (part.startsWith('`') && part.endsWith('`') && part.length >= 2) {
+      return (
+        <code
+          key={i}
+          style={{
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            padding: '1.5px 5.5px',
+            borderRadius: '4px',
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '12px',
+            color: '#38bdf8',
+          }}
+        >
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    if (part.startsWith('*') && part.endsWith('*') && part.length >= 2) {
+      return (
+        <em key={i} style={{ fontStyle: 'italic', color: '#cbd5e1' }}>
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
+/** Lightweight React-safe Markdown renderer with code block syntax highlighting, subtopics & inline markdown */
 function FormattedMessage({ content }: { content: string }) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
@@ -318,28 +361,134 @@ function FormattedMessage({ content }: { content: string }) {
           );
         }
 
-        // Render inline markdown for text (bold, list, paragraphs)
+        // Render inline markdown for text (bold, list, subtopic headings, blockquotes, paragraphs)
         const lines = (part.text || '').split('\n');
         return (
           <div key={idx} style={{ margin: '6px 0' }}>
             {lines.map((line, lIdx) => {
-              if (line.startsWith('# ')) {
-                return <h2 key={lIdx} style={{ fontSize: '17px', fontWeight: 650, margin: '14px 0 6px', color: '#fff' }}>{line.slice(2)}</h2>;
-              }
-              if (line.startsWith('## ')) {
-                return <h3 key={lIdx} style={{ fontSize: '15px', fontWeight: 600, margin: '12px 0 4px', color: '#fff' }}>{line.slice(3)}</h3>;
-              }
-              if (line.startsWith('- ') || line.startsWith('* ')) {
+              // Subtopic / Heading 3, 4, 5, 6 (### Subtopic)
+              if (line.match(/^#{3,6}\s+/)) {
                 return (
-                  <div key={lIdx} style={{ display: 'flex', gap: '8px', marginLeft: '6px', margin: '3px 0' }}>
-                    <span style={{ color: '#38bdf8' }}>•</span>
-                    <span>{line.slice(2)}</span>
+                  <div
+                    key={lIdx}
+                    style={{
+                      fontSize: '14.5px',
+                      fontWeight: 650,
+                      margin: '14px 0 6px',
+                      color: '#38bdf8',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <span style={{ color: '#0284c7', fontSize: '12px' }}>◈</span>
+                    <span>{renderInline(line.replace(/^#{3,6}\s+/, ''))}</span>
                   </div>
                 );
               }
+              // Heading 2 (## Topic)
+              if (line.startsWith('## ')) {
+                return (
+                  <h3
+                    key={lIdx}
+                    style={{
+                      fontSize: '16px',
+                      fontWeight: 700,
+                      margin: '16px 0 6px',
+                      color: '#ffffff',
+                      borderBottom: '1px solid rgba(255,255,255,0.08)',
+                      paddingBottom: '4px',
+                    }}
+                  >
+                    {renderInline(line.slice(3))}
+                  </h3>
+                );
+              }
+              // Heading 1 (# Major Title)
+              if (line.startsWith('# ')) {
+                return (
+                  <h2
+                    key={lIdx}
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: 750,
+                      margin: '18px 0 8px',
+                      color: '#ffffff',
+                    }}
+                  >
+                    {renderInline(line.slice(2))}
+                  </h2>
+                );
+              }
+              // Blockquote (> Notice / Callout)
+              if (line.startsWith('> ')) {
+                return (
+                  <div
+                    key={lIdx}
+                    style={{
+                      margin: '8px 0',
+                      padding: '8px 12px',
+                      background: 'rgba(56,189,248,0.07)',
+                      borderLeft: '3px solid #38bdf8',
+                      borderRadius: '0 6px 6px 0',
+                      fontSize: '12.5px',
+                      color: '#bae6fd',
+                    }}
+                  >
+                    {renderInline(line.slice(2))}
+                  </div>
+                );
+              }
+              // Numbered list (1. Item)
+              const numMatch = line.match(/^(\d+)\.\s+(.*)/);
+              if (numMatch) {
+                return (
+                  <div
+                    key={lIdx}
+                    style={{
+                      display: 'flex',
+                      gap: '8px',
+                      marginLeft: '6px',
+                      margin: '4px 0',
+                      alignItems: 'baseline',
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: '#38bdf8',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: '12px',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {numMatch[1]}.
+                    </span>
+                    <span style={{ flex: 1 }}>{renderInline(numMatch[2])}</span>
+                  </div>
+                );
+              }
+              // Bullet item (- item, * item, • item)
+              if (line.startsWith('- ') || line.startsWith('* ') || line.startsWith('• ')) {
+                return (
+                  <div
+                    key={lIdx}
+                    style={{
+                      display: 'flex',
+                      gap: '8px',
+                      marginLeft: '6px',
+                      margin: '4px 0',
+                      alignItems: 'baseline',
+                    }}
+                  >
+                    <span style={{ color: '#38bdf8', fontSize: '14px', lineHeight: 1 }}>•</span>
+                    <span style={{ flex: 1 }}>{renderInline(line.replace(/^[-*•]\s+/, ''))}</span>
+                  </div>
+                );
+              }
+              // Regular paragraph
               return (
                 <p key={lIdx} style={{ margin: '4px 0', minHeight: line.trim() ? undefined : '8px' }}>
-                  {line}
+                  {renderInline(line)}
                 </p>
               );
             })}
@@ -369,7 +518,8 @@ export default function AntigravityChatPage() {
   const [store, setStore] = useState<StoreData>(DEFAULT_STORE);
   const [selectedModel, setSelectedModel] = useState<string>('kimi-web/k3');
   const [inputVal, setInputVal] = useState<string>('');
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [generatingChats, setGeneratingChats] = useState<Record<string, boolean>>({});
+  const isCurrentChatGenerating = Boolean(store.activeChatId && generatingChats[store.activeChatId]);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
   const [modelDropdownOpen, setModelDropdownOpen] = useState<boolean>(false);
   const [projectDropdownOpen, setProjectDropdownOpen] = useState<boolean>(false);
@@ -448,7 +598,7 @@ export default function AntigravityChatPage() {
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
-  }, [activeChat?.messages, isGenerating]);
+  }, [activeChat?.messages, isCurrentChatGenerating]);
 
   // Adjust textarea height
   const handleTextareaInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -458,83 +608,107 @@ export default function AntigravityChatPage() {
   };
 
   const selectProject = (pId: string) => {
-    const updated = { ...store, activeProject: pId };
-    persist(updated);
+    setStore((prevStore) => {
+      const updated = { ...prevStore, activeProject: pId };
+      try {
+        localStorage.setItem('antigravity_store', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
     setProjectDropdownOpen(false);
   };
 
   const selectChat = (pId: string, cId: string) => {
-    const updated = {
-      ...store,
-      activeProject: pId,
-      activeChatId: cId,
-      projects: store.projects.map((p) => {
-        if (p.id !== pId) return p;
-        return {
-          ...p,
-          conversations: p.conversations.map((c) => (c.id === cId ? { ...c, hasUnread: false } : c)),
-        };
-      }),
-    };
-    persist(updated);
+    setStore((prevStore) => {
+      const updated = {
+        ...prevStore,
+        activeProject: pId,
+        activeChatId: cId,
+        projects: prevStore.projects.map((p) => {
+          if (p.id !== pId) return p;
+          return {
+            ...p,
+            conversations: p.conversations.map((c) => (c.id === cId ? { ...c, hasUnread: false } : c)),
+          };
+        }),
+      };
+      try {
+        localStorage.setItem('antigravity_store', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
   };
 
   const newChat = () => {
-    const updated = { ...store, activeChatId: null };
-    persist(updated);
+    setStore((prevStore) => {
+      const updated = { ...prevStore, activeChatId: null };
+      try {
+        localStorage.setItem('antigravity_store', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
     setInputVal('');
     if (textareaRef.current) textareaRef.current.focus();
   };
 
   const handleSend = async () => {
     const text = inputVal.trim();
-    if (!text || isGenerating) return;
+    if (!text) return;
+
+    const currProj = store.projects.find((p) => p.id === store.activeProject) || store.projects[0];
+    const currChat = currProj.conversations.find((c) => c.id === store.activeChatId);
+
+    const targetChatId = currChat ? currChat.id : `chat_${Date.now()}`;
+    const targetProjId = currProj.id;
+
+    if (generatingChats[targetChatId]) return;
 
     setInputVal('');
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
-    setIsGenerating(true);
+    setGeneratingChats((prev) => ({ ...prev, [targetChatId]: true }));
 
-    let currProj = store.projects.find((p) => p.id === store.activeProject) || store.projects[0];
-    let currChat = currProj.conversations.find((c) => c.id === store.activeChatId);
-
-    const newChatId = currChat ? currChat.id : `chat_${Date.now()}`;
     const userMsg: Message = { role: 'user', content: text, timestamp: 'Now' };
 
-    let updatedProjects: Project[];
-    if (!currChat) {
-      const newConversation: Conversation = {
-        id: newChatId,
-        title: text.length > 28 ? `${text.slice(0, 28)}...` : text,
-        time: 'Now',
-        hasUnread: false,
-        messages: [userMsg],
-      };
-      updatedProjects = store.projects.map((p) => {
-        if (p.id !== currProj.id) return p;
-        return { ...p, conversations: [newConversation, ...p.conversations] };
-      });
-    } else {
-      updatedProjects = store.projects.map((p) => {
-        if (p.id !== currProj.id) return p;
-        return {
-          ...p,
-          conversations: p.conversations.map((c) => {
-            if (c.id !== currChat!.id) return c;
-            return { ...c, messages: [...c.messages, userMsg] };
-          }),
-        };
-      });
-    }
+    setStore((prevStore) => {
+      const pIndex = prevStore.projects.findIndex((p) => p.id === targetProjId);
+      if (pIndex === -1) return prevStore;
+      const project = prevStore.projects[pIndex];
+      const chatIndex = project.conversations.findIndex((c) => c.id === targetChatId);
 
-    const updatedStore = {
-      ...store,
-      activeProject: currProj.id,
-      activeChatId: newChatId,
-      projects: updatedProjects,
-    };
-    persist(updatedStore);
+      let updatedConversations: Conversation[];
+      if (chatIndex === -1) {
+        const newConversation: Conversation = {
+          id: targetChatId,
+          title: text.length > 28 ? `${text.slice(0, 28)}...` : text,
+          time: 'Now',
+          hasUnread: false,
+          messages: [userMsg],
+        };
+        updatedConversations = [newConversation, ...project.conversations];
+      } else {
+        updatedConversations = project.conversations.map((c) =>
+          c.id === targetChatId ? { ...c, messages: [...c.messages, userMsg] } : c
+        );
+      }
+
+      const nextProjects = prevStore.projects.map((p, idx) =>
+        idx === pIndex ? { ...p, conversations: updatedConversations } : p
+      );
+
+      const nextStore = {
+        ...prevStore,
+        activeProject: targetProjId,
+        activeChatId: targetChatId,
+        projects: nextProjects,
+      };
+
+      try {
+        localStorage.setItem('antigravity_store', JSON.stringify(nextStore));
+      } catch {}
+      return nextStore;
+    });
 
     // AI Completion request
     try {
@@ -617,18 +791,26 @@ export default function AntigravityChatPage() {
         timestamp: 'Now',
       };
 
-      const finalProjects = updatedStore.projects.map((p) => {
-        if (p.id !== currProj.id) return p;
-        return {
-          ...p,
-          conversations: p.conversations.map((c) => {
-            if (c.id !== newChatId) return c;
-            return { ...c, messages: [...c.messages, assistantMsg] };
-          }),
+      setStore((prevStore) => {
+        const nextProjects = prevStore.projects.map((p) => {
+          if (p.id !== targetProjId) return p;
+          return {
+            ...p,
+            conversations: p.conversations.map((c) => {
+              if (c.id !== targetChatId) return c;
+              return { ...c, messages: [...c.messages, assistantMsg] };
+            }),
+          };
+        });
+        const nextStore = {
+          ...prevStore,
+          projects: nextProjects,
         };
+        try {
+          localStorage.setItem('antigravity_store', JSON.stringify(nextStore));
+        } catch {}
+        return nextStore;
       });
-
-      persist({ ...updatedStore, projects: finalProjects });
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err);
       const assistantMsg: Message = {
@@ -637,20 +819,32 @@ export default function AntigravityChatPage() {
         timestamp: 'Now',
       };
 
-      const finalProjects = updatedStore.projects.map((p) => {
-        if (p.id !== currProj.id) return p;
-        return {
-          ...p,
-          conversations: p.conversations.map((c) => {
-            if (c.id !== newChatId) return c;
-            return { ...c, messages: [...c.messages, assistantMsg] };
-          }),
+      setStore((prevStore) => {
+        const nextProjects = prevStore.projects.map((p) => {
+          if (p.id !== targetProjId) return p;
+          return {
+            ...p,
+            conversations: p.conversations.map((c) => {
+              if (c.id !== targetChatId) return c;
+              return { ...c, messages: [...c.messages, assistantMsg] };
+            }),
+          };
+        });
+        const nextStore = {
+          ...prevStore,
+          projects: nextProjects,
         };
+        try {
+          localStorage.setItem('antigravity_store', JSON.stringify(nextStore));
+        } catch {}
+        return nextStore;
       });
-
-      persist({ ...updatedStore, projects: finalProjects });
     } finally {
-      setIsGenerating(false);
+      setGeneratingChats((prev) => {
+        const next = { ...prev };
+        delete next[targetChatId];
+        return next;
+      });
     }
   };
 
@@ -769,6 +963,7 @@ export default function AntigravityChatPage() {
                 <div style={{ marginLeft: '12px', paddingLeft: '8px', borderLeft: '1px solid rgba(255,255,255,0.05)', marginTop: '4px' }}>
                   {p.conversations.map((c) => {
                     const isCurrentChat = c.id === store.activeChatId;
+                    const isChatGenerating = Boolean(generatingChats[c.id]);
                     return (
                       <div
                         key={c.id}
@@ -787,10 +982,35 @@ export default function AntigravityChatPage() {
                           transition: 'background 0.15s, color 0.15s',
                         }}
                       >
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '170px' }}>
-                          {c.title}
-                        </span>
-                        {c.time && <span style={{ fontSize: '10px', color: '#52525b' }}>{c.time}</span>}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flex: 1 }}>
+                          {isChatGenerating && (
+                            <span
+                              style={{
+                                width: '6px',
+                                height: '6px',
+                                borderRadius: '50%',
+                                background: '#38bdf8',
+                                boxShadow: '0 0 8px #38bdf8',
+                                flexShrink: 0,
+                              }}
+                            />
+                          )}
+                          <span
+                            style={{
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              maxWidth: isChatGenerating ? '130px' : '170px',
+                            }}
+                          >
+                            {c.title}
+                          </span>
+                        </div>
+                        {isChatGenerating ? (
+                          <span style={{ fontSize: '9.5px', color: '#38bdf8', fontFamily: 'monospace' }}>memproses...</span>
+                        ) : (
+                          c.time && <span style={{ fontSize: '10px', color: '#52525b' }}>{c.time}</span>
+                        )}
                       </div>
                     );
                   })}
@@ -899,22 +1119,6 @@ export default function AntigravityChatPage() {
                 {activeModelObj.name}
               </span>
             </div>
-            <a
-              href="/chat.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                fontSize: '11.5px',
-                color: '#a1a1aa',
-                textDecoration: 'none',
-                padding: '3px 9px',
-                borderRadius: '6px',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.06)',
-              }}
-            >
-              Buka Asing ↗
-            </a>
           </div>
         </header>
 
