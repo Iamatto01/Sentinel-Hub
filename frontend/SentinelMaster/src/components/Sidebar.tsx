@@ -36,20 +36,16 @@ interface NavLink {
 }
 
 const CORE_APPS: NavLink[] = [
-  { href: '/', label: 'Dashboard' },
-  { href: '/frieren', label: 'Frieren AIOS Copilot' },
-  { href: '/chat', label: 'Antigravity Chat' },
-  { href: '/router', label: 'Sentinel AI Gateway' },
-  { href: '/sentinelai', label: 'SentinelAI Platform' },
+  { href: '/router', label: 'Sentinel Router' },
   { href: '/hermes', label: 'Hermes Agent AI' },
-  { href: '/orchestrator', label: 'AI Swarm IDE' },
 ];
 
-const PLATFORM_APPS: NavLink[] = [
-  { href: '/tree', label: 'SentinelTree (Family Tree)' },
-  { href: '/along', label: 'SentinelAlong (CAD Sketcher)' },
-  { href: '/ctf', label: 'Sentinel CTF Platform' },
-  { href: '/mlbb', label: 'Sentinel MLBB' },
+const CODE_APPS: NavLink[] = [
+  {
+    href: '/github',
+    label: 'GitHub Integration',
+    count: (totals) => totals.githubRepos,
+  },
 ];
 
 const SYSTEM_LINKS: NavLink[] = [
@@ -69,7 +65,7 @@ const SYSTEM_LINKS: NavLink[] = [
 ];
 
 function isActive(pathname: string, href: string): boolean {
-  if (href === '/') return pathname === '/';
+  if (href === '/') return pathname === '/' || pathname === '/router';
   if (href === '/kali') {
     return pathname === '/kali' || pathname.startsWith('/kali/') || pathname === '/projects' || pathname.startsWith('/projects/');
   }
@@ -145,7 +141,7 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Green Sidebar Toggle Button (matching user sketch) */}
+        {/* Green Sidebar Toggle Button */}
         <button
           type="button"
           onClick={toggleSidebar}
@@ -171,32 +167,45 @@ export default function Sidebar() {
             aria-current={isActive(pathname, link.href) ? 'page' : undefined}
           >
             <span style={{ flex: 1 }}>{link.label}</span>
-            {link.href === '/frieren' && (
-              <span className="nav-count" style={{ background: 'rgba(167, 139, 250, 0.2)', color: '#c4b5fd', borderColor: 'rgba(167, 139, 250, 0.35)' }}>
-                AIOS
+            {link.href === '/router' && (
+              <span className="nav-count" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.3)' }}>
+                Gateway
               </span>
             )}
-            {link.href === '/router' && (
-              <span className="nav-count" style={{ background: 'var(--panel-3)', color: 'var(--text)', borderColor: 'var(--line)' }}>
-                Free AI
+            {link.href === '/hermes' && (
+              <span className="nav-count" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', borderColor: 'rgba(168, 85, 247, 0.3)' }}>
+                Agent
               </span>
             )}
           </Link>
         ))}
 
         <div className="nav-section" style={{ marginTop: '14px', color: 'var(--text-faint)', fontWeight: 600, fontSize: '10.5px' }}>
-          Platforms & Web Apps
+          Code & Projects
         </div>
-        {PLATFORM_APPS.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={isActive(pathname, link.href) ? 'nav-item active' : 'nav-item'}
-            aria-current={isActive(pathname, link.href) ? 'page' : undefined}
-          >
-            <span style={{ flex: 1 }}>{link.label}</span>
-          </Link>
-        ))}
+        {CODE_APPS.map((link) => {
+          const count = totals && link.count ? link.count(totals) : null;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={isActive(pathname, link.href) ? 'nav-item active' : 'nav-item'}
+              aria-current={isActive(pathname, link.href) ? 'page' : undefined}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                </svg>
+                {link.label}
+              </span>
+              {count !== null && count > 0 ? (
+                <span className="nav-count" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.3)' }}>
+                  {formatNumber(count)}
+                </span>
+              ) : null}
+            </Link>
+          );
+        })}
 
         <div className="nav-section" style={{ marginTop: '14px', color: 'var(--text-faint)', fontWeight: 600, fontSize: '10.5px' }}>
           Infrastructure & Fleet
@@ -236,4 +245,3 @@ export default function Sidebar() {
     </aside>
   );
 }
-
