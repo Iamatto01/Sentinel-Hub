@@ -51,7 +51,7 @@ const CODE_APPS: NavLink[] = [
 const SYSTEM_LINKS: NavLink[] = [
   {
     href: '/kali',
-    label: 'Server Management',
+    label: 'Kali Linux Host',
     count: (totals) => totals.projects,
   },
   {
@@ -208,7 +208,7 @@ export default function Sidebar() {
         })}
 
         <div className="nav-section" style={{ marginTop: '14px', color: 'var(--text-faint)', fontWeight: 600, fontSize: '10.5px' }}>
-          Infrastructure & Fleet
+          Server Management
         </div>
         {SYSTEM_LINKS.map((link) => {
           const count = totals && link.count ? link.count(totals) : null;

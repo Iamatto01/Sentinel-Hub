@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { PageBody } from './PageHeader';
 import { usePoll } from './useApi';
 import { useSidebar, ThemeToggle, MobileMenuButton } from './HubShell';
-import FrierenDesktopShell from './FrierenDesktopShell';
 import type { OverviewPayload } from '@/lib/overview';
 import type { RouterCredentials } from '@/lib/router-types';
 
@@ -13,28 +12,7 @@ export default function OverviewView() {
   const overview = usePoll<OverviewPayload>('/api/overview', 30_000);
   const credentials = usePoll<RouterCredentials>('/api/router/credentials', 120_000);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  const [viewMode, setViewModeState] = useState<'desktop' | 'grid'>('desktop');
   const { isSidebarHidden, toggleSidebar } = useSidebar();
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('sentinel_hub_view_mode');
-      if (saved === 'grid' || saved === 'desktop') {
-        setViewModeState(saved);
-      }
-    } catch {
-      // Ignore
-    }
-  }, []);
-
-  const setViewMode = (mode: 'desktop' | 'grid') => {
-    setViewModeState(mode);
-    try {
-      localStorage.setItem('sentinel_hub_view_mode', mode);
-    } catch {
-      // Ignore
-    }
-  };
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -77,75 +55,11 @@ export default function OverviewView() {
         </div>
         <div className="topbar-spacer" />
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Frieren Desktop OS vs Bento Grid Switcher */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(167, 139, 250, 0.22)',
-              borderRadius: '12px',
-              padding: '2px',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setViewMode('desktop')}
-              style={{
-                padding: '4px 10px',
-                borderRadius: '10px',
-                border: 'none',
-                background: viewMode === 'desktop' ? 'rgba(167, 139, 250, 0.25)' : 'transparent',
-                color: viewMode === 'desktop' ? '#ffffff' : 'var(--text-faint)',
-                fontSize: '11.5px',
-                fontWeight: viewMode === 'desktop' ? 650 : 500,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                transition: 'all 0.15s ease',
-              }}
-              title="Frieren AIOS Desktop Canvas Mode"
-            >
-              <span>🖥️</span>
-              <span>Frieren Desktop</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              style={{
-                padding: '4px 10px',
-                borderRadius: '10px',
-                border: 'none',
-                background: viewMode === 'grid' ? 'rgba(167, 139, 250, 0.25)' : 'transparent',
-                color: viewMode === 'grid' ? '#ffffff' : 'var(--text-faint)',
-                fontSize: '11.5px',
-                fontWeight: viewMode === 'grid' ? 650 : 500,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                transition: 'all 0.15s ease',
-              }}
-              title="Classic Bento Grid Mode"
-            >
-              <span>📊</span>
-              <span>Bento Grid</span>
-            </button>
-          </div>
-
           <ThemeToggle />
         </div>
       </div>
 
-      {viewMode === 'desktop' ? (
-        <FrierenDesktopShell
-          overviewData={overview.data}
-          credentialsData={credentials.data}
-          onSwitchToGrid={() => setViewMode('grid')}
-        />
-      ) : (
-        <PageBody>
+      <PageBody>
         {/* Apple-Style Monochrome Glass Hero Banner */}
         <div className="hero-card">
           <div className="hero-header">
@@ -186,13 +100,13 @@ export default function OverviewView() {
           </div>
 
           <div className="app-grid">
-            {/* Sentinel Router AI Gateway */}
+            {/* Sentinel Router */}
             <div className="app-card featured">
               <div className="app-card-head">
                 <div className="app-icon">⚡</div>
                 <div className="app-title-group">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div className="app-title">Sentinel AI Gateway</div>
+                    <div className="app-title">Sentinel Router</div>
                     <span className="app-badge">Unlimited Free AI</span>
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>OmniRoute Proxy & Token Saver</div>
@@ -224,32 +138,56 @@ export default function OverviewView() {
               </div>
             </div>
 
-            {/* Frieren AIOS Copilot & Workspace */}
-            <div className="app-card featured" style={{ borderColor: 'rgba(167, 139, 250, 0.45)' }}>
+            {/* Hermes Agent AI */}
+            <div className="app-card featured">
               <div className="app-card-head">
-                <div className="app-icon" style={{ background: 'rgba(167, 139, 250, 0.15)', color: '#c4b5fd' }}>🧝‍♀️</div>
+                <div className="app-icon">🤖</div>
                 <div className="app-title-group">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div className="app-title">Frieren AIOS Copilot</div>
-                    <span className="app-badge" style={{ background: 'rgba(167, 139, 250, 0.2)', color: '#c4b5fd', borderColor: 'rgba(167, 139, 250, 0.4)' }}>✦ Neural Workspace</span>
+                    <div className="app-title">Hermes Agent AI</div>
+                    <span className="app-badge" style={{ background: 'rgba(168, 85, 247, 0.2)', color: '#c084fc', borderColor: 'rgba(168, 85, 247, 0.4)' }}>Autonomous Agent</span>
                   </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>OmniRoute AI & Fleet Intelligence</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Full-Stack Autonomous Coding & System Copilot</div>
                 </div>
               </div>
 
               <div className="app-desc">
-                Desktop companion & neural workspace powered by OmniRoute on Port 20128. Fleet supervisor audit, SQLite WAL monitor, and grimoire intelligence.
+                Autonomous system copilot with access to live server telemetry, database WAL audits, PM2 process management, and multi-agent swarm missions.
               </div>
 
               <div className="app-meta">
-                <span className="app-tag" style={{ color: '#c4b5fd' }}>Chibi Pet (Alt+F)</span>
-                <span className="app-tag">Gemini 3.8 Flash</span>
-                <span className="app-tag">AIOS Shell</span>
+                <span className="app-tag" style={{ color: '#c084fc' }}>Swarm Missions</span>
+                <span className="app-tag">Multi-Model</span>
+                <span className="app-tag">System Telemetry</span>
               </div>
 
               <div className="app-actions">
-                <Link href="/frieren" className="btn-primary-action" style={{ background: 'linear-gradient(135deg, #7c3aed, #6366f1)' }}>
-                  Launch AIOS Workspace →
+                <Link href="/hermes" className="btn-primary-action" style={{ background: 'linear-gradient(135deg, #7c3aed, #6366f1)' }}>
+                  Launch Hermes Agent →
+                </Link>
+              </div>
+            </div>
+
+            {/* GitHub Integration */}
+            <div className="app-card">
+              <div className="app-card-head">
+                <div className="app-icon">🐙</div>
+                <div className="app-title-group">
+                  <div className="app-title">GitHub Integration</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Code & Repository Command</div>
+                </div>
+              </div>
+              <div className="app-desc">
+                Manage repositories across personal & org accounts, run automated security audits, perform git pull/sync, and live preview web projects.
+              </div>
+              <div className="app-meta">
+                <span className="app-tag">Live Preview</span>
+                <span className="app-tag">Audit & Sync</span>
+                <span className="app-tag">Multi-Org</span>
+              </div>
+              <div className="app-actions">
+                <Link href="/github" className="btn-secondary-action">
+                  Manage Repositories →
                 </Link>
               </div>
             </div>
@@ -441,7 +379,7 @@ export default function OverviewView() {
                 <div className="app-icon">🖥️</div>
                 <div className="app-title-group">
                   <div className="app-title">Server Management</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Dedicated 24/7 Home Lab & Fleet</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-faint)' }}>Dedicated 24/7 Home Lab Server</div>
                 </div>
               </div>
               <div className="app-desc">
@@ -454,7 +392,7 @@ export default function OverviewView() {
               </div>
               <div className="app-actions">
                 <Link href="/kali" className="btn-secondary-action">
-                  Manage Server & Fleet →
+                  Manage Server →
                 </Link>
               </div>
             </div>
@@ -593,7 +531,6 @@ export default function OverviewView() {
           </div>
         </div>
       </PageBody>
-      )}
     </>
   );
 }

@@ -186,8 +186,8 @@ const DEFAULT_STORE: StoreData = {
   activeChatId: null,
   projects: [
     {
-      id: 'frieren-desktop',
-      name: 'frieren-desktop',
+      id: 'sentinel-system',
+      name: 'sentinel-system',
       conversations: [
         { id: 'fd_1', title: 'Optimizing RAM And Boot...', time: '6d', hasUnread: false, messages: [] },
         { id: 'fd_2', title: 'Reset Laptop Default Setti...', time: '', hasUnread: true, messages: [] },

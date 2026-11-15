@@ -44,20 +44,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="lp-ambient-bg" aria-hidden="true">
           <div className="lp-glow-1" />
           <div className="lp-glow-2" />
-          <div className="lp-stars">
-            <span className="star s1" />
-            <span className="star s2" />
-            <span className="star s3" />
-            <span className="star s4" />
-            <span className="star s5" />
-            <span className="star s6" />
-            <span className="star s7" />
-            <span className="star s8" />
-            <span className="star s9" />
-            <span className="star s10" />
-            <span className="star s11" />
-            <span className="star s12" />
-          </div>
           <div className="lp-grid-matrix" />
         </div>
         {children}
@@ -65,4 +51,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-
