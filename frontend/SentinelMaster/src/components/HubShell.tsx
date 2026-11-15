@@ -11,7 +11,6 @@ import React, {
 } from 'react';
 import { usePathname } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
-import FrierenFloatingPet from '@/components/FrierenFloatingPet';
 
 export type ThemeMode = 'dark' | 'light';
 
@@ -234,7 +233,6 @@ export function HubShell({ children }: { children: ReactNode }) {
           />
         )}
         <div className="main">{children}</div>
-        {pathname !== '/frieren' && <FrierenFloatingPet />}
       </div>
     </ShellContext.Provider>
   );

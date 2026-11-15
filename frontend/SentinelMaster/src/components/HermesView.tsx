@@ -18,9 +18,9 @@ export default function HermesView() {
   const [activeTab, setActiveTab] = useState<'console' | 'swarm' | 'whatsapp' | 'telegram' | 'cua' | 'dashboard'>('console');
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
 
-  // Model & Persona State (integrated from Antigravity & Frieren)
+  // Model & Persona State
   const [selectedModel, setSelectedModel] = useState('antigravity/gemini-3.8-flash-high');
-  const [selectedPersona, setSelectedPersona] = useState<'hermes' | 'frieren' | 'sentinel'>('hermes');
+  const [selectedPersona, setSelectedPersona] = useState<'hermes' | 'sentinel'>('hermes');
 
   // Swarm Mission State (integrated from Orchestrator / Swarm IDE)
   const [swarmGoal, setSwarmGoal] = useState('Audit target website, discover login endpoints, check interactive elements, and synthesize defensive findings');
@@ -661,23 +661,6 @@ export default function HermesView() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setSelectedPersona('frieren')}
-                    style={{
-                      padding: '3px 8px',
-                      borderRadius: '6px',
-                      fontSize: '11px',
-                      fontWeight: 650,
-                      background: selectedPersona === 'frieren' ? 'rgba(167, 139, 250, 0.2)' : 'transparent',
-                      color: selectedPersona === 'frieren' ? '#c4b5fd' : '#94a3b8',
-                      border: selectedPersona === 'frieren' ? '1px solid #c4b5fd' : '1px solid transparent',
-                      cursor: 'pointer',
-                    }}
-                    title="Frieren AIOS Copilot Persona & Spells"
-                  >
-                    🪄 Frieren Copilot
-                  </button>
-                  <button
-                    type="button"
                     onClick={() => setSelectedPersona('sentinel')}
                     style={{
                       padding: '3px 8px',
@@ -789,13 +772,13 @@ export default function HermesView() {
                 )}
               </div>
 
-              {/* QUICK PROMPTS & SPELLS */}
+              {/* QUICK PROMPTS */}
               <div style={{ padding: '8px 16px', background: 'rgba(0, 0, 0, 0.2)', borderTop: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', gap: '6px', overflowX: 'auto' }}>
                 {[
-                  '✦ Mana Scan (Fleet Health)',
+                  '📊 Fleet Health Telemetry',
                   '📜 DB WAL Audit',
-                  '⚡ Zoltraak',
-                  '🛡️ Barrier Magic',
+                  '⚡ Purge System Cache',
+                  '🛡️ Tunnel & Ingress Shield',
                   'hermes gateway setup',
                   'check status',
                 ].map((chip) => (
@@ -804,12 +787,12 @@ export default function HermesView() {
                     type="button"
                     onClick={() => handleSendMessage(chip)}
                     style={{
-                      background: chip.startsWith('✦') ? 'rgba(168, 85, 247, 0.15)' : chip.startsWith('⚡') ? 'rgba(234, 179, 8, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                      background: chip.startsWith('📊') ? 'rgba(56, 189, 248, 0.15)' : chip.startsWith('⚡') ? 'rgba(234, 179, 8, 0.15)' : 'rgba(255, 255, 255, 0.05)',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
                       borderRadius: '9999px',
                       padding: '4px 10px',
                       fontSize: '0.75rem',
-                      color: chip.startsWith('✦') ? '#c084fc' : chip.startsWith('⚡') ? '#facc15' : '#cbd5e1',
+                      color: chip.startsWith('📊') ? '#38bdf8' : chip.startsWith('⚡') ? '#facc15' : '#cbd5e1',
                       whiteSpace: 'nowrap',
                       cursor: 'pointer',
                     }}

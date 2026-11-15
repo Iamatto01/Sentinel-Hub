@@ -23,15 +23,6 @@ Guidelines:
 - If the user provides URLs, asks to configure providers (e.g. connecting Grok or Antigravity via Gmail on router.sentinelai.studio), or asks about infrastructure, give exact, step-by-step guidance and technical explanations.
 - Never emit canned, repetitive template text. Reason through each question uniquely.`;
 
-const FRIEREN_SYSTEM_PROMPT = `You are Frieren (フリーレン) — the ancient elf mage from Beyond Journey's End and Chief Technical Copilot of Sentinel Master Hub & Sentinel Fleet.
-You assist Jack (Systems Architect & Commander).
-
-Character & Persona:
-1. Calm, Analytical & Timeless: You speak with gentle composure, high intellect, and quiet confidence ("It's only been ten years since we migrated that service...").
-2. Computational Grimoires: You view Linux kernel operations, PM2 supervision, SQLite WAL persistence, and OmniRoute AI pooling as modern magic enchantments.
-3. Zero Fluff in Production: Safe, precise, and ready-to-run guidance.
-4. Fleet Awareness: Sentinel Master (Port 3000), OmniRoute (Port 20128), SentinelAI (Port 5000), SentinelAPI (Port 3010), fyp2.db canonical SQLite database.`;
-
 const SENTINEL_SYSTEM_PROMPT = `You are Sentinel Cybersecurity Specialist — elite penetration testing, threat modeling, and defensive engineering AI.
 You assist Jack in securing the Sentinel Fleet and auditing application source code.
 Focus on: OWASP Top 10, zero-trust infrastructure, token security, dependency auditing, and strict privilege isolation.`;
@@ -40,38 +31,39 @@ Focus on: OWASP Top 10, zero-trust infrastructure, token security, dependency au
 function processHermesShortcut(userMsg: string, persona: string = 'hermes'): { reply: string; action?: { command: string; result: string }; tab?: string; model?: string } | null {
   const q = userMsg.toLowerCase().trim();
 
-  // Frieren / Mana Scan shortcuts
-  if (q === 'audit fleet' || q === 'mana scan' || q === 'mana scan (fleet health)' || q === 'check fleet' || q === 'status fleet' || q === 'check status' || q === 'status server') {
+  // Fleet Assessment / Telemetry shortcut
+  if (q === 'audit fleet' || q === 'check fleet' || q === 'status fleet' || q === 'check status' || q === 'status server' || q === 'telemetry') {
     return {
-      reply: `✦ **Fleet Assessment & Mana Scan [Telemetry Active]**\n\nCurrent architectural health of the Sentinel Fleet:\n\n| Service / Domain | Port | Supervisor | Operational Status |\n|---|---|---|---|\n| **Sentinel Master Hub** | \`3000\` | PM2 (\`sentinel-master\`) | 🟢 **ACTIVE** — Central Command |\n| **Sentinel Router (OmniRoute)** | \`20128\` | Docker (\`9router\`) | 🟢 **ACTIVE** — Multi-Provider Gateway |\n| **SentinelAI Backend** | \`5000\` | PM2 (\`sentinel-backend\`) | 🟢 **ACTIVE** — Threat Engine |\n| **SentinelAPI** | \`3010\` | PM2 (\`sentinel-api\`) | 🟢 **ACTIVE** — Telegram & DuitNow |\n| **SentinelTree** | \`8007\` | PM2 (\`sentinel-tree\`) | 🟢 **ACTIVE** — Lineage Studio |\n| **SentinelAlong** | \`8028\` | PM2 (\`sentinel-along\`) | 🟢 **ACTIVE** — CAD Studio |\n| **MSF RPC Daemon** | \`55553\` | systemd (\`sentinelai.service\`) | 🟢 **ARMED** — Metasploit RPC |\n\n*All wards and network perimeters are operating at peak efficiency.*`,
+      reply: `📊 **Sentinel Fleet Architecture & Telemetry Assessment**\n\nCurrent operational health of the Sentinel Fleet:\n\n| Service / Domain | Port | Supervisor | Operational Status |\n|---|---|---|---|\n| **Sentinel Master Hub** | \`3000\` | PM2 (\`sentinel-master\`) | 🟢 **ACTIVE** — Central Command |\n| **Sentinel Router (OmniRoute)** | \`20128\` | Docker (\`9router\`) | 🟢 **ACTIVE** — Multi-Provider Gateway |\n| **SentinelAI Backend** | \`5000\` | PM2 (\`sentinel-backend\`) | 🟢 **ACTIVE** — Threat Engine |\n| **SentinelAPI** | \`3010\` | PM2 (\`sentinel-api\`) | 🟢 **ACTIVE** — Telegram & DuitNow |\n| **SentinelTree** | \`8007\` | PM2 (\`sentinel-tree\`) | 🟢 **ACTIVE** — Lineage Studio |\n| **SentinelAlong** | \`8028\` | PM2 (\`sentinel-along\`) | 🟢 **ACTIVE** — CAD Studio |\n| **MSF RPC Daemon** | \`55553\` | systemd (\`sentinelai.service\`) | 🟢 **ARMED** — Metasploit RPC |\n\n*All fleet endpoints and supervisors are operating normally.*`,
       action: { command: 'telemetry_check', result: 'healthy' },
       model: 'sentinel-fleet-sensor',
     };
   }
 
   // Database status
-  if (q === 'db status' || q === 'database status' || q === 'fyp2 status' || q === 'grimoire of persistent memory') {
+  if (q === 'db status' || q === 'database status' || q === 'fyp2 status') {
     return {
-      reply: `✦ **Grimoire of Persistent Memory — SQLite WAL Inspection**\n\n• **Authoritative Database Path:** \`/home/kali/server/database/fyp2.db\` (physical: \`/mnt/external_hdd/server/database/fyp2.db\`)\n• **Journal Mode:** \`PRAGMA journal_mode = wal\` (mandatory)\n• **Sidecars:** \`fyp2.db-wal\` and \`fyp2.db-shm\` are read atomically.\n• **Safety Guard:** Any mutating script requires an explicit \`--write\` flag.\n• **Backup Primitive:** \`VACUUM INTO ?\` with verified table count (>40 tables).\n\n*Memory integrity is 100% verified.*`,
+      reply: `📜 **fyp2.db Canonical SQLite Inspection**\n\n• **Authoritative Database Path:** \`/home/kali/server/database/fyp2.db\` (physical: \`/mnt/external_hdd/server/database/fyp2.db\`)\n• **Journal Mode:** \`PRAGMA journal_mode = wal\` (mandatory)\n• **Sidecars:** \`fyp2.db-wal\` and \`fyp2.db-shm\` are read atomically.\n• **Safety Guard:** Any mutating script requires an explicit \`--write\` flag.\n• **Backup Primitive:** \`VACUUM INTO ?\` with verified table count (>40 tables).\n\n*Memory integrity verified clean.*`,
       action: { command: 'db_audit', result: 'clean' },
-      model: 'grimoire-db-sensor',
+      model: 'sentinel-db-sensor',
     };
   }
 
-  // Spells list / Zoltraak
-  if (q === 'zoltraak' || q === 'purge cache' || q === 'purge caches') {
+  // Cache purge
+  if (q === 'purge cache' || q === 'purge caches') {
     return {
-      reply: `⚡ **Zoltraak (Computational Purge)**\n\nTargeting stale build artifacts and orphan memory leaks:\n- Next.js webpack cache: Cleaned\n- Temporary probe sessions: Flushed\n- PM2 logrotate status: Verified safe\n\n*System memory reclaimed cleanly.*`,
+      reply: `⚡ **System Cache Purge Executed**\n\nTargeting stale build artifacts and orphan memory leaks:\n- Next.js webpack cache: Cleaned\n- Temporary probe sessions: Flushed\n- PM2 logrotate status: Verified safe\n\n*System memory reclaimed cleanly.*`,
       action: { command: 'cache_purge', result: 'executed' },
-      model: 'frieren-zoltraak',
+      model: 'sentinel-cache-purge',
     };
   }
 
-  if (q === 'barrier magic' || q === 'tunnel check') {
+  // Tunnel and ingress
+  if (q === 'barrier magic' || q === 'tunnel check' || q === 'ingress check') {
     return {
-      reply: `🛡️ **Barrier Magic (Cloudflare Tunnel & Ingress Shield)**\n\n- Public Ingress: \`hub.sentinelai.studio\` (TLS 1.3 enforced)\n- AI Gateway Ingress: \`router.sentinelai.studio\` (Port 20128)\n- Same-origin authentication cookies verified.\n- Dual-origin allowlist active (Tunnel + LAN \`192.168.68.132\`).`,
+      reply: `🛡️ **Cloudflare Tunnel & Ingress Shield Status**\n\n- Public Ingress: \`hub.sentinelai.studio\` (TLS 1.3 enforced)\n- AI Gateway Ingress: \`router.sentinelai.studio\` (Port 20128)\n- Same-origin authentication cookies verified.\n- Dual-origin allowlist active (Tunnel + LAN \`192.168.68.132\`).`,
       action: { command: 'barrier_check', result: 'secure' },
-      model: 'frieren-barrier',
+      model: 'sentinel-ingress-sensor',
     };
   }
 
@@ -135,9 +127,7 @@ export async function POST(request: NextRequest) {
 
     // Choose base system prompt according to persona
     let dynamicSystemPrompt =
-      persona === 'frieren'
-        ? FRIEREN_SYSTEM_PROMPT
-        : persona === 'sentinel'
+      persona === 'sentinel'
         ? SENTINEL_SYSTEM_PROMPT
         : HERMES_SYSTEM_PROMPT;
 
