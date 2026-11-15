@@ -1,71 +1,55 @@
-# 🚀 INI KALI LA — Workspace Hub
+# SENTINEL WORKSPACE — INFRASTRUCTURE & ACCESS
 
-> Organized master workspace containing all projects, frontends, backends, databases, and microservices.
+## 1. Remote Connectivity & Cloudflare Tunnel
+> **IMPORTANT:** Direct IP access to `192.168.68.132` is **DEPRECATED / OFFLINE**.
+> All remote access to the Kali server and Sentinel services is routed exclusively through **Cloudflare Tunnel** (`*.sentinelai.studio`).
 
----
+### 1.1 SSH Access via Cloudflare Tunnel
+To connect to the Kali Linux host from Windows or any remote client:
 
-## 📂 Directory Layout
+**Method A: Local TCP Proxy (Recommended for Tools & Paramiko)**
+```bash
+# Start background tunnel forwarder on local port 2222:
+cloudflared access tcp --hostname ssh.sentinelai.studio --url 127.0.0.1:2222
 
-```text
-F:\INI KALI LA\
-├── 📁 projects/                # All standalone project workspaces
-│   ├── 📁 FYP2PROJECT/         # SentinelAI FYP2 Main Repository (AI Pentest Platform)
-│   ├── 📁 Sentinel-CyberMaster/# Autonomous Cyber Defense & Automation
-│   ├── 📁 Sentinel-CTF/        # Capture-The-Flag Challenges & Solver Platform
-│   ├── 📁 SentinelAlong/       # 2D/3D Floorplan & Architectural Sketcher (Port 8028)
-│   ├── 📁 SentinelArcuz100/    # Arcuz 100-Floor RPG Server & Client (Port 8029)
-│   ├── 📁 SentinelConvert/     # Universal Data Converter Engine
-│   ├── 📁 SentinelFame/        # Fame Operations & Traffic Management Engine
-│   ├── 📁 SentinelMLBB/        # MLBB Analytics & Bot Automation (Port 3005)
-│   └── 📁 Sentineltree/        # Family Tree Visualization & Cloudflare Pages
-│
-├── 📁 frontend/                # Web Dashboards & User Interfaces
-│   ├── 📁 SentinelMaster/      # Unified Command Hub (Next.js 16, Port 3000)
-│   └── 📁 SentinelAI/          # FYP2 Cyber Threat Dashboard (Vite + React, Port 5173)
-│
-├── 📁 backend/                 # API Engines & Application Servers
-│   ├── 📁 SentinelAI/          # Python/Node.js Security Pipeline (Port 5000)
-│   └── 📁 SentinelAPI/         # Express API & Token Gateway (Port 3010)
-│
-├── 📁 database/                # SQLite Databases & Automated Backups
-│   ├── fyp2.db                 # Authoritative FYP2 Database
-│   └── 📁 backups/             # Daily rolling snapshots
-│
-├── 📁 docker/                  # Container Definitions & Orchestration
-│   ├── Dockerfile              # Kali Linux Environment Image
-│   └── docker-compose.yml      # Service Compose Stack
-│
-├── 📁 docs/                    # Architecture Guides & Port Allocation
-│
-├── 📁 scripts/                 # Server Launchers, Docker Controls & Scripts
-│   ├── START_LOCAL_WINDOWS.bat # Run local services natively on Windows
-│   ├── START_KALI_DOCKER.bat   # Start Kali Linux Docker Container
-│   └── INSTALL_DOCKER.bat      # Docker Desktop Installer Helper
-│
-├── 📁 sentinel-hub/            # Master symlink to F:\Sentinel Hub
-├── 📄 LAUNCH_ANTIGRAVITY_CHAT.bat # One-click launch for Antigravity AI Chat UI
-└── 📄 README.md                # This documentation file
+# Connect via standard SSH:
+ssh -p 2222 kali@127.0.0.1
 ```
 
----
-
-## 🌐 Network & Port Ownership
-
-| Port | Service | Tech Stack | Status / Route |
-| :--- | :--- | :--- | :--- |
-| **3000** | `SentinelMaster` | Next.js 16 (React 19) | `hub.sentinelai.studio` / `localhost:3000` |
-| **3005** | `SentinelMLBB` | Next.js App | Local MLBB Assistant |
-| **3010** | `SentinelAPI` | Node.js Express | API Gateway |
-| **5000** | `SentinelAI Backend` | Node.js / Python | Core FYP2 Engine |
-| **5173** | `SentinelAI Frontend`| Vite + React | `sentinelai.studio` |
-| **8028** | `SentinelAlong` | HTML5 / Canvas | Floorplan Tool |
-| **8029** | `SentinelArcuz100` | Node.js Game Server | Flash / WebSocket |
-| **20128**| `Sentinel Router` | OmniRoute (Docker) | `router.sentinelai.studio` / Port 20128 |
+**Method B: OpenSSH ProxyCommand (`~/.ssh/config`)**
+```ssh-config
+Host kali-tunnel
+    HostName ssh.sentinelai.studio
+    User kali
+    ProxyCommand cloudflared access ssh --hostname %h
+```
+Then run: `ssh kali-tunnel`.
 
 ---
 
-## ⚡ Quick Start
+## 2. Public Services Directory
 
-- **Launch Antigravity Chat:** Double-click `LAUNCH_ANTIGRAVITY_CHAT.bat`
-- **Launch Sentinel Master Hub:** Run `cd frontend\SentinelMaster && npm run dev`
-- **Start All Local Services:** Run `scripts\START_LOCAL_WINDOWS.bat`
+| Service | Public URL | Internal Port | Supervisor |
+|---|---|---|---|
+| **Sentinel Hub** | `https://hub.sentinelai.studio` | 3000 | PM2 (`sentinel-master`) |
+| **Sentinel Router (OmniRoute)** | `https://router.sentinelai.studio` | 20128 | Docker (`9router`) |
+| **Sentinel API** | `https://api.sentinelai.studio` | 3010 | PM2 (`sentinel-api`) |
+| **Sentinel Frontend** | `https://app.sentinelai.studio` | 5173 | PM2 (`sentinel-frontend`) |
+| **SSH Tunnel** | `ssh.sentinelai.studio` | 22 | systemd (`sshd`) via cloudflared |
+
+---
+
+## 3. Sentinel Router (OmniRoute) Maintenance Notes
+
+### 3.1 Header Name Safety Rule (Critical)
+* Never introduce spaces into HTTP header names during rebranding scripts.
+* The header `X-Sentinel-Route-No-Cache` must remain strictly hyphenated (`-`), not spaced (`X-Sentinel Route-`), or the browser's `Headers.append()` will throw:
+  `TypeError: Headers.append: "X-Sentinel Route-No-Cache" is an invalid header name.`
+* Status: **FIXED & VERIFIED** on live container `9router` (image: `sentinel-proxy:omniroute-3.8.50-pwfix`).
+
+### 3.2 Uncensored / OpenAI-Compatible Models
+* Node: `Uncensored AI (Pollinations)` (`openai-compatible-chat-f19e79bf-f569-4fb4-b157-9104463745d3`)
+* Base URL: `https://text.pollinations.ai/openai/v1`
+* Active Working Free Models:
+  * `uncensored/openai-fast` (GPT-OSS 20B reasoning, unrestricted) — **200 OK Verified**
+  * `uncensored/openai` (GPT-OSS 20B standard) — **200 OK Verified**

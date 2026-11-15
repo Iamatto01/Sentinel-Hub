@@ -1,8 +1,8 @@
 @echo off
-title Antigravity AI Console - INI KALI LA
+title Antigravity AI Console - Sentinel Hub
 echo ========================================================
 echo   ANTIGRAVITY AI CONSOLE
-echo   Project: INI KALI LA
+echo   Project: Sentinel Hub
 echo   Connected to: Sentinel Router / Local AI Gateway
 echo ========================================================
 echo.
@@ -12,3 +12,4 @@ echo.
 echo Antigravity AI Console launched successfully!
 timeout /t 3 >nul
 exit
+
