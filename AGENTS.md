@@ -15,7 +15,7 @@ rules; it may never remove one from this file.
 > corruption with a scheduler.*
 
 **PM2 owns:** `3000` hub (`sentinel-master`) · `5000` sentinel-backend · `3010` sentinel-api ·
-`5173` sentinel-frontend · `3005` sentinel-mlbb · `8009` sentinel-threat · `8016` sentinel-web ·
+`5173` sentinel-frontend · `3005` sentinel-mlbb · `8007` sentinel-tree · `8009` sentinel-threat · `8016` sentinel-web ·
 `8028` sentinel-along · `8029` sentinel-arcuz
 
 **Docker owns:** `20128` — the OmniRoute container (`docker-proxy`). **Not a PM2 app.** Only

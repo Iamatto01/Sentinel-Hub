@@ -18,6 +18,7 @@ This document acts as the persistent, living memory across all AI agent sessions
 | **5173** | SentinelAI Frontend | **PM2** (`sentinel-frontend`) | Vite build |
 | **3010** | SentinelAPI | **PM2** (`sentinel-api`) | API endpoints |
 | **3005** | SentinelMLBB | **PM2** (`sentinel-mlbb`) | MLBB bot service |
+| **8007** | SentinelTree | **PM2** (`sentinel-tree`) | Family tree web app (`tree.sentinelai.studio`) |
 | **8009** | SentinelThreat | **PM2** (`sentinel-threat`) | Threat detection |
 | **8016** | SentinelWeb | **PM2** (`sentinel-web`) | Web crawler/dashboard |
 | **8028** | SentinelAlong | **PM2** (`sentinel-along`) | Floorplan & Room Sketcher (`along.sentinelai.studio`) |

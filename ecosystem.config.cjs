@@ -29,6 +29,7 @@
  *   3010  sentinel-api         SentinelAPI          (.env, restated here)
  *   5000  sentinel-backend     SentinelAI backend   (.env, restated here)
  *   5173  sentinel-frontend    vite preview         (hardcoded in package.json)
+ *   8007  sentinel-tree        static file server   (CLI flag)
  *   8009  sentinel-threat      static file server   (CLI flag)
  *   8016  sentinel-web         SentinelWeb          (declared here — no other source)
  *   8029  sentinel-arcuz       game server          (code default)
@@ -217,6 +218,25 @@ module.exports = {
       args: [
         '-c',
         'python3 -m http.server 8009 --directory /home/kali/server/SentinelThreat',
+      ],
+      cwd: '/home/kali',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '256M',
+    },
+
+    // ---------------------------------------------------------------------
+    // SentinelTree — interactive family tree web application.
+    // Serves tree.sentinelai.studio on port 8007.
+    // ---------------------------------------------------------------------
+    {
+      name: 'sentinel-tree',
+      script: '/usr/bin/bash',
+      args: [
+        '-c',
+        'python3 -m http.server 8007 --directory /home/kali/server/Sentineltree',
       ],
       cwd: '/home/kali',
       instances: 1,
