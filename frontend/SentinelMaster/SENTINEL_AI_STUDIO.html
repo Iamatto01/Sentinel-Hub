@@ -1311,7 +1311,7 @@
               <!-- Model Selector Dropdown -->
               <div class="dropdown-container">
                 <button class="tool-btn" id="btnModelPicker">
-                  <span id="labelActiveModel">Model: Gemini 3.8 Flash High</span>
+                  <span id="labelActiveModel">Model: kimi-web/k3</span>
                 </button>
                 <div class="dropdown-menu" id="dropdownModelMenu"></div>
               </div>
@@ -1499,12 +1499,13 @@
       { id: 'reasoning', name: 'Deep Reasoning', promptAddon: 'Think step-by-step. Break problems down methodically before giving the final answer.' }
     ];
 
-    // Supported Models
+    // Supported Models (Real Upstream Names)
     const MODELS = [
-      { id: 'sentinel-flagship', name: 'Gemini 3.8 Flash High', note: 'Fast & High IQ' },
-      { id: 'auto/best-coding', name: 'Sentinel Best Coding', note: 'Router Coding Agent' },
-      { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', note: 'Anthropic' },
-      { id: 'deepseek-r1', name: 'DeepSeek R1', note: 'Reasoning' },
+      { id: 'kimi-web/k3', name: 'kimi-web/k3', note: 'Moonshot AI • Long Context' },
+      { id: 'antigravity/claude-sonnet-4-6', name: 'claude-sonnet-4-6', note: 'Anthropic • Frontier Code' },
+      { id: 'antigravity/gemini-3-flash', name: 'gemini-3-flash', note: 'Google DeepMind • Ultra-Fast' },
+      { id: 'deepseek-web/expert', name: 'deepseek-web/expert', note: 'DeepSeek AI • Reasoning' },
+      { id: 'auto/best-fast', name: 'auto/best-fast', note: 'Sentinel OmniRoute • Auto Best' },
       { id: 'ollama-local', name: 'Local Ollama Model', note: 'Offline / Port 11434' },
       { id: 'builtin-offline', name: 'Built-in Offline Assistant', note: '100% Reliable Offline' }
     ];

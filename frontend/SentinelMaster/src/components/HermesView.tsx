@@ -55,6 +55,37 @@ export default function HermesView() {
   // Dashboard / Port Probe State
   const [probeStatus, setProbeStatus] = useState<{ loading: boolean; result: string | null }>({ loading: false, result: null });
 
+  // Load saved Telegram token or check server gateway status on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedToken = localStorage.getItem('hermes_tg_bot_token');
+      const savedInfo = localStorage.getItem('hermes_tg_bot_info');
+      if (savedToken) setTgToken(savedToken);
+      if (savedInfo) {
+        try {
+          setTgBotInfo(JSON.parse(savedInfo));
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    // Check server if bot is already live on Kali
+    fetch('/api/hermes/gateway')
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.data?.botConfigured) {
+          const username = json.data.botUsername || 'AttoMonkeytypeBot';
+          setTgBotInfo({
+            connected: true,
+            username,
+            firstName: 'HERMES ATTO',
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Auto-scroll chat to bottom
   useEffect(() => {
     if (chatScrollRef.current) {
@@ -182,28 +213,38 @@ export default function HermesView() {
 
   // Verify Telegram Bot Token
   const handleVerifyTelegram = async () => {
-    if (!tgToken) return;
+    const tokenToUse = tgToken.trim();
+    if (!tokenToUse) return;
     setTgConnecting(true);
 
     try {
       const res = await fetch('/api/hermes/gateway', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'verify_telegram', telegramToken: tgToken }),
+        body: JSON.stringify({ action: 'verify_telegram', telegramToken: tokenToUse }),
       });
       if (res.ok) {
         const json = await res.json();
-        setTgBotInfo({
+        const username = json.data?.username || 'AttoMonkeytypeBot';
+        const firstName = json.data?.firstName || 'HERMES ATTO';
+        const info = {
           connected: true,
-          username: json.data.username || '@Sentinel_Sales_Bot',
-          firstName: json.data.firstName || 'Sentinel Bot',
-        });
+          username,
+          firstName,
+        };
+        setTgBotInfo(info);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('hermes_tg_bot_token', tokenToUse);
+          localStorage.setItem('hermes_tg_bot_info', JSON.stringify(info));
+        }
       } else {
+        const errJson = await res.json().catch(() => ({}));
         setTgBotInfo(null);
-        alert('Format token bot tidak sah. Sila semak token dari @BotFather.');
+        alert(errJson.error || 'Format token bot tidak sah. Sila semak token dari @BotFather.');
       }
     } catch {
       setTgBotInfo(null);
+      alert('Ralat menyambungkan ke pelayan. Sila cuba lagi.');
     } finally {
       setTgConnecting(false);
     }
@@ -413,7 +454,7 @@ export default function HermesView() {
               fontSize: '0.85rem',
             }}
           >
-            💬 Konsol Ejen Interaktif
+            💬 Sembang Web Langsung (Konsol Ejen)
           </button>
 
           <button
@@ -1116,20 +1157,45 @@ export default function HermesView() {
                 {tgBotInfo && (
                   <div
                     style={{
-                      background: 'rgba(168, 85, 247, 0.1)',
-                      border: '1px solid rgba(168, 85, 247, 0.3)',
-                      borderRadius: '10px',
-                      padding: '14px',
+                      background: 'rgba(16, 185, 129, 0.12)',
+                      border: '1px solid rgba(16, 185, 129, 0.4)',
+                      borderRadius: '12px',
+                      padding: '16px',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#c084fc', fontWeight: 650, fontSize: '0.95rem' }}>
-                      <span>✓ Bot Telegram Berjaya Disambungkan!</span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 10px #10b981' }} />
+                        <span style={{ color: '#34d399', fontWeight: 700, fontSize: '0.95rem' }}>✓ Bot Telegram Sedang Aktif!</span>
+                      </div>
+                      <a
+                        href={`https://t.me/${tgBotInfo.username.replace('@', '')}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
+                          color: '#ffffff',
+                          padding: '6px 14px',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          textDecoration: 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
+                        }}
+                      >
+                        📱 Buka Chat di Telegram ↗
+                      </a>
                     </div>
-                    <div style={{ marginTop: '6px', fontSize: '0.82rem', color: '#e2e8f0' }}>
-                      Username: <b>{tgBotInfo.username}</b> &bull; Nama: <b>{tgBotInfo.firstName}</b>
+                    <div style={{ marginTop: '8px', fontSize: '0.82rem', color: '#e2e8f0' }}>
+                      Username: <b>@{tgBotInfo.username.replace('@', '')}</b> &bull; Nama: <b>{tgBotInfo.firstName}</b>
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
-                      Mod: Polling Web &amp; Webhook HTTPS bersedia menerima pesanan.
+                    <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '8px', lineHeight: 1.5, padding: '10px', background: 'rgba(0,0,0,0.35)', borderRadius: '8px' }}>
+                      💡 <b>Cara Berbual (Chat) Dengan Hermes:</b><br />
+                      • <b>Di Telegram:</b> Tekan butang biru <b>Buka Chat di Telegram</b> di atas, kemudian taip <code>hi</code>, <code>status</code>, atau apa-apa soalan. Bot akan terus reply serta-merta.<br />
+                      • <b>Di Laman Web Ini:</b> Anda juga boleh terus berbual di konsol sembang web di bawah tanpa perlu membuka Telegram!
                     </div>
                   </div>
                 )}
@@ -1231,6 +1297,170 @@ export default function HermesView() {
                 )}
               </div>
             </Card>
+
+            {/* FULL WIDTH INLINE WEB CHAT SECTION */}
+            <div
+              style={{
+                gridColumn: '1 / -1',
+                marginTop: '8px',
+                background: 'rgba(12, 14, 18, 0.95)',
+                borderRadius: '16px',
+                border: '1px solid rgba(168, 85, 247, 0.3)',
+                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.6)',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  padding: '12px 18px',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontWeight: 600, color: '#f8fafc', fontSize: '0.9rem' }}>💬 Sembang Langsung Bersama Hermes AI (Web Console)</span>
+                  <span style={{ fontSize: '0.75rem', color: '#c084fc' }}>&bull; Berbual terus dari pelayar tanpa perlu buka Telegram</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('console')}
+                  style={{
+                    background: 'rgba(168, 85, 247, 0.15)',
+                    border: '1px solid rgba(168, 85, 247, 0.3)',
+                    color: '#c084fc',
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                  }}
+                >
+                  Buka Konsol Penuh ↗
+                </button>
+              </div>
+
+              {/* RECENT MESSAGES */}
+              <div
+                style={{
+                  padding: '16px',
+                  maxHeight: '260px',
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}
+              >
+                {messages.slice(-6).map((m) => (
+                  <div
+                    key={m.id}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: m.sender === 'user' ? 'flex-end' : 'flex-start',
+                    }}
+                  >
+                    <div
+                      style={{
+                        maxWidth: '85%',
+                        padding: '8px 12px',
+                        borderRadius: m.sender === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                        background: m.sender === 'user' ? 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)' : 'rgba(255, 255, 255, 0.06)',
+                        border: m.sender === 'user' ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)',
+                        color: '#f8fafc',
+                        fontSize: '0.85rem',
+                        lineHeight: 1.4,
+                        whiteSpace: 'pre-line',
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {m.text}
+                    </div>
+                    <span style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>{m.timestamp}</span>
+                  </div>
+                ))}
+
+                {isSending && (
+                  <div style={{ color: '#c084fc', fontSize: '0.8rem', padding: '4px' }}>
+                    <span style={{ animation: 'pulse 1.5s infinite' }}>Hermes sedang memproses jawapan...</span>
+                  </div>
+                )}
+              </div>
+
+              {/* QUICK CHIP PROMPTS */}
+              <div style={{ padding: '6px 14px', background: 'rgba(0, 0, 0, 0.25)', borderTop: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', gap: '6px', overflowX: 'auto' }}>
+                {[
+                  'hi',
+                  'check status',
+                  'Jana Kod QR DuitNow RM50',
+                  'Semak servis pelayan Kali',
+                  'Bagaimana cara guna API?',
+                ].map((chip) => (
+                  <button
+                    key={chip}
+                    type="button"
+                    onClick={() => handleSendMessage(chip)}
+                    style={{
+                      padding: '3px 8px',
+                      background: 'rgba(255, 255, 255, 0.04)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '4px',
+                      color: '#cbd5e1',
+                      fontSize: '0.72rem',
+                      whiteSpace: 'nowrap',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+
+              {/* CHAT INPUT BAR */}
+              <div style={{ padding: '12px 16px', background: 'rgba(0, 0, 0, 0.35)', borderTop: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  placeholder="Taip mesej kepada Hermes AI di sini (cth: hi, semak status server, dll)..."
+                  style={{
+                    flex: 1,
+                    background: '#09090b',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    color: '#ffffff',
+                    fontSize: '0.85rem',
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleSendMessage()}
+                  disabled={!inputValue.trim() || isSending}
+                  style={{
+                    background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0 16px',
+                    color: '#ffffff',
+                    fontWeight: 600,
+                    cursor: inputValue.trim() ? 'pointer' : 'default',
+                    opacity: inputValue.trim() ? 1 : 0.6,
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  Hantar
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

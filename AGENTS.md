@@ -315,7 +315,7 @@ count of every shared table against the source. `backups/` holds 3 canonical fil
 ### 5.1 One way to build the gateway
 Recreate OmniRoute **only** via `/home/kali/server/9router/deploy-omnirouter.sh`.
 Never `docker run` it by hand — the environment and bind mounts are baked into that script.
-Image: `sentinel-proxy:omniroute-3.8.50-pwfix` (`182546e4d69a`).
+Image: `sentinel-proxy:omniroute-3.8.53-pwfix` (rebuilt from upstream `3.8.53` + playwright deps aligned). Rollback target: `sentinel-proxy:omniroute-3.8.50-pwfix`.
 
 ### 5.2 Back up before mutating gateway state
 Before changing combos or providers:

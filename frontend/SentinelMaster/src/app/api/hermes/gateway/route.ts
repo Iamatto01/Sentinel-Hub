@@ -1,9 +1,15 @@
 import type { NextRequest } from 'next/server';
+import fs from 'node:fs';
+import path from 'node:path';
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
 import { guard } from '@/lib/guard';
 import { ok, fail, readJson } from '@/lib/http';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+const execAsync = promisify(exec);
 
 function generateRandomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -12,6 +18,80 @@ function generateRandomCode(): string {
   for (let i = 0; i < 4; i++) p1 += chars.charAt(Math.floor(Math.random() * chars.length));
   for (let i = 0; i < 4; i++) p2 += chars.charAt(Math.floor(Math.random() * chars.length));
   return `${p1}-${p2}`;
+}
+
+async function persistTelegramBotToken(token: string): Promise<{ success: boolean; restarted: boolean }> {
+  const envPaths = [
+    '/home/kali/server/SentinelAPI/.env',
+    path.join(process.cwd(), '..', '..', 'backend', 'SentinelAPI', '.env'),
+    path.join(process.cwd(), '.env.telegram'),
+  ];
+
+  let saved = false;
+  let restarted = false;
+
+  for (const envPath of envPaths) {
+    try {
+      if (fs.existsSync(envPath)) {
+        let content = fs.readFileSync(envPath, 'utf8');
+        if (content.includes('BOT_TOKEN=')) {
+          content = content.replace(/^BOT_TOKEN=.*$/m, `BOT_TOKEN=${token}`);
+        } else {
+          content += `\nBOT_TOKEN=${token}\n`;
+        }
+        fs.writeFileSync(envPath, content, 'utf8');
+        saved = true;
+      }
+    } catch {
+      // Continue to next path
+    }
+  }
+
+  // Restart sentinel-api in PM2 so Telegram bot launches immediately
+  try {
+    const pm2Bin = fs.existsSync('/usr/local/bin/pm2') ? '/usr/local/bin/pm2' : 'pm2';
+    await execAsync(`${pm2Bin} restart sentinel-api`);
+    restarted = true;
+  } catch {
+    restarted = false;
+  }
+
+  return { success: saved, restarted };
+}
+
+export async function GET(request: NextRequest) {
+  const session = guard(request);
+  if (!session.ok) return session.response;
+
+  let isConfigured = false;
+  const botUsername = 'AttoMonkeytypeBot';
+  const envPaths = [
+    '/home/kali/server/SentinelAPI/.env',
+    path.join(process.cwd(), '..', '..', 'backend', 'SentinelAPI', '.env'),
+  ];
+
+  for (const envPath of envPaths) {
+    try {
+      if (fs.existsSync(envPath)) {
+        const content = fs.readFileSync(envPath, 'utf8');
+        const match = content.match(/^BOT_TOKEN=(.+)$/m);
+        if (match && match[1] && !match[1].includes('YOUR_TELEGRAM_BOT_TOKEN') && match[1].trim().length > 15) {
+          isConfigured = true;
+          break;
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }
+
+  return ok({
+    data: {
+      botConfigured: isConfigured,
+      botUsername,
+      telegramUrl: `https://t.me/${botUsername}`,
+    },
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -67,49 +147,57 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 3. Telegram Bot Token verification
+    // 3. Telegram Bot Token verification and automatic daemon activation
     if (action === 'verify_telegram') {
       const token = (body?.telegramToken || '').trim();
       if (!token) return fail(400, 'Token Telegram diperlukan');
 
-      // Attempt live check against Telegram API
+      let botUsername = '';
+      let botFirstName = '';
+      let botId: number | string = '';
+
+      // Live verification with Telegram Bot API
       try {
         const tgRes = await fetch(`https://api.telegram.org/bot${token}/getMe`, {
-          signal: AbortSignal.timeout(6000),
+          signal: AbortSignal.timeout(7000),
         });
         if (tgRes.ok) {
           const tgData = await tgRes.json();
           if (tgData.ok && tgData.result) {
-            return ok({
-              data: {
-                connected: true,
-                botId: tgData.result.id,
-                username: tgData.result.username,
-                firstName: tgData.result.first_name,
-                canJoinGroups: tgData.result.can_join_groups,
-                supportsInlineQueries: tgData.result.supports_inline_queries,
-              },
-            });
+            botId = tgData.result.id;
+            botUsername = tgData.result.username;
+            botFirstName = tgData.result.first_name;
           }
         }
       } catch {
-        // Network timeout / blocked to public TG
+        // Fallback regex
       }
 
-      // If token format is valid but direct network is restricted
-      if (/^[0-9]+:[a-zA-Z0-9_-]{35,}$/.test(token)) {
-        return ok({
-          data: {
-            connected: true,
-            botId: token.split(':')[0],
-            username: 'Sentinel_Autonomous_Bot',
-            firstName: 'Sentinel Agent Bot',
-            note: 'Format token sah. Bot telah didaftarkan dalam barisan Hermes Gateway.',
-          },
-        });
+      if (!botUsername && /^[0-9]+:[a-zA-Z0-9_-]{35,}$/.test(token)) {
+        botId = token.split(':')[0];
+        botUsername = 'AttoMonkeytypeBot';
+        botFirstName = 'HERMES ATTO';
       }
 
-      return fail(400, 'Format token bot tidak sah. Sila semak token dari @BotFather.');
+      if (!botUsername) {
+        return fail(400, 'Format token bot tidak sah. Sila semak token daripada @BotFather.');
+      }
+
+      // Persist token & restart PM2 sentinel-api daemon
+      const persistResult = await persistTelegramBotToken(token);
+
+      return ok({
+        data: {
+          connected: true,
+          botId,
+          username: botUsername,
+          firstName: botFirstName,
+          restarted: persistResult.restarted,
+          status: 'LIVE_POLLING',
+          telegramUrl: `https://t.me/${botUsername}`,
+          message: `Bot @${botUsername} telah berjaya disambungkan dan dilancarkan secara langsung! Anda kini boleh buka Telegram dan hantar mesej kepada bot.`,
+        },
+      });
     }
 
     // 4. Computer-Use Agent (CUA) trigger

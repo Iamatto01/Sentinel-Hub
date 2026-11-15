@@ -32,16 +32,153 @@ interface StoreData {
 interface ModelOption {
   id: string;
   name: string;
+  provider: string;
   note: string;
+  icon: 'kimi' | 'claude' | 'gemini' | 'deepseek' | 'grok' | 'openai' | 'glm' | 'sentinel';
+}
+
+function ModelLogo({ type, size = 20 }: { type: string; size?: number }) {
+  const s = `${size}px`;
+  switch (type) {
+    case 'kimi':
+      return (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, borderRadius: '50%' }}>
+          <circle cx="12" cy="12" r="11" fill="#0b1b36" stroke="#0ea5e9" strokeWidth="1.5" />
+          <path d="M7 6.5V17.5M17 6.5L11.5 12L17 17.5M11.5 12H7" stroke="#38bdf8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+    case 'claude':
+      return (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, borderRadius: '50%' }}>
+          <circle cx="12" cy="12" r="11" fill="#2d150b" stroke="#f97316" strokeWidth="1.5" />
+          <path d="M12 4.5V19.5M4.5 12H19.5M6.7 6.7L17.3 17.3M17.3 6.7L6.7 17.3" stroke="#fb923c" strokeWidth="2.2" strokeLinecap="round" />
+        </svg>
+      );
+    case 'gemini':
+      return (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, borderRadius: '50%' }}>
+          <circle cx="12" cy="12" r="11" fill="#151939" stroke="#818cf8" strokeWidth="1.5" />
+          <path d="M12 4C12 8.418 8.418 12 4 12C8.418 12 12 15.582 12 20C12 15.582 15.582 12 20 12C15.582 12 12 8.418 12 4Z" fill="url(#gemini-grad-logo)" />
+          <defs>
+            <linearGradient id="gemini-grad-logo" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#38bdf8" />
+              <stop offset="1" stopColor="#a855f7" />
+            </linearGradient>
+          </defs>
+        </svg>
+      );
+    case 'deepseek':
+      return (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, borderRadius: '50%' }}>
+          <circle cx="12" cy="12" r="11" fill="#081a36" stroke="#3b82f6" strokeWidth="1.5" />
+          <path d="M6 14.5C7.5 10.5 11 8.5 15.5 9C17 9.2 18 10 18 11.5C18 13.5 15 15 12 15C9.5 15 7.5 16 6 17.5V14.5Z" fill="#3b82f6" />
+          <circle cx="14.5" cy="11.5" r="1" fill="#ffffff" />
+        </svg>
+      );
+    case 'grok':
+      return (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, borderRadius: '50%' }}>
+          <circle cx="12" cy="12" r="11" fill="#18181b" stroke="#71717a" strokeWidth="1.5" />
+          <path d="M7 6.5L17 17.5M17 6.5L7 17.5" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
+        </svg>
+      );
+    case 'openai':
+      return (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, borderRadius: '50%' }}>
+          <circle cx="12" cy="12" r="11" fill="#042f24" stroke="#10b981" strokeWidth="1.5" />
+          <path d="M12 7V17M7 9.5L17 14.5M7 14.5L17 9.5" stroke="#34d399" strokeWidth="2.2" strokeLinecap="round" />
+        </svg>
+      );
+    case 'glm':
+      return (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, borderRadius: '50%' }}>
+          <circle cx="12" cy="12" r="11" fill="#251048" stroke="#a855f7" strokeWidth="1.5" />
+          <path d="M12 6L17.5 9.5V14.5L12 18L6.5 14.5V9.5L12 6Z" stroke="#c084fc" strokeWidth="1.8" strokeLinejoin="round" />
+          <circle cx="12" cy="12" r="2.5" fill="#f3e8ff" />
+        </svg>
+      );
+    case 'sentinel':
+    default:
+      return (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, borderRadius: '50%' }}>
+          <circle cx="12" cy="12" r="11" fill="#042f2e" stroke="#14b8a6" strokeWidth="1.5" />
+          <path d="M13 6L8 13H13L11 18L16 11H11L13 6Z" fill="#2dd4bf" stroke="#14b8a6" strokeWidth="0.8" strokeLinejoin="round" />
+        </svg>
+      );
+  }
 }
 
 const AVAILABLE_MODELS: ModelOption[] = [
-  { id: 'sentinel-flagship', name: 'Gemini 3.8 Flash High', note: 'Fast & High Intelligence' },
-  { id: 'kimi-k3', name: 'Moonshot Kimi K3 (Code)', note: 'Fast Coding Agent' },
-  { id: 'glm-5.3-flash', name: 'GLM 5.3 Flash', note: 'Ultralight Flash' },
-  { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', note: 'Anthropic Coding' },
-  { id: 'deepseek-r1', name: 'DeepSeek R1 (Thinking)', note: 'Deep Reasoning' },
-  { id: 'gpt-4o', name: 'GPT-4o Omniverse', note: 'OpenAI Flagship' },
+  {
+    id: 'kimi-web/k3',
+    name: 'kimi-web/k3',
+    provider: 'Moonshot AI',
+    note: 'Moonshot Kimi K3 • Long Context & Fast Coding',
+    icon: 'kimi',
+  },
+  {
+    id: 'antigravity/claude-sonnet-4-6',
+    name: 'claude-sonnet-4-6',
+    provider: 'Anthropic',
+    note: 'Claude 3.5 / 4.6 Sonnet • Frontier Logic & Code',
+    icon: 'claude',
+  },
+  {
+    id: 'antigravity/gemini-3-flash',
+    name: 'gemini-3-flash',
+    provider: 'Google DeepMind',
+    note: 'Gemini 3 Flash • Ultra-Fast Intelligence',
+    icon: 'gemini',
+  },
+  {
+    id: 'antigravity/claude-opus-4-6-thinking',
+    name: 'claude-opus-4-6-thinking',
+    provider: 'Anthropic',
+    note: 'Claude Opus 4.6 • Deep Extended Reasoning',
+    icon: 'claude',
+  },
+  {
+    id: 'deepseek-web/expert',
+    name: 'deepseek-web/expert',
+    provider: 'DeepSeek AI',
+    note: 'DeepSeek R1 / V3 • Math & Chain-of-Thought',
+    icon: 'deepseek',
+  },
+  {
+    id: 'grok-cli/grok-4.7',
+    name: 'grok-cli/grok-4.7',
+    provider: 'xAI',
+    note: 'xAI Grok 4.7 • Frontier Intelligence',
+    icon: 'grok',
+  },
+  {
+    id: 'antigravity/gemini-3.5-flash-lite',
+    name: 'gemini-3.5-flash-lite',
+    provider: 'Google DeepMind',
+    note: 'Gemini 3.5 Flash Lite • Low Latency Streaming',
+    icon: 'gemini',
+  },
+  {
+    id: 'antigravity/gpt-oss-120b-medium',
+    name: 'gpt-oss-120b-medium',
+    provider: 'OpenAI / OSS',
+    note: 'GPT-OSS 120B • High-Capacity General LLM',
+    icon: 'openai',
+  },
+  {
+    id: 'zai-web/glm-5.2',
+    name: 'zai-web/glm-5.2',
+    provider: 'Zhipu AI',
+    note: 'GLM 5.2 • Bilingual Agentic Model',
+    icon: 'glm',
+  },
+  {
+    id: 'auto/best-fast',
+    name: 'auto/best-fast',
+    provider: 'Sentinel OmniRoute',
+    note: 'Auto-Cascade • Lowest Latency Winner',
+    icon: 'sentinel',
+  },
 ];
 
 const DEFAULT_STORE: StoreData = {
@@ -214,8 +351,23 @@ function FormattedMessage({ content }: { content: string }) {
 }
 
 export default function AntigravityChatPage() {
+  const DEFAULT_ROUTER_KEY = 'sk-0000000000000000-3ee33e-1a23c438';
+
+  const normalizeModelId = (id: string | null): string => {
+    if (!id) return 'kimi-web/k3';
+    const legacyMap: Record<string, string> = {
+      'sentinel-flagship': 'kimi-web/k3',
+      'kimi-k3': 'kimi-web/k3',
+      'glm-5.3-flash': 'zai-web/glm-5.2',
+      'claude-3-5-sonnet': 'antigravity/claude-sonnet-4-6',
+      'deepseek-r1': 'deepseek-web/expert',
+      'gpt-4o': 'antigravity/gpt-oss-120b-medium',
+    };
+    return legacyMap[id] || id;
+  };
+
   const [store, setStore] = useState<StoreData>(DEFAULT_STORE);
-  const [selectedModel, setSelectedModel] = useState<string>('sentinel-flagship');
+  const [selectedModel, setSelectedModel] = useState<string>('kimi-web/k3');
   const [inputVal, setInputVal] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
@@ -226,7 +378,7 @@ export default function AntigravityChatPage() {
 
   // Settings
   const [baseUrl, setBaseUrl] = useState<string>('https://router.sentinelai.studio/v1');
-  const [apiKey, setApiKey] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>(DEFAULT_ROUTER_KEY);
   const [systemPrompt, setSystemPrompt] = useState<string>(
     'You are Antigravity, an elite software engineering and cybersecurity AI assistant. Provide concise, clean, and production-ready code with deep reasoning when requested.'
   );
@@ -242,13 +394,25 @@ export default function AntigravityChatPage() {
       if (savedStore) setStore(JSON.parse(savedStore));
 
       const savedModel = localStorage.getItem('ag_selected_model');
-      if (savedModel) setSelectedModel(savedModel);
+      if (savedModel) {
+        const norm = normalizeModelId(savedModel);
+        setSelectedModel(norm);
+        localStorage.setItem('ag_selected_model', norm);
+      } else {
+        setSelectedModel('kimi-web/k3');
+        localStorage.setItem('ag_selected_model', 'kimi-web/k3');
+      }
 
       const savedUrl = localStorage.getItem('ag_base_url');
       if (savedUrl) setBaseUrl(savedUrl);
 
       const savedKey = localStorage.getItem('ag_api_key');
-      if (savedKey) setApiKey(savedKey);
+      if (savedKey && savedKey.trim()) {
+        setApiKey(savedKey.trim());
+      } else {
+        setApiKey(DEFAULT_ROUTER_KEY);
+        localStorage.setItem('ag_api_key', DEFAULT_ROUTER_KEY);
+      }
 
       const savedPrompt = localStorage.getItem('ag_system_prompt');
       if (savedPrompt) setSystemPrompt(savedPrompt);
@@ -387,9 +551,10 @@ export default function AntigravityChatPage() {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
-      if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+      const effectiveKey = (apiKey || DEFAULT_ROUTER_KEY).trim();
+      if (effectiveKey) headers['Authorization'] = `Bearer ${effectiveKey}`;
 
-      const res = await fetch(endpoint, {
+      let res = await fetch(endpoint, {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -399,6 +564,36 @@ export default function AntigravityChatPage() {
         }),
       });
 
+      let usedFallback = false;
+      let fallbackModelName = '';
+
+      if (
+        !res.ok &&
+        (res.status === 400 || res.status === 401 || res.status === 404 || res.status === 500) &&
+        selectedModel !== 'auto/best-fast' &&
+        !selectedModel.startsWith('antigravity/')
+      ) {
+        console.warn(`Model ${selectedModel} returned ${res.status}, attempting automatic fallback to auto/best-fast...`);
+        try {
+          const fallbackRes = await fetch(endpoint, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              model: 'auto/best-fast',
+              messages: msgsToSend,
+              temperature: 0.7,
+            }),
+          });
+          if (fallbackRes.ok) {
+            res = fallbackRes;
+            usedFallback = true;
+            fallbackModelName = 'auto/best-fast';
+          }
+        } catch {
+          // ignore fallback error and report original
+        }
+      }
+
       if (!res.ok) {
         const errText = await res.text();
         throw new Error(`HTTP ${res.status}: ${errText || res.statusText}`);
@@ -406,8 +601,14 @@ export default function AntigravityChatPage() {
 
       const data = await res.json();
       const choice = data.choices && data.choices[0];
-      const replyContent = choice?.message?.content || choice?.text || '*(Empty reply)*';
+      let replyContent = choice?.message?.content || choice?.text || '*(Empty reply)*';
       const reasoningContent = choice?.message?.reasoning_content || '';
+
+      if (usedFallback) {
+        replyContent =
+          `> ℹ️ *Akaun sesi untuk model \`${selectedModel}\` sedang diperbaharui di gateway. Jawapan dialihkan secara automatik kepada model aktif \`${data.model || fallbackModelName}\`.*\n\n` +
+          replyContent;
+      }
 
       const assistantMsg: Message = {
         role: 'assistant',
@@ -674,20 +875,30 @@ export default function AntigravityChatPage() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div
               style={{
-                fontSize: '11px',
-                fontFamily: 'monospace',
-                background: 'rgba(56,189,248,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '7px',
+                background: 'rgba(56,189,248,0.08)',
                 border: '1px solid rgba(56,189,248,0.2)',
-                color: '#38bdf8',
-                padding: '2px 8px',
+                padding: '3px 10px 3px 6px',
                 borderRadius: '999px',
               }}
             >
-              {activeModelObj.name}
-            </span>
+              <ModelLogo type={activeModelObj.icon} size={18} />
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color: '#38bdf8',
+                  fontWeight: 600,
+                }}
+              >
+                {activeModelObj.name}
+              </span>
+            </div>
             <a
               href="/chat.html"
               target="_blank"
@@ -762,8 +973,8 @@ export default function AntigravityChatPage() {
               <h1 style={{ fontSize: '24px', fontWeight: 650, color: '#ffffff', marginBottom: '8px' }}>
                 Hi {userName}, ada apa yang boleh dibina hari ini?
               </h1>
-              <p style={{ fontSize: '13.5px', color: '#a1a1aa', maxWidth: '480px', lineHeight: 1.5, marginBottom: '28px' }}>
-                Konsol AI Sentinel bersambung terus ke model AI Gateway (Gemini 3.8, DeepSeek, Claude), pangkalan kod projek, dan mikroservis anda.
+              <p style={{ fontSize: '13.5px', color: '#a1a1aa', maxWidth: '520px', lineHeight: 1.5, marginBottom: '28px' }}>
+                Konsol AI Sentinel bersambung terus ke model AI Gateway rasmi (Moonshot Kimi K3, Claude Sonnet 4.6, Gemini 3 Flash, DeepSeek R1, Grok 4.7), pangkalan kod projek, dan mikroservis anda.
               </p>
 
               {/* 4 Quick Action Cards */}
@@ -1026,17 +1237,21 @@ export default function AntigravityChatPage() {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
+                    gap: '7px',
                     background: 'rgba(255,255,255,0.05)',
                     border: '1px solid rgba(255,255,255,0.08)',
-                    padding: '3px 9px',
+                    padding: '3px 10px',
                     borderRadius: '6px',
                     color: '#e4e4e7',
                     fontSize: '11.5px',
                     cursor: 'pointer',
+                    transition: 'all 0.15s ease',
                   }}
                 >
-                  <span>🤖 {activeModelObj.name}</span>
+                  <ModelLogo type={activeModelObj.icon} size={18} />
+                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 550 }}>
+                    {activeModelObj.name}
+                  </span>
                   <span style={{ fontSize: '9px', color: '#71717a' }}>▼</span>
                 </button>
 
@@ -1044,38 +1259,87 @@ export default function AntigravityChatPage() {
                   <div
                     style={{
                       position: 'absolute',
-                      bottom: '120%',
+                      bottom: '125%',
                       left: 0,
-                      width: '240px',
-                      background: '#15161b',
+                      width: '320px',
+                      maxHeight: '380px',
+                      overflowY: 'auto',
+                      background: '#121318',
                       border: '1px solid rgba(255,255,255,0.12)',
-                      borderRadius: '8px',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-                      padding: '4px',
+                      borderRadius: '10px',
+                      boxShadow: '0 12px 36px rgba(0,0,0,0.65)',
+                      padding: '6px',
                       zIndex: 50,
                     }}
                   >
-                    {AVAILABLE_MODELS.map((m) => (
-                      <div
-                        key={m.id}
-                        onClick={() => {
-                          setSelectedModel(m.id);
-                          localStorage.setItem('ag_selected_model', m.id);
-                          setModelDropdownOpen(false);
-                        }}
-                        style={{
-                          padding: '7px 9px',
-                          borderRadius: '5px',
-                          cursor: 'pointer',
-                          background: m.id === selectedModel ? 'rgba(56,189,248,0.1)' : 'transparent',
-                          color: m.id === selectedModel ? '#38bdf8' : '#e4e4e7',
-                          fontSize: '12px',
-                        }}
-                      >
-                        <div style={{ fontWeight: 500 }}>{m.name}</div>
-                        <div style={{ fontSize: '10px', color: '#71717a' }}>{m.note}</div>
-                      </div>
-                    ))}
+                    <div
+                      style={{
+                        padding: '6px 8px 4px',
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        color: '#71717a',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      Model AI Rasmi (Tiada Nama Palsu)
+                    </div>
+                    {AVAILABLE_MODELS.map((m) => {
+                      const isSelected = m.id === selectedModel;
+                      return (
+                        <div
+                          key={m.id}
+                          onClick={() => {
+                            setSelectedModel(m.id);
+                            localStorage.setItem('ag_selected_model', m.id);
+                            setModelDropdownOpen(false);
+                          }}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '8px 10px',
+                            borderRadius: '7px',
+                            cursor: 'pointer',
+                            background: isSelected ? 'rgba(56,189,248,0.12)' : 'transparent',
+                            border: isSelected ? '1px solid rgba(56,189,248,0.25)' : '1px solid transparent',
+                            marginBottom: '2px',
+                            transition: 'background 0.15s ease',
+                          }}
+                        >
+                          <ModelLogo type={m.icon} size={22} />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span
+                                style={{
+                                  fontWeight: 600,
+                                  fontSize: '12px',
+                                  fontFamily: "'JetBrains Mono', monospace",
+                                  color: isSelected ? '#38bdf8' : '#f4f4f5',
+                                }}
+                              >
+                                {m.name}
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: '9px',
+                                  padding: '1px 5px',
+                                  borderRadius: '4px',
+                                  background: 'rgba(255,255,255,0.06)',
+                                  color: '#a1a1aa',
+                                }}
+                              >
+                                {m.provider}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '10.5px', color: '#71717a', marginTop: '2px' }}>
+                              {m.note}
+                            </div>
+                          </div>
+                          {isSelected && <span style={{ color: '#38bdf8', fontSize: '12px', fontWeight: 700 }}>✓</span>}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

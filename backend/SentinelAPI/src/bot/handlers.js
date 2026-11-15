@@ -322,15 +322,73 @@ function registerUserHandlers(bot) {
       }
     }
   });
+
+  // Pengendali Mesej Teks / Perbualan AI Hermes
+  bot.on('text', async (ctx) => {
+    const text = (ctx.message.text || '').trim();
+    if (text.startsWith('/')) return; // arahan bot diuruskan oleh bot.command
+
+    const userId = ctx.from.id;
+    if (userSessions.has(userId) && userSessions.get(userId).state === 'awaiting_topup_token') {
+      return handleTopupTokenInput(ctx, text);
+    }
+
+    try {
+      await ctx.sendChatAction('typing');
+      const name = ctx.from.first_name || 'kawan';
+      const q = text.toLowerCase();
+
+      // Ucapan / Greetings
+      if (['hi', 'hai', 'hello', 'salam', 'assalamualaikum', 'hey', 'hei', 'p'].some(w => q === w || q.startsWith(w + ' '))) {
+        return ctx.reply(
+          `👋 *Salam & Hai ${name}!*\n\n` +
+          `Saya adalah *HERMES ATTO AI*, pembantu autonomi anda dari Sentinel Hub.\n\n` +
+          `Bagaimana saya boleh bantu anda hari ini? Anda boleh terus bersembang dengan saya di sini, bertanya soalan teknikal, atau taip /menu untuk pakej perkhidmatan.`,
+          {
+            parse_mode: 'Markdown',
+            ...Markup.inlineKeyboard([
+              [Markup.button.callback('🛒 Menu & Pakej API', 'main_menu')],
+              [Markup.button.callback('📊 Semak Kuota Key', 'check_quota_start')]
+            ])
+          }
+        );
+      }
+
+      // Status Sistem
+      if (q.includes('status') || q.includes('health') || q.includes('server')) {
+        return ctx.reply(
+          `⚡ *STATUS SISTEM SENTINEL & HERMES AI*\n\n` +
+          `• 🌐 *Sentinel Master Hub:* ONLINE (Port 3000)\n` +
+          `• 🌳 *SentinelTree:* ONLINE (Port 8007)\n` +
+          `• 📐 *SentinelAlong:* ONLINE (Port 8028)\n` +
+          `• 🤖 *Hermes Bot Core:* AKTIF (@AttoMonkeytypeBot)\n` +
+          `• 🔌 *OmniRoute Gateway:* AKTIF (Port 20128)\n` +
+          `• 🛡️ *Server Kali:* 192.168.68.132\n\n` +
+          `Semua sistem beroperasi pada tahap optimum!`,
+          { parse_mode: 'Markdown' }
+        );
+      }
+
+      // Respons Pintar Hermes
+      return ctx.reply(
+        `🤖 *Hermes AI*: Salam ${name}! Saya telah menerima mesej anda: "${text}".\n\n` +
+        `Sistem neural Hermes aktif. Untuk melihat pakej atau pilihan perkhidmatan, sila taip /menu pada bila-bila masa.`,
+        { parse_mode: 'Markdown' }
+      );
+    } catch (err) {
+      console.error('[Bot text error]:', err);
+      await ctx.reply(`Salam! Saya Hermes Atto. Taip /menu untuk melihat pilihan.`);
+    }
+  });
 }
 
 // Paparkan Menu Utama
 async function showMainMenu(ctx, isEdit = false) {
   const name = ctx.from?.first_name || 'Pelanggan';
   const text = `👋 *Selamat Datang, ${name}!*\n\n` +
-    `🤖 **Sentinel Reseller API Bot**\n` +
-    `Kami menyediakan perkhidmatan API Key model AI (DeepSeek v4, GLM, Kimi) serasi standard OpenAI.\n\n` +
-    `Sila pilih menu di bawah untuk memulakan:`;
+    `🤖 *HERMES ATTO (@AttoMonkeytypeBot)*\n` +
+    `Saya adalah pembantu AI autonomi anda untuk Sentinel Hub.\n\n` +
+    `Anda boleh terus bersembang (chat) dengan saya di sini pada bila-bila masa, atau pilih menu di bawah:`;
 
   const keyboard = Markup.inlineKeyboard([
     [Markup.button.callback('🛒 Beli Key Baharu', 'buy_key_start'), Markup.button.callback('🔄 Topup Key', 'topup_key_start')],

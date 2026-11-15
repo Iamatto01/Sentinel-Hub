@@ -34,7 +34,7 @@ This document acts as the persistent, living memory across all AI agent sessions
 ## 2. GATEWAY & DIRECT MODEL ROUTING
 
 **Base URL:** `https://router.sentinelai.studio/v1` (or local origin `http://kali:20128/v1`)  
-**Container:** `9router` (OmniRoute 3.8.50 on port `20128`)
+**Container:** `9router` (OmniRoute 3.8.53 on port `20128`)
 
 Active routing uses direct provider prefixes and custom aliases:
 * **Coding & Complex Logic:** `kiro/claude-sonnet-4.5` (or alias `claude-sonnet-4.5`), `kiro/claude-sonnet-4` (fast 3.2s)

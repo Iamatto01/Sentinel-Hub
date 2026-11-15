@@ -1284,7 +1284,7 @@
 
               <!-- Model Selector Pill -->
               <div class="model-pill" id="btnModelPicker" style="position:relative;">
-                <span id="activeModelLabel">Gemini 3.8 Flash High</span>
+                <span id="activeModelLabel">kimi-web/k3</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
 
                 <!-- Dropdown for Model Picker -->
@@ -1396,18 +1396,58 @@
       ]
     };
 
-    // Models supported via Sentinel Router
+    function getModelLogoSvg(type, size = 18) {
+      const s = size + 'px';
+      switch (type) {
+        case 'kimi':
+          return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;border-radius:50%"><circle cx="12" cy="12" r="11" fill="#0b1b36" stroke="#0ea5e9" stroke-width="1.5"/><path d="M7 6.5V17.5M17 6.5L11.5 12L17 17.5M11.5 12H7" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        case 'claude':
+          return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;border-radius:50%"><circle cx="12" cy="12" r="11" fill="#2d150b" stroke="#f97316" stroke-width="1.5"/><path d="M12 4.5V19.5M4.5 12H19.5M6.7 6.7L17.3 17.3M17.3 6.7L6.7 17.3" stroke="#fb923c" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+        case 'gemini':
+          return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;border-radius:50%"><circle cx="12" cy="12" r="11" fill="#151939" stroke="#818cf8" stroke-width="1.5"/><path d="M12 4C12 8.418 8.418 12 4 12C8.418 12 12 15.582 12 20C12 15.582 15.582 12 20 12C15.582 12 12 8.418 12 4Z" fill="#38bdf8"/></svg>`;
+        case 'deepseek':
+          return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;border-radius:50%"><circle cx="12" cy="12" r="11" fill="#081a36" stroke="#3b82f6" stroke-width="1.5"/><path d="M6 14.5C7.5 10.5 11 8.5 15.5 9C17 9.2 18 10 18 11.5C18 13.5 15 15 12 15C9.5 15 7.5 16 6 17.5V14.5Z" fill="#3b82f6"/><circle cx="14.5" cy="11.5" r="1" fill="#ffffff"/></svg>`;
+        case 'grok':
+          return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;border-radius:50%"><circle cx="12" cy="12" r="11" fill="#18181b" stroke="#71717a" stroke-width="1.5"/><path d="M7 6.5L17 17.5M17 6.5L7 17.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+        case 'openai':
+          return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;border-radius:50%"><circle cx="12" cy="12" r="11" fill="#042f24" stroke="#10b981" stroke-width="1.5"/><path d="M12 7V17M7 9.5L17 14.5M7 14.5L17 9.5" stroke="#34d399" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+        case 'glm':
+          return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;border-radius:50%"><circle cx="12" cy="12" r="11" fill="#251048" stroke="#a855f7" stroke-width="1.5"/><path d="M12 6L17.5 9.5V14.5L12 18L6.5 14.5V9.5L12 6Z" stroke="#c084fc" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.5" fill="#f3e8ff"/></svg>`;
+        case 'sentinel':
+        default:
+          return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;border-radius:50%"><circle cx="12" cy="12" r="11" fill="#042f2e" stroke="#14b8a6" stroke-width="1.5"/><path d="M13 6L8 13H13L11 18L16 11H11L13 6Z" fill="#2dd4bf" stroke="#14b8a6" stroke-width="0.8" stroke-linejoin="round"/></svg>`;
+      }
+    }
+
+    // Official Models supported via Sentinel Router (No fake/masquerading names)
     const AVAILABLE_MODELS = [
-      { id: 'sentinel-flagship', name: 'Gemini 3.8 Flash High', note: 'Fast & High Intelligence' },
-      { id: 'kimi-k3', name: 'Moonshot Kimi K3 (Code)', note: 'Fast Coding Agent' },
-      { id: 'glm-5.3-flash', name: 'GLM 5.3 Flash', note: 'Ultralight Flash' },
-      { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', note: 'Anthropic Coding' },
-      { id: 'deepseek-r1', name: 'DeepSeek R1 (Thinking)', note: 'Deep Reasoning' },
-      { id: 'gpt-4o', name: 'GPT-4o Omniverse', note: 'OpenAI Flagship' }
+      { id: 'kimi-web/k3', name: 'kimi-web/k3', provider: 'Moonshot AI', note: 'Kimi K3 • Long-Context & Fast Coding', icon: 'kimi' },
+      { id: 'antigravity/claude-sonnet-4-6', name: 'claude-sonnet-4-6', provider: 'Anthropic', note: 'Claude 3.5 / 4.6 Sonnet • Frontier Logic', icon: 'claude' },
+      { id: 'antigravity/gemini-3-flash', name: 'gemini-3-flash', provider: 'Google DeepMind', note: 'Gemini 3 Flash • Ultra-Fast Intelligence', icon: 'gemini' },
+      { id: 'antigravity/claude-opus-4-6-thinking', name: 'claude-opus-4-6-thinking', provider: 'Anthropic', note: 'Claude Opus 4.6 • Deep Extended Reasoning', icon: 'claude' },
+      { id: 'deepseek-web/expert', name: 'deepseek-web/expert', provider: 'DeepSeek AI', note: 'DeepSeek R1 / V3 • Math & Chain-of-Thought', icon: 'deepseek' },
+      { id: 'grok-cli/grok-4.7', name: 'grok-cli/grok-4.7', provider: 'xAI', note: 'xAI Grok 4.7 • Frontier Intelligence', icon: 'grok' },
+      { id: 'antigravity/gemini-3.5-flash-lite', name: 'gemini-3.5-flash-lite', provider: 'Google DeepMind', note: 'Gemini 3.5 Flash Lite • Low Latency Streaming', icon: 'gemini' },
+      { id: 'antigravity/gpt-oss-120b-medium', name: 'gpt-oss-120b-medium', provider: 'OpenAI / OSS', note: 'GPT-OSS 120B • High-Capacity Reasoning', icon: 'openai' },
+      { id: 'zai-web/glm-5.2', name: 'zai-web/glm-5.2', provider: 'Zhipu AI', note: 'GLM 5.2 • Bilingual Agentic Model', icon: 'glm' },
+      { id: 'auto/best-fast', name: 'auto/best-fast', provider: 'Sentinel OmniRoute', note: 'Auto-Router • Lowest Latency Winner', icon: 'sentinel' }
     ];
 
+    function normalizeModelId(id) {
+      if (!id) return 'kimi-web/k3';
+      const legacyMap = {
+        'sentinel-flagship': 'kimi-web/k3',
+        'kimi-k3': 'kimi-web/k3',
+        'glm-5.3-flash': 'zai-web/glm-5.2',
+        'claude-3-5-sonnet': 'antigravity/claude-sonnet-4-6',
+        'deepseek-r1': 'deepseek-web/expert',
+        'gpt-4o': 'antigravity/gpt-oss-120b-medium'
+      };
+      return legacyMap[id] || id;
+    }
+
     let store = JSON.parse(localStorage.getItem('antigravity_store') || JSON.stringify(DEFAULT_DATA));
-    let currentSelectedModel = localStorage.getItem('ag_selected_model') || 'sentinel-flagship';
+    let currentSelectedModel = normalizeModelId(localStorage.getItem('ag_selected_model') || 'kimi-web/k3');
 
     // DOM Elements
     const sidebar = document.getElementById('sidebar');
@@ -1780,17 +1820,41 @@
 
     btnSend.addEventListener('click', sendMessage);
 
+    function updateActiveModelDisplay() {
+      const activeObj = AVAILABLE_MODELS.find(m => m.id === currentSelectedModel) || AVAILABLE_MODELS[0];
+      if (activeModelLabel) {
+        activeModelLabel.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;">${getModelLogoSvg(activeObj.icon, 16)}<span>${activeObj.name}</span></span>`;
+      }
+    }
+
     // Model Selector Dropdown
     function renderModelPickerDropdown() {
       dropdownModelPicker.innerHTML = '';
+      const title = document.createElement('div');
+      title.style.cssText = 'padding: 4px 8px; font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;';
+      title.textContent = 'Model AI Rasmi (Tiada Nama Palsu)';
+      dropdownModelPicker.appendChild(title);
+
       AVAILABLE_MODELS.forEach(m => {
         const item = document.createElement('div');
-        item.className = `dropdown-item ${m.id === currentSelectedModel ? 'active' : ''}`;
-        item.innerHTML = `<span>${m.name}</span><span class="badge">${m.note}</span>`;
+        const isSelected = m.id === currentSelectedModel;
+        item.className = `dropdown-item ${isSelected ? 'active' : ''}`;
+        item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;';
+        item.innerHTML = `
+          ${getModelLogoSvg(m.icon, 20)}
+          <div style="flex:1;min-width:0;text-align:left;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-weight:600;font-family:var(--font-mono);font-size:12px;color:${isSelected ? 'var(--accent)' : 'var(--text-main)'};">${m.name}</span>
+              <span style="font-size:9.5px;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--text-muted);">${m.provider}</span>
+            </div>
+            <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;">${m.note}</div>
+          </div>
+          ${isSelected ? '<span style="color:var(--accent);font-weight:bold;">✓</span>' : ''}
+        `;
         item.addEventListener('click', (e) => {
           e.stopPropagation();
           currentSelectedModel = m.id;
-          activeModelLabel.textContent = m.name;
+          updateActiveModelDisplay();
           localStorage.setItem('ag_selected_model', m.id);
           dropdownModelPicker.style.display = 'none';
         });
@@ -1876,6 +1940,7 @@
     // Initial render
     renderProjectsTree();
     renderModelPickerDropdown();
+    updateActiveModelDisplay();
 
     // Check if initial chat was selected
     if (store.activeChatId) {
