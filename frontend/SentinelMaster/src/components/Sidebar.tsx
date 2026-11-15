@@ -37,6 +37,7 @@ interface NavLink {
 
 const CORE_APPS: NavLink[] = [
   { href: '/', label: 'Dashboard' },
+  { href: '/frieren', label: 'Frieren AIOS Copilot' },
   { href: '/chat', label: 'Antigravity Chat' },
   { href: '/router', label: 'Sentinel AI Gateway' },
   { href: '/sentinelai', label: 'SentinelAI Platform' },
@@ -170,6 +171,11 @@ export default function Sidebar() {
             aria-current={isActive(pathname, link.href) ? 'page' : undefined}
           >
             <span style={{ flex: 1 }}>{link.label}</span>
+            {link.href === '/frieren' && (
+              <span className="nav-count" style={{ background: 'rgba(167, 139, 250, 0.2)', color: '#c4b5fd', borderColor: 'rgba(167, 139, 250, 0.35)' }}>
+                AIOS
+              </span>
+            )}
             {link.href === '/router' && (
               <span className="nav-count" style={{ background: 'var(--panel-3)', color: 'var(--text)', borderColor: 'var(--line)' }}>
                 Free AI

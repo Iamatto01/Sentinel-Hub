@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="gemini-bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1e1035"/>
+      <stop offset="60%" stop-color="#0e071c"/>
+      <stop offset="100%" stop-color="#05020a"/>
+    </radialGradient>
+    <linearGradient id="gemini-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1ba0e2"/>
+      <stop offset="35%" stop-color="#9b72cb"/>
+      <stop offset="70%" stop-color="#d96570"/>
+      <stop offset="100%" stop-color="#f49c46"/>
+    </linearGradient>
+    <filter id="glow-gemini" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <rect width="400" height="400" fill="url(#gemini-bg)"/>
+  <!-- Ambient Sparkles -->
+  <circle cx="90" cy="110" r="2" fill="#fff" opacity="0.6"/>
+  <circle cx="310" cy="90" r="3" fill="#9b72cb" opacity="0.7"/>
+  <circle cx="320" cy="290" r="2" fill="#1ba0e2" opacity="0.5"/>
+  <circle cx="80" cy="300" r="2.5" fill="#f49c46" opacity="0.5"/>
+  <!-- Central Glowing Ambient -->
+  <circle cx="200" cy="180" r="85" fill="#9b72cb" opacity="0.25" filter="url(#glow-gemini)"/>
+  <!-- Google Gemini 4-Point Star Core -->
+  <g transform="translate(200, 180) scale(1.1)" filter="url(#glow-gemini)">
+    <path fill="url(#gemini-grad)" d="M 0,-70 Q 0,0 70,0 Q 0,0 0,70 Q 0,0 -70,0 Q 0,0 0,-70 Z"/>
+    <circle cx="0" cy="0" r="14" fill="#ffffff" opacity="0.9"/>
+  </g>
+  <!-- Typography -->
+  <text x="200" y="315" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#ffffff" letter-spacing="3" text-anchor="middle">GEMINI AI</text>
+  <text x="200" y="340" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="500" fill="#38bdf8" letter-spacing="2" text-anchor="middle">LIVE INTELLIGENCE</text>
+  <circle cx="200" cy="360" r="3" fill="#9b72cb" opacity="0.8"/>
+</svg>

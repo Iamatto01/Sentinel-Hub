@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cube-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#71717a"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(50, 50) scale(0.75)">
+    <!-- Top Face -->
+    <polygon points="0,-42 38,-20 0,2 -38,-20" fill="#ffffff" opacity="0.9" stroke="#ffffff" stroke-width="2"/>
+    <!-- Left Face -->
+    <polygon points="-38,-20 0,2 0,44 -38,22" fill="#71717a" opacity="0.6" stroke="#ffffff" stroke-width="2"/>
+    <!-- Right Face -->
+    <polygon points="0,2 38,-20 38,22 0,44" fill="url(#cube-grad)" opacity="0.4" stroke="#ffffff" stroke-width="2"/>
+    <!-- Corner Nodes -->
+    <circle cx="0" cy="-42" r="3.5" fill="#ffffff"/>
+    <circle cx="38" cy="-20" r="3.5" fill="#ffffff"/>
+    <circle cx="-38" cy="-20" r="3.5" fill="#ffffff"/>
+    <circle cx="0" cy="2" r="4.5" fill="#ffffff"/>
+    <circle cx="-38" cy="22" r="3.5" fill="#ffffff"/>
+    <circle cx="38" cy="22" r="3.5" fill="#ffffff"/>
+    <circle cx="0" cy="44" r="3.5" fill="#ffffff"/>
+  </g>
+</svg>

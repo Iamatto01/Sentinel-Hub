@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="fold-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#71717a"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(15, 18) scale(0.7)">
+    <!-- Back Tab -->
+    <path d="M 6 15 L 36 15 L 48 26 L 94 26 Q 100 26 100 32 L 100 70 Q 100 76 94 76 L 6 76 Q 0 76 0 70 L 0 21 Q 0 15 6 15 Z" fill="#71717a" opacity="0.4" stroke="#ffffff" stroke-width="3"/>
+    <!-- Document Inside -->
+    <rect x="14" y="8" width="60" height="30" rx="3" fill="#ffffff" opacity="0.8"/>
+    <!-- Front Flap -->
+    <path d="M 0 32 L 40 32 L 52 24 L 94 24 Q 100 24 100 30 L 100 74 Q 100 80 94 80 L 6 80 Q 0 80 0 74 Z" fill="url(#fold-grad)" opacity="0.5" stroke="#ffffff" stroke-width="3.5"/>
+  </g>
+</svg>

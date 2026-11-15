@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="ai-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#71717a"/>
+    </linearGradient>
+  </defs>
+  <!-- Cybernetic Neural Processor Core -->
+  <g transform="translate(50, 50) scale(0.85)">
+    <!-- Outer Hexagon Frame -->
+    <polygon points="0,-45 39,-22 39,22 0,45 -39,22 -39,-22" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.4"/>
+    <!-- Intersecting Nodes -->
+    <circle cx="0" cy="-45" r="3.5" fill="#ffffff"/>
+    <circle cx="39" cy="-22" r="3.5" fill="#ffffff"/>
+    <circle cx="39" cy="22" r="3.5" fill="#ffffff"/>
+    <circle cx="0" cy="45" r="3.5" fill="#ffffff"/>
+    <circle cx="-39" cy="22" r="3.5" fill="#ffffff"/>
+    <circle cx="-39" cy="-22" r="3.5" fill="#ffffff"/>
+    <!-- Inner Diamond / Spark -->
+    <polygon points="0,-30 24,0 0,30 -24,0" fill="url(#ai-grad)" opacity="0.6" stroke="#ffffff" stroke-width="2"/>
+    <circle cx="0" cy="0" r="9" fill="#ffffff"/>
+    <line x1="-16" y1="-16" x2="16" y2="16" stroke="#ffffff" stroke-width="2" opacity="0.8"/>
+    <line x1="16" y1="-16" x2="-16" y2="16" stroke="#ffffff" stroke-width="2" opacity="0.8"/>
+  </g>
+</svg>

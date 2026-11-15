@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <style>
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    @keyframes blink { 0%,90%,100% { ry: 3.5; } 95% { ry: 0.5; } }
+    @keyframes hair-sway { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(2deg); } }
+    @keyframes sparkle { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+    @keyframes staff-glow { 0%,100% { filter: drop-shadow(0 0 2px #a78bfa); } 50% { filter: drop-shadow(0 0 8px #c4b5fd); } }
+    .body { animation: float 3s ease-in-out infinite; }
+    .eye { animation: blink 4s ease-in-out infinite; }
+    .eye-r { animation: blink 4s ease-in-out infinite 0.1s; }
+    .hair-strand { animation: hair-sway 4s ease-in-out infinite; transform-origin: 80px 30px; }
+    .sparkle1 { animation: sparkle 2s ease-in-out infinite; }
+    .sparkle2 { animation: sparkle 2.5s ease-in-out infinite 0.8s; }
+    .sparkle3 { animation: sparkle 3s ease-in-out infinite 1.5s; }
+    .staff { animation: staff-glow 3s ease-in-out infinite; }
+  </style>
+  
+  <g class="body">
+    <!-- Shadow -->
+    <ellipse cx="80" cy="152" rx="25" ry="5" fill="rgba(0,0,0,0.15)"/>
+    
+    <!-- Staff -->
+    <g class="staff">
+      <line x1="115" y1="45" x2="120" y2="145" stroke="#8b7355" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="114" cy="42" r="6" fill="none" stroke="#a78bfa" stroke-width="2"/>
+      <circle cx="114" cy="42" r="2.5" fill="#c4b5fd"/>
+    </g>
+    
+    <!-- Robe / Body -->
+    <path d="M55,85 Q55,75 65,72 L95,72 Q105,75 105,85 L108,140 Q108,148 80,148 Q52,148 52,140 Z" fill="#f5f0ff"/>
+    <path d="M55,85 Q55,75 65,72 L95,72 Q105,75 105,85 L108,140 Q108,148 80,148 Q52,148 52,140 Z" fill="none" stroke="#d8d0e8" stroke-width="1"/>
+    
+    <!-- Robe details - front fold -->
+    <path d="M78,75 L76,148" stroke="#e8e0f0" stroke-width="1" fill="none"/>
+    <path d="M82,75 L84,148" stroke="#e8e0f0" stroke-width="1" fill="none"/>
+    
+    <!-- Robe purple trim -->
+    <path d="M60,85 Q80,90 100,85" stroke="#9b8ec4" stroke-width="2" fill="none"/>
+    
+    <!-- Sleeves -->
+    <path d="M55,82 Q40,95 42,110 Q45,112 50,108 Q52,95 60,85" fill="#f5f0ff" stroke="#d8d0e8" stroke-width="1"/>
+    <path d="M105,82 Q118,95 116,110 Q113,112 108,108 Q106,95 100,85" fill="#f5f0ff" stroke="#d8d0e8" stroke-width="1"/>
+    
+    <!-- Hands -->
+    <circle cx="46" cy="108" r="4" fill="#fce4d6"/>
+    <circle cx="112" cy="108" r="4" fill="#fce4d6"/>
+    
+    <!-- Neck -->
+    <rect x="74" y="65" width="12" height="8" rx="2" fill="#fce4d6"/>
+    
+    <!-- Head -->
+    <ellipse cx="80" cy="48" rx="26" ry="22" fill="#fce4d6"/>
+    
+    <!-- Hair back -->
+    <path d="M54,48 Q50,20 65,15 Q80,8 95,15 Q110,20 106,48" fill="#c0c8d8"/>
+    
+    <!-- Hair front bangs -->
+    <path d="M56,45 Q58,30 68,28 Q72,35 70,42" fill="#b8c4d8"/>
+    <path d="M68,42 Q70,28 80,26 Q82,28 80,42" fill="#c0c8d8"/>
+    <path d="M78,42 Q80,28 90,28 Q94,35 92,42" fill="#b8c4d8"/>
+    <path d="M90,42 Q94,30 104,45" fill="#c0c8d8"/>
+    
+    <!-- Hair side strands -->
+    <g class="hair-strand">
+      <path d="M54,48 Q48,65 50,85 Q52,88 54,85 Q55,65 58,50" fill="#c0c8d8"/>
+      <path d="M106,48 Q112,65 110,85 Q108,88 106,85 Q105,65 102,50" fill="#c0c8d8"/>
+    </g>
+    
+    <!-- Long back hair -->
+    <path d="M56,50 Q52,90 55,130 Q58,135 62,130 Q60,90 62,55" fill="#b8c4d8" opacity="0.7"/>
+    <path d="M104,50 Q108,90 105,130 Q102,135 98,130 Q100,90 98,55" fill="#b8c4d8" opacity="0.7"/>
+    
+    <!-- Ears (elvish/pointed) -->
+    <path d="M54,45 Q42,38 48,30 Q52,36 56,42" fill="#fce4d6"/>
+    <path d="M106,45 Q118,38 112,30 Q108,36 104,42" fill="#fce4d6"/>
+    <path d="M54,45 Q42,38 48,30" fill="none" stroke="#f0c8b0" stroke-width="0.5"/>
+    <path d="M106,45 Q118,38 112,30" fill="none" stroke="#f0c8b0" stroke-width="0.5"/>
+    
+    <!-- Eyes -->
+    <ellipse cx="70" cy="50" rx="3.5" ry="3.5" fill="#7c6fac" class="eye"/>
+    <ellipse cx="90" cy="50" rx="3.5" ry="3.5" fill="#7c6fac" class="eye eye-r"/>
+    
+    <!-- Eye highlights -->
+    <circle cx="71.5" cy="48.5" r="1.2" fill="white"/>
+    <circle cx="91.5" cy="48.5" r="1.2" fill="white"/>
+    
+    <!-- Eyebrows -->
+    <path d="M64,43 Q70,41 76,43" stroke="#9098a8" stroke-width="1.2" fill="none"/>
+    <path d="M84,43 Q90,41 96,43" stroke="#9098a8" stroke-width="1.2" fill="none"/>
+    
+    <!-- Mouth (slight, neutral Frieren expression) -->
+    <path d="M76,57 Q80,59 84,57" stroke="#c09898" stroke-width="1" fill="none"/>
+    
+    <!-- Blush -->
+    <ellipse cx="65" cy="55" rx="4" ry="2" fill="#ffb8b8" opacity="0.3"/>
+    <ellipse cx="95" cy="55" rx="4" ry="2" fill="#ffb8b8" opacity="0.3"/>
+    
+    <!-- Magic sparkles -->
+    <g class="sparkle1">
+      <path d="M35,70 L37,65 L39,70 L37,75 Z" fill="#c4b5fd" opacity="0.8"/>
+    </g>
+    <g class="sparkle2">
+      <path d="M125,55 L126.5,51 L128,55 L126.5,59 Z" fill="#a78bfa" opacity="0.6"/>
+    </g>
+    <g class="sparkle3">
+      <path d="M45,35 L46,32 L47,35 L46,38 Z" fill="#ddd6fe" opacity="0.7"/>
+    </g>
+  </g>
+</svg>

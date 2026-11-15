@@ -230,7 +230,7 @@ function escapeHtml(str: string): string {
 /** Helper for parsing inline markdown formatting: **bold**, *italic*, `code` */
 function renderInline(text: string): React.ReactNode {
   if (!text) return null;
-  const regex = /(\*\*[^*]+?\*\*|\*[^*]+?\*|`[^`]+?`)/g;
+  const regex = /(\*\*[^*]+?\*\*|`[^`]+?`|\*[^*]+?\*|_[^_]+?_)/g;
   const parts = text.split(regex);
 
   return parts.map((part, i) => {
@@ -259,7 +259,10 @@ function renderInline(text: string): React.ReactNode {
         </code>
       );
     }
-    if (part.startsWith('*') && part.endsWith('*') && part.length >= 2) {
+    if (
+      (part.startsWith('*') && part.endsWith('*') && part.length >= 2) ||
+      (part.startsWith('_') && part.endsWith('_') && part.length >= 2)
+    ) {
       return (
         <em key={i} style={{ fontStyle: 'italic', color: '#cbd5e1' }}>
           {part.slice(1, -1)}
@@ -439,16 +442,17 @@ function FormattedMessage({ content }: { content: string }) {
                   </div>
                 );
               }
-              // Numbered list (1. Item)
-              const numMatch = line.match(/^(\d+)\.\s+(.*)/);
+              // Numbered list (1. Item or indented 1. Item)
+              const numMatch = line.match(/^(\s*)(\d+)\.\s+(.*)/);
               if (numMatch) {
+                const indent = Math.min(numMatch[1].length * 6, 24);
                 return (
                   <div
                     key={lIdx}
                     style={{
                       display: 'flex',
                       gap: '8px',
-                      marginLeft: '6px',
+                      marginLeft: `${6 + indent}px`,
                       margin: '4px 0',
                       alignItems: 'baseline',
                     }}
@@ -461,27 +465,29 @@ function FormattedMessage({ content }: { content: string }) {
                         fontWeight: 600,
                       }}
                     >
-                      {numMatch[1]}.
+                      {numMatch[2]}.
                     </span>
-                    <span style={{ flex: 1 }}>{renderInline(numMatch[2])}</span>
+                    <span style={{ flex: 1 }}>{renderInline(numMatch[3])}</span>
                   </div>
                 );
               }
-              // Bullet item (- item, * item, • item)
-              if (line.startsWith('- ') || line.startsWith('* ') || line.startsWith('• ')) {
+              // Bullet item (- item, * item, • item or indented)
+              const bulletMatch = line.match(/^(\s*)([-*•])\s+(.*)/);
+              if (bulletMatch) {
+                const indent = Math.min(bulletMatch[1].length * 6, 24);
                 return (
                   <div
                     key={lIdx}
                     style={{
                       display: 'flex',
                       gap: '8px',
-                      marginLeft: '6px',
+                      marginLeft: `${6 + indent}px`,
                       margin: '4px 0',
                       alignItems: 'baseline',
                     }}
                   >
                     <span style={{ color: '#38bdf8', fontSize: '14px', lineHeight: 1 }}>•</span>
-                    <span style={{ flex: 1 }}>{renderInline(line.replace(/^[-*•]\s+/, ''))}</span>
+                    <span style={{ flex: 1 }}>{renderInline(bulletMatch[3])}</span>
                   </div>
                 );
               }
@@ -1306,7 +1312,7 @@ export default function AntigravityChatPage() {
               })}
 
               {/* Generating loading indicator */}
-              {isGenerating && (
+              {isCurrentChatGenerating && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#a1a1aa', fontSize: '12.5px', padding: '6px 0' }}>
                   <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#38bdf8', animation: 'pulse 1s infinite' }} />
                   <span>Sedang memproses dengan {activeModelObj.name}...</span>
@@ -1566,16 +1572,16 @@ export default function AntigravityChatPage() {
             <button
               type="button"
               onClick={handleSend}
-              disabled={isGenerating || !inputVal.trim()}
+              disabled={isCurrentChatGenerating || !inputVal.trim()}
               style={{
-                background: inputVal.trim() && !isGenerating ? '#ffffff' : 'rgba(255,255,255,0.1)',
-                color: inputVal.trim() && !isGenerating ? '#090a0c' : '#71717a',
+                background: inputVal.trim() && !isCurrentChatGenerating ? '#ffffff' : 'rgba(255,255,255,0.1)',
+                color: inputVal.trim() && !isCurrentChatGenerating ? '#090a0c' : '#71717a',
                 border: 'none',
                 borderRadius: '8px',
                 padding: '6px 14px',
                 fontSize: '12.5px',
                 fontWeight: 600,
-                cursor: inputVal.trim() && !isGenerating ? 'pointer' : 'default',
+                cursor: inputVal.trim() && !isCurrentChatGenerating ? 'pointer' : 'default',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
